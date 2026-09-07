@@ -3,7 +3,7 @@ SerpApi Visual Search Provider.
 Uploads local probe image to SerpApi Image API (https://serpapi.com/image)
 to obtain a temporary image_id, then queries SerpApi Google Lens
 (https://serpapi.com/search.json?engine=google_lens) for candidate discovery.
-Activated when SERPAPI_API_KEY is configured in .env.
+Unwraps Google redirects, parses exact matches first, and prioritizes direct publisher URLs.
 """
 
 import asyncio
@@ -14,7 +14,14 @@ from typing import Dict, List, Optional
 from PIL import Image
 import requests
 
-from src.search.base import BaseSearchEngine, CandidateResult, extract_domain, normalize_url
+from src.search.base import (
+    BaseSearchEngine,
+    CandidateResult,
+    canonical_page_key,
+    extract_domain,
+    normalize_url,
+    resolve_google_goto,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -36,10 +43,8 @@ class SerpApiSearchEngine(BaseSearchEngine):
         """
         upload_url = "https://serpapi.com/image"
         try:
-            # Optimize image buffer to stay safely within SerpApi's 500KB limit
             buf = io.BytesIO()
             with Image.open(image_path) as img:
-                # Downsample if dimensions exceed 1000px
                 max_dim = max(img.width, img.height)
                 if max_dim > 1000:
                     scale = 1000.0 / max_dim
@@ -91,22 +96,33 @@ class SerpApiSearchEngine(BaseSearchEngine):
                 return []
 
             data = resp.json()
-            raw_items = data.get("visual_matches", [])
-            seen_urls = set()
+            
+            # Combine exact matches first, then visual matches
+            exact_items = data.get("exact_matches", [])
+            visual_items = data.get("visual_matches", [])
+            raw_items = exact_items + [item for item in visual_items if item not in exact_items]
+
+            seen_keys = set()
             rank = 1
 
             for item in raw_items:
                 if len(results) >= max_results:
                     break
-                link = item.get("link") or item.get("source_url") or item.get("url")
-                if not link:
+                raw_link = item.get("link") or item.get("source_url") or item.get("url")
+                if not raw_link:
                     continue
-                norm_link = normalize_url(link)
-                if norm_link in seen_urls:
-                    continue
-                seen_urls.add(norm_link)
 
-                thumb = item.get("thumbnail") or item.get("original") or item.get("image")
+                # Unwrap Google /goto or /url redirects
+                resolved_link = resolve_google_goto(raw_link)
+                norm_link = normalize_url(resolved_link)
+                canon_key = canonical_page_key(norm_link)
+
+                if canon_key in seen_keys:
+                    continue
+                seen_keys.add(canon_key)
+
+                # Prefer full-size image over thumbnail
+                thumb = item.get("image") or item.get("original") or item.get("thumbnail")
                 title = item.get("title") or item.get("source") or item.get("snippet")
 
                 results.append(CandidateResult(
@@ -139,10 +155,8 @@ class SerpApiSearchEngine(BaseSearchEngine):
         if not path.exists():
             raise FileNotFoundError(f"Input image not found: {path}")
 
-        # Step 1: Upload image to SerpApi Image API
         image_id = await asyncio.to_thread(self._upload_image, path)
         if not image_id:
             return []
 
-        # Step 2: Query Google Lens with the assigned image_id
         return await asyncio.to_thread(self._query_google_lens, image_id, max_results)

@@ -10,6 +10,11 @@ import os
 import sys
 from pathlib import Path
 
+# Ensure project root is in sys.path so 'src' is always importable
+_root = Path(__file__).resolve().parent.parent
+if str(_root) not in sys.path:
+    sys.path.insert(0, str(_root))
+
 # Force UTF-8 on Windows terminal streams to prevent charmap/cp1252 encode errors
 if sys.platform == "win32":
     try:
@@ -217,6 +222,48 @@ def render_final_status(result: PipelineRunResult):
     console.print(panel)
 
 
+def run_reverify(target: str) -> int:
+    """Executes standalone forensic re-verification of an evidence bundle against the blockchain."""
+    from src.pipeline.evidence import verify_evidence_bundle
+    print_banner()
+    console.print(Panel("[bold yellow]STANDALONE CRYPTOGRAPHIC EVIDENCE RE-VERIFICATION[/bold yellow]", box=box.ROUNDED))
+    try:
+        report = verify_evidence_bundle(target)
+    except Exception as e:
+        console.print(f"[bold red]Failed to inspect evidence bundle: {e}[/bold red]")
+        return 1
+
+    table = Table(title="Cryptographic Hash Verification", box=box.ROUNDED)
+    table.add_column("Property", style="bold white", width=26)
+    table.add_column("Fingerprint / Value", style="cyan", width=50)
+    table.add_column("Status", justify="center", width=12)
+
+    # Metadata hash row
+    meta_status = "[bold green]✓ MATCH[/bold green]" if report["metadata_hash_match"] else "[bold red]✗ MISMATCH[/bold red]"
+    table.add_row("Stored Metadata SHA-256", report["stored_metadata_hash"] or "N/A", "")
+    table.add_row("Recomputed Metadata SHA-256", report["recomputed_metadata_hash"] or "N/A", meta_status)
+
+    # Image hash row
+    img_status = "[bold green]✓ MATCH[/bold green]" if report["image_hash_match"] else "[bold red]✗ MISMATCH[/bold red]"
+    table.add_row("Stored Image SHA-256", report["stored_image_hash"] or "N/A", "")
+    table.add_row("Recomputed Image SHA-256", report["recomputed_image_hash"] or "N/A", img_status)
+
+    # Blockchain
+    table.add_row("Blockchain Network", str(report.get("network", "N/A")), "")
+    table.add_row("Transaction Hash", str(report.get("transaction", "N/A")), "")
+    table.add_row("Block Number", str(report.get("block_number", "N/A")), "")
+
+    console.print(table)
+    console.print()
+
+    if report["verified"]:
+        console.print(Panel("[bold green]✓ EVIDENCE VERIFIED — UNTAMPERED ON-CHAIN ATTESTATION CONFIRMED[/bold green]", box=box.HEAVY))
+        return 0
+    else:
+        console.print(Panel("[bold red]✗ TAMPER DETECTED — EVIDENCE HAS BEEN ALTERED OR HASHES DIVERGED[/bold red]", box=box.HEAVY))
+        return 6
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="HH Goa 2026 Task 3 — Face ID + Web Discovery + Blockchain Verification",
@@ -225,8 +272,14 @@ def main():
         "--image",
         "-i",
         type=str,
-        required=True,
+        default=None,
         help="Path to the input face portrait image (e.g. examples/jensen_huang_portrait.jpg)",
+    )
+    parser.add_argument(
+        "--reverify",
+        type=str,
+        default=None,
+        help="Path to evidence bundle directory, metadata.json, or past run ID to re-verify against blockchain",
     )
     parser.add_argument(
         "--face-index",
@@ -253,6 +306,13 @@ def main():
     )
 
     args = parser.parse_args()
+
+    if args.reverify:
+        sys.exit(run_reverify(args.reverify))
+
+    if not args.image:
+        parser.error("Must provide either --image <path> to run pipeline, or --reverify <path> to verify evidence.")
+
     image_path = Path(args.image).resolve()
 
     if not image_path.exists():

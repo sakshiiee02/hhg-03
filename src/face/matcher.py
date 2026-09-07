@@ -10,7 +10,7 @@ from typing import List, Optional, Tuple
 import numpy as np
 
 from src.face.detector import DetectedFace, FaceDetector
-from src.face.embedder import compute_cosine_similarity
+from src.face.embedder import compute_cosine_similarity, compute_cosine_similarity_matrix
 
 
 class MatchVerdict(str, Enum):
@@ -137,8 +137,14 @@ class FaceMatcher:
         best_idx = -1
         best_box = None
 
-        for f in faces:
-            sim = compute_cosine_similarity(target_embedding, f.embedding)
+        if len(faces) > 1:
+            emb_mat = np.stack([f.embedding for f in faces])
+            sims = compute_cosine_similarity_matrix(target_embedding, emb_mat)
+        else:
+            sims = np.array([compute_cosine_similarity(target_embedding, faces[0].embedding)], dtype=np.float32)
+
+        for i, f in enumerate(faces):
+            sim = float(sims[i])
             face_scores.append(CandidateFaceScore(
                 face_index=f.face_index,
                 similarity=sim,

@@ -1336,9 +1336,18 @@
                   </div>
                 </div>
 
-                <div class="form-label">
-                  <span>Canonical RFC-8785 JSON Payload</span>
-                  <button type="button" class="btn-secondary mono" id="copyRecordBtn" style="padding: 2px 6px; font-size: 10px;">COPY JSON</button>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; flex-wrap: wrap;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <button type="button" class="btn-secondary mono" id="reverifyBtn" style="padding: 4px 10px; font-size: 11px; font-weight: 600;">
+                      <svg class="nav-icon" style="width: 12px; height: 12px;" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                      <span>RE-VERIFY ON-CHAIN INTEGRITY</span>
+                    </button>
+                    <span class="mono" id="reverifyResultChip" style="font-size: 11px; display: none; padding: 2px 8px; border-radius: 4px;"></span>
+                  </div>
+                  <div class="form-label" style="margin-bottom: 0;">
+                    <span>Canonical RFC-8785 JSON</span>
+                    <button type="button" class="btn-secondary mono" id="copyRecordBtn" style="padding: 2px 6px; font-size: 10px;">COPY JSON</button>
+                  </div>
                 </div>
                 <div class="code-preview-box mono" id="canonicalJsonBox">// Canonical cryptographic record will appear here...</div>
               </div>
@@ -1670,6 +1679,9 @@ contract FaceVerificationRegistry {
     document.getElementById("valTxHash").textContent = "—";
     document.getElementById("valBlockSubmitter").textContent = "—";
     document.getElementById("canonicalJsonBox").textContent = "// Awaiting pipeline execution...";
+    if (document.getElementById("reverifyResultChip")) {
+      document.getElementById("reverifyResultChip").style.display = "none";
+    }
 
     // 5. Reset Micro-Stepper
     resetStepper();
@@ -1942,6 +1954,56 @@ contract FaceVerificationRegistry {
       alert("Canonical RFC-8785 JSON copied to clipboard!");
     });
   });
+
+  // Standalone Re-verification Button Handler
+  const reverifyBtn = document.getElementById("reverifyBtn");
+  const reverifyResultChip = document.getElementById("reverifyResultChip");
+
+  reverifyBtn.addEventListener("click", async () => {
+    reverifyBtn.disabled = true;
+    reverifyBtn.innerHTML = `<span class="mono">VERIFYING WITH ON-CHAIN VAULT...</span>`;
+    reverifyResultChip.style.display = "none";
+    appendLog(new Date().toLocaleTimeString(), `--- Initiating Standalone Re-Verification against On-Chain Evidence Vault ---`);
+
+    try {
+      const res = await fetch("/api/reverify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ run_id: currentRunId }),
+      });
+      const report = await res.json();
+      displayReverifyResult(report);
+    } catch (err) {
+      appendLog(new Date().toLocaleTimeString(), `Re-verification request error: ${err.message}`);
+      reverifyResultChip.style.display = "inline-block";
+      reverifyResultChip.style.backgroundColor = "var(--status-danger-bg)";
+      reverifyResultChip.style.color = "var(--status-danger-text)";
+      reverifyResultChip.textContent = "VERIFICATION ERROR";
+    } finally {
+      reverifyBtn.disabled = false;
+      reverifyBtn.innerHTML = `
+        <svg class="nav-icon" style="width: 12px; height: 12px;" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+        <span>RE-VERIFY ON-CHAIN INTEGRITY</span>
+      `;
+    }
+  });
+
+  function displayReverifyResult(report) {
+    reverifyResultChip.style.display = "inline-block";
+    if (report.verified) {
+      reverifyResultChip.style.backgroundColor = "var(--status-success-bg)";
+      reverifyResultChip.style.border = "1px solid var(--status-success-border)";
+      reverifyResultChip.style.color = "var(--status-success-text)";
+      reverifyResultChip.textContent = "✓ ON-CHAIN INTEGRITY VERIFIED (HASHES MATCH)";
+      appendLog(new Date().toLocaleTimeString(), `[AUDIT SUCCESS] Evidence bundle verified against ${report.network || "Ethereum Sepolia"}. Metadata SHA: MATCH. Image SHA: MATCH.`);
+    } else {
+      reverifyResultChip.style.backgroundColor = "var(--status-danger-bg)";
+      reverifyResultChip.style.border = "1px solid var(--status-danger-border)";
+      reverifyResultChip.style.color = "var(--status-danger-text)";
+      reverifyResultChip.textContent = "✗ TAMPER DETECTED — EXIT CODE 6 (HASH MISMATCH)";
+      appendLog(new Date().toLocaleTimeString(), `[AUDIT ALERT] CRYPTOGRAPHIC TAMPER DETECTED! Local evidence diverges from on-chain anchor.`);
+    }
+  }
 
   // Stepper Reset
   function resetStepper() {

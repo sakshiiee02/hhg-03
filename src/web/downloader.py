@@ -1,6 +1,7 @@
 """
-Bounded async candidate image downloader with multi-tiered fallback.
-Handles direct page media extraction with graceful fallback to search engine CDN previews.
+Bounded async candidate image downloader with multi-tiered fallback and SSRF protection.
+Handles direct page media extraction with graceful fallback to search engine CDN previews,
+blocking private, loopback, and cloud metadata network targets.
 """
 
 import asyncio
@@ -13,7 +14,7 @@ import cv2
 import numpy as np
 
 from src.blockchain.hash import hash_bytes
-from src.search.base import CandidateResult
+from src.search.base import CandidateResult, is_safe_public_url
 from src.web.extract import extract_page_metadata
 
 logger = logging.getLogger(__name__)
@@ -42,13 +43,17 @@ class DownloadedCandidate:
 
 
 class CandidateDownloader:
-    """Bounded async candidate downloader implementing multi-tiered fallback."""
+    """Bounded async candidate downloader implementing multi-tiered fallback with SSRF protection."""
 
     def __init__(self, concurrency_limit: int = 8, timeout_seconds: float = 6.0):
         self.semaphore = asyncio.Semaphore(concurrency_limit)
         self.timeout = aiohttp.ClientTimeout(total=timeout_seconds)
 
     async def _fetch_bytes(self, session: aiohttp.ClientSession, url: str) -> Optional[bytes]:
+        """Safely fetches image bytes while enforcing SSRF protection."""
+        if not url or not is_safe_public_url(url):
+            logger.debug(f"Bypassed fetching unsafe or non-public URL: {url}")
+            return None
         try:
             headers = {"User-Agent": USER_AGENT, "Accept": "image/*,*/*;q=0.8"}
             async with session.get(url, headers=headers, timeout=self.timeout) as resp:
@@ -75,35 +80,38 @@ class CandidateDownloader:
             tier_used = "tier2_indexed_cdn"
 
             # -------------------------------------------------------------
-            # Tier 1: Attempt direct page extraction
+            # Tier 1: Attempt direct page extraction (if public safe)
             # -------------------------------------------------------------
-            try:
-                headers = {"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml"}
-                async with session.get(candidate.page_url, headers=headers, timeout=self.timeout) as page_resp:
-                    if page_resp.status == 200:
-                        html_text = await page_resp.text(errors="ignore")
-                        meta = extract_page_metadata(html_text, candidate.page_url)
-                        if meta.title:
-                            title = meta.title
-                        if meta.canonical_url:
-                            canonical_url = meta.canonical_url
-                        if meta.description:
-                            excerpt = meta.description
+            if is_safe_public_url(candidate.page_url):
+                try:
+                    headers = {"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml"}
+                    async with session.get(candidate.page_url, headers=headers, timeout=self.timeout) as page_resp:
+                        if page_resp.status == 200:
+                            html_text = await page_resp.text(errors="ignore")
+                            meta = extract_page_metadata(html_text, candidate.page_url)
+                            if meta.title:
+                                title = meta.title
+                            if meta.canonical_url:
+                                canonical_url = meta.canonical_url
+                            if meta.description:
+                                excerpt = meta.description
 
-                        # If page provided an og:image, attempt to download it
-                        if meta.image_url:
-                            img_data = await self._fetch_bytes(session, meta.image_url)
-                            if img_data:
-                                image_bytes = img_data
-                                resolved_img_url = meta.image_url
-                                tier_used = "tier1_page_dom"
-            except Exception as e:
-                logger.debug(f"Tier 1 page visit failed for {candidate.page_url} ({e}). Falling back to Tier 2.")
+                            # If page provided an og:image, attempt to download it
+                            if meta.image_url and is_safe_public_url(meta.image_url):
+                                img_data = await self._fetch_bytes(session, meta.image_url)
+                                if img_data:
+                                    image_bytes = img_data
+                                    resolved_img_url = meta.image_url
+                                    tier_used = "tier1_page_dom"
+                except Exception as e:
+                    logger.debug(f"Tier 1 page visit failed for {candidate.page_url} ({e}). Falling back to Tier 2.")
+            else:
+                logger.debug(f"Skipping Tier 1 DOM visit for unsafe URL: {candidate.page_url}")
 
             # -------------------------------------------------------------
             # Tier 2: Fallback to direct search engine CDN image preview
             # -------------------------------------------------------------
-            if not image_bytes and candidate.image_url:
+            if not image_bytes and candidate.image_url and is_safe_public_url(candidate.image_url):
                 img_data = await self._fetch_bytes(session, candidate.image_url)
                 if img_data:
                     image_bytes = img_data
@@ -140,7 +148,7 @@ class CandidateDownloader:
         self,
         candidates: List[CandidateResult],
     ) -> List[DownloadedCandidate]:
-        """Concurrently downloads candidate imagery with bounded async concurrency."""
+        """Concurrently downloads candidate imagery with bounded async concurrency and SSRF safety."""
         conn = aiohttp.TCPConnector(ssl=False, limit=20)
         async with aiohttp.ClientSession(connector=conn) as session:
             tasks = [self._download_single(session, c) for c in candidates]

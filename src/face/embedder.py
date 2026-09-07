@@ -1,5 +1,6 @@
 """
 ArcFace 512-D feature embedder and normalization utilities.
+Includes scalar and vectorized matrix cosine similarity computation.
 """
 
 from typing import Union
@@ -23,3 +24,22 @@ def compute_cosine_similarity(vec_a: np.ndarray, vec_b: np.ndarray) -> float:
     a_norm = normalize_embedding(vec_a)
     b_norm = normalize_embedding(vec_b)
     return float(np.dot(a_norm, b_norm))
+
+
+def compute_cosine_similarity_matrix(target_vec: np.ndarray, candidate_matrix: np.ndarray) -> np.ndarray:
+    """
+    Vectorized cosine similarity of one target vector (shape [D]) against
+    a matrix of candidate embeddings (shape [N, D]).
+    Returns a 1D float array of shape [N].
+    """
+    mat = np.asarray(candidate_matrix, dtype=np.float32)
+    if mat.size == 0:
+        return np.zeros((0,), dtype=np.float32)
+    if mat.ndim == 1:
+        mat = mat.reshape(1, -1)
+
+    tgt = normalize_embedding(target_vec)
+    norms = np.linalg.norm(mat, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0
+    normed_mat = mat / norms
+    return (normed_mat @ tgt).ravel()

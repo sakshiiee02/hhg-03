@@ -76,6 +76,7 @@ class PipelineRunResult:
     re_verification_passed: bool
     tamper_mode_active: bool
     evidence_saved: bool
+    evidence_dir: str = ""
     top_candidates: List[CandidateVerificationResult] = field(default_factory=list)
     faces_results: List[FaceVerificationProfile] = field(default_factory=list)
 
@@ -538,6 +539,12 @@ class PipelineOrchestrator:
             ledger.save_matched_media(winning_cand_obj.image_bytes)
         if prim_profile.canonical_record:
             ledger.save_canonical_record(prim_profile.canonical_record)
+        if winning_cand_obj and prim_profile.canonical_record and prim_profile.attestation:
+            ledger.save_evidence_bundle(
+                matched_image_bytes=winning_cand_obj.image_bytes,
+                canonical_record=prim_profile.canonical_record,
+                attestation_receipt=prim_profile.attestation,
+            )
 
         # Save comprehensive evidence ledger report
         ledger.save_evidence_report({
@@ -592,6 +599,7 @@ class PipelineOrchestrator:
             re_verification_passed=prim_profile.re_verification_passed,
             tamper_mode_active=tamper,
             evidence_saved=True,
+            evidence_dir=str(ledger.evidence_dir),
             top_candidates=prim_profile.top_candidates,
             faces_results=faces_profiles,
         )

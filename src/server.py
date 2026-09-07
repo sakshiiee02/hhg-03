@@ -19,6 +19,7 @@ from aiohttp import web
 
 from src.config import get_config
 from src.face.detector import FaceDetector
+from src.pipeline.evidence import verify_evidence_bundle
 from src.pipeline.orchestrator import PipelineOrchestrator, PipelineRunResult
 
 logger = logging.getLogger(__name__)
@@ -197,6 +198,38 @@ async def handle_get_runs(request: web.Request) -> web.Response:
     return web.json_response({"runs": runs})
 
 
+async def handle_reverify(request: web.Request) -> web.Response:
+    """Independent on-chain re-verification of evidence bundles."""
+    try:
+        data = {}
+        if request.can_read_body:
+            try:
+                data = await request.json()
+            except Exception:
+                pass
+
+        target = data.get("run_id") or data.get("evidence_id") or data.get("bundle_path")
+        if not target:
+            target = request.query.get("run_id") or request.query.get("evidence_id")
+
+        if not target:
+            runs = sorted(RUNS_DIR.glob("run_*"), key=lambda p: p.stat().st_mtime, reverse=True)
+            for r in runs:
+                if (r / "evidence" / "metadata.json").exists() or (r / "metadata.json").exists():
+                    target = str(r)
+                    break
+            if not target and runs:
+                target = str(runs[0])
+            elif not target:
+                return web.json_response({"success": False, "error": "No evidence bundle or past run found to re-verify."}, status=400)
+
+        report = await asyncio.to_thread(verify_evidence_bundle, target)
+        return web.json_response(report)
+    except Exception as e:
+        logger.error(f"Re-verification error: {e}", exc_info=True)
+        return web.json_response({"success": False, "error": str(e)}, status=500)
+
+
 async def handle_ws(request: web.Request) -> web.WebSocketResponse:
     ws = web.WebSocketResponse(max_msg_size=32 * 1024 * 1024)
     await ws.prepare(request)
@@ -207,7 +240,27 @@ async def handle_ws(request: web.Request) -> web.WebSocketResponse:
                 data = json.loads(msg.data)
                 action = data.get("action")
 
-                if action == "preview":
+                if action == "reverify":
+                    target = data.get("run_id") or data.get("evidence_id") or data.get("bundle_path")
+                    if not target:
+                        runs = sorted(RUNS_DIR.glob("run_*"), key=lambda p: p.stat().st_mtime, reverse=True)
+                        for r in runs:
+                            if (r / "evidence" / "metadata.json").exists() or (r / "metadata.json").exists():
+                                target = str(r)
+                                break
+                    if target:
+                        report = await asyncio.to_thread(verify_evidence_bundle, target)
+                        await ws.send_json({
+                            "type": "reverify_result",
+                            **report,
+                        })
+                    else:
+                        await ws.send_json({
+                            "type": "error",
+                            "message": "No evidence bundle or past run found to re-verify.",
+                        })
+
+                elif action == "preview":
                     preset = data.get("preset", "jensen_huang_portrait.jpg")
                     image_path = EXAMPLES_DIR / preset
                     if image_path.exists():
@@ -446,6 +499,8 @@ def create_app() -> web.Application:
     app.router.add_get("/api/examples", handle_get_examples)
     app.router.add_get("/api/runs", handle_get_runs)
     app.router.add_post("/api/upload", handle_upload)
+    app.router.add_post("/api/reverify", handle_reverify)
+    app.router.add_get("/api/reverify", handle_reverify)
     app.router.add_get("/api/ledger/{run_id}", handle_get_ledger)
     app.router.add_get("/ws", handle_ws)
     return app
