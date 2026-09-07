@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HH Goa 2026 — Task 3 | Face ID & Blockchain Verification</title>
+  <style>
+    /* ==========================================================================
+       STRICT MONOCHROME BENTO GRID
+       - Zero animations
+       - Zero gradients
+       - Zero colors (Pure grayscale: #000000 to #ffffff)
+       - Strict modular Bento grid layout
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      animation: none !important;
+      transition: none !important;
+    }
+
+    body {
+      background-color: #080808;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.45;
+      padding: 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Typography */
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+    .muted {
+      color: #777777;
+    }
+    .bold {
+      font-weight: 700;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Header Bar */
+    header {
+      border: 1px solid #222222;
+      background-color: #101010;
+      padding: 14px 20px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .header-meta {
+      display: flex;
+      gap: 20px;
+      font-size: 11px;
+    }
+    .header-meta span {
+      color: #888888;
+    }
+    .header-meta span strong {
+      color: #ffffff;
+    }
+
+    /* Bento Grid Framework */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+
+    .bento-card {
+      background-color: #101010;
+      border: 1px solid #222222;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-header {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888888;
+      border-bottom: 1px solid #222222;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Column Widths */
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+    .col-8 { grid-column: span 8; }
+    .col-12 { grid-column: span 12; }
+
+    @media (max-width: 1100px) {
+      .col-4 { grid-column: span 6; }
+      .col-8 { grid-column: span 12; }
+    }
+    @media (max-width: 768px) {
+      .col-4, .col-6, .col-8, .col-12 { grid-column: span 12; }
+    }
+
+    /* Form Elements */
+    label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888888;
+      margin-bottom: 6px;
+    }
+
+    .preset-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .preset-btn {
+      background-color: #161616;
+      border: 1px solid #282828;
+      color: #cccccc;
+      padding: 8px 10px;
+      text-align: left;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .preset-btn:hover {
+      background-color: #222222;
+      color: #ffffff;
+      border-color: #444444;
+    }
+    .preset-btn.active {
+      background-color: #ffffff;
+      color: #000000;
+      font-weight: 700;
+      border-color: #ffffff;
+    }
+
+    /* Upload Target & Drag-Drop */
+    .upload-box {
+      border: 1px dashed #333333;
+      background-color: #141414;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      user-select: none;
+    }
+    .upload-box:hover {
+      border-color: #666666;
+      background-color: #181818;
+    }
+    .upload-box.dragover {
+      border-color: #ffffff;
+      border-style: solid;
+      background-color: #222222;
+    }
+    .upload-box.active {
+      border-color: #ffffff;
+      border-style: solid;
+      background-color: #1a1a1a;
+    }
+    .upload-box input[type="file"] {
+      display: none;
+    }
+    .upload-text {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .upload-sub {
+      font-size: 10px;
+      color: #777777;
+      text-transform: uppercase;
+    }
+    .upload-actions {
+      margin-top: 4px;
+      display: flex;
+      gap: 8px;
+    }
+    .mini-btn {
+      background-color: #000000;
+      border: 1px solid #444444;
+      color: #cccccc;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 8px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .mini-btn:hover {
+      background-color: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+    }
+
+    /* Range Slider Styling */
+    .slider-group {
+      margin-bottom: 14px;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .slider-header label {
+      margin-bottom: 0;
+    }
+    .slider-header span {
+      font-size: 11px;
+      color: #ffffff;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: #1c1c1c;
+      border: 1px solid #333333;
+      outline: none;
+      margin: 6px 0 4px 0;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      background: #ffffff;
+      border: 1px solid #ffffff;
+      cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      background: #ffffff;
+      border: 1px solid #ffffff;
+      cursor: pointer;
+    }
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: #666666;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    select {
+      width: 100%;
+      background-color: #161616;
+      border: 1px solid #282828;
+      color: #e0e0e0;
+      padding: 8px 10px;
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      background-color: #141414;
+      border: 1px solid #222222;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    .toggle-row input[type="checkbox"] {
+      cursor: pointer;
+      width: 15px;
+      height: 15px;
+      accent-color: #ffffff;
+    }
+
+    .primary-btn {
+      width: 100%;
+      background-color: #ffffff;
+      color: #000000;
+      border: 1px solid #ffffff;
+      font-weight: 800;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 12px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .primary-btn:hover {
+      background-color: #cccccc;
+      border-color: #cccccc;
+    }
+    .primary-btn:disabled {
+      background-color: #222222;
+      color: #555555;
+      border-color: #222222;
+      cursor: not-allowed;
+    }
+
+    .secondary-btn {
+      background-color: #161616;
+      color: #ffffff;
+      border: 1px solid #333333;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+    .secondary-btn:hover {
+      background-color: #282828;
+      border-color: #666666;
+    }
+
+    /* Stepper */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .step-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      border: 1px solid #1c1c1c;
+      background-color: #141414;
+      font-size: 12px;
+    }
+    .step-name {
+      display: flex;
+      gap: 8px;
+    }
+    .step-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border: 1px solid #333333;
+      text-transform: uppercase;
+    }
+    .step-badge.pending {
+      color: #555555;
+      border-color: #222222;
+      background-color: #0c0c0c;
+    }
+    .step-badge.running {
+      color: #ffffff;
+      border-color: #888888;
+      background-color: #222222;
+    }
+    .step-badge.ok {
+      background-color: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+    }
+    .step-badge.fail {
+      background-color: #000000;
+      color: #ffffff;
+    }
+
+    /* Multi-Face Person Chips */
+    .face-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #141414;
+      border: 1px solid #2c2c2c;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 11px;
+      color: #bbbbbb;
+      user-select: none;
+    }
+    .face-chip:hover {
+      background-color: #222222;
+      border-color: #555555;
+      color: #ffffff;
+    }
+    .face-chip.active {
+      background-color: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+      font-weight: 700;
+    }
+    .face-chip-img {
+      width: 22px;
+      height: 22px;
+      object-fit: cover;
+      border: 1px solid #444444;
+      display: block;
+    }
+    .face-chip.active .face-chip-img {
+      border-color: #000000;
+    }
+
+    /* Image Display Boxes */
+    .media-box {
+      width: 100%;
+      height: 200px;
+      background-color: #050505;
+      border: 1px solid #222222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .media-box img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .media-placeholder {
+      color: #444444;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Key Value Matrix */
+    .kv-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .kv-table tr {
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .kv-table td {
+      padding: 6px 0;
+      font-size: 12px;
+    }
+    .kv-table td.label {
+      color: #777777;
+      width: 38%;
+    }
+    .kv-table td.value {
+      color: #ffffff;
+      word-break: break-all;
+    }
+
+    /* Vector Monospace Strip */
+    .vector-strip {
+      background-color: #0c0c0c;
+      border: 1px solid #1f1f1f;
+      padding: 8px;
+      font-size: 11px;
+      color: #888888;
+      word-break: break-all;
+      margin-top: 8px;
+      max-height: 56px;
+      overflow-y: auto;
+    }
+
+    /* Leaderboard Table */
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    table.data-table th {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #777777;
+      border-bottom: 1px solid #282828;
+      padding: 8px 6px;
+    }
+    table.data-table td {
+      font-size: 12px;
+      border-bottom: 1px solid #1a1a1a;
+      padding: 8px 6px;
+    }
+    table.data-table tr.top-match td {
+      background-color: #181818;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .status-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      text-transform: uppercase;
+      border: 1px solid #333333;
+      display: inline-block;
+    }
+    .status-tag.match {
+      background-color: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+    }
+    .status-tag.runner {
+      border-color: #666666;
+      color: #bbbbbb;
+    }
+    .status-tag.reject {
+      color: #444444;
+      border-color: #222222;
+    }
+
+    /* Terminal Log Box */
+    .terminal-box {
+      background-color: #080808;
+      border: 1px solid #1f1f1f;
+      padding: 10px 12px;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #999999;
+      height: 140px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .log-line {
+      margin-bottom: 2px;
+    }
+    .log-time {
+      color: #555555;
+      margin-right: 6px;
+    }
+    .log-msg {
+      color: #cccccc;
+    }
+
+    /* Cryptographic Verdict Banner */
+    .verdict-banner {
+      border: 2px solid #222222;
+      background-color: #101010;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .verdict-banner.verified {
+      background-color: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+    }
+    .verdict-banner.tampered {
+      background-color: #000000;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+    }
+    .verdict-title {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .verdict-desc {
+      font-size: 11px;
+      margin-top: 3px;
+      opacity: 0.8;
+    }
+    .verdict-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 5px 12px;
+      border: 1px solid currentColor;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Top Navigation Header -->
+  <header>
+    <div class="header-title">HH Goa 2026 — Task 3 : Facial Discovery & Cryptographic Verification</div>
+    <div class="header-meta mono">
+      <span>NETWORK: <strong>SEPOLIA</strong></span>
+      <span>MODEL: <strong>ARCFACE (512-D)</strong></span>
+      <span id="headerStatus">STATE: <strong>IDLE</strong></span>
+    </div>
+  </header>
+
+  <!-- Bento Grid Structure -->
+  <div class="bento-grid">
+
+    <!-- Card 1: Configuration & Controls (Span 4) -->
+    <div class="bento-card col-4">
+      <div class="card-header">
+        <span>01 / Pipeline Input</span>
+        <span class="mono">CONFIG</span>
+      </div>
+
+      <label>Portrait Presets</label>
+      <div class="preset-group">
+        <button type="button" class="preset-btn active" data-file="jensen_huang_portrait.jpg">
+          Jensen Huang (NVIDIA CEO)
+        </button>
+        <button type="button" class="preset-btn" data-file="sam_altman_portrait.jpg">
+          Sam Altman (OpenAI CEO)
+        </button>
+        <button type="button" class="preset-btn" data-file="negative_control.jpg">
+          Negative Control (Linus Torvalds)
+        </button>
+      </div>
+
+      <label>Or Upload Custom Image</label>
+      <div class="upload-box" id="uploadBox">
+        <div class="upload-text" id="uploadText">[ + SELECT OR DROP IMAGE ]</div>
+        <div class="upload-sub" id="uploadSub">Supports JPG, PNG, WEBP (Up to 50MB)</div>
+        <div class="upload-actions" id="uploadActions" style="display: none;">
+          <button type="button" class="mini-btn" id="clearUploadBtn">CLEAR UPLOAD</button>
+        </div>
+        <input type="file" id="customFileInput" accept="image/jpeg,image/png,image/webp" />
+      </div>
+
+      <label>Search Discovery Engine</label>
+      <select id="engineSelect">
+        <option value="auto">Auto Router (Yandex -> Lens -> SerpApi)</option>
+        <option value="yandex">Yandex Images (Stealth Chromium)</option>
+        <option value="google_lens">Google Lens</option>
+        <option value="serpapi">SerpApi Safety Net</option>
+      </select>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <label for="confSlider">Match Confidence Threshold</label>
+          <span class="mono bold" id="confValue">0.80 (80%)</span>
+        </div>
+        <input type="range" id="confSlider" min="0.50" max="0.95" step="0.01" value="0.80" />
+        <div class="slider-labels mono">
+          <span>0.50 (Permissive)</span>
+          <span>0.80 (Default)</span>
+          <span>0.95 (Strict)</span>
+        </div>
+      </div>
+
+      <label>Security & Verification Guard</label>
+      <div class="toggle-row">
+        <span>Tamper Mode (--tamper)</span>
+        <input type="checkbox" id="tamperToggle" />
+      </div>
+      <div class="toggle-row">
+        <span>Dry Run (Biometrics Only)</span>
+        <input type="checkbox" id="dryRunToggle" />
+      </div>
+
+      <button id="runBtn" class="primary-btn">Execute Pipeline</button>
+    </div>
+
+    <!-- Card 2: 8-Step Pipeline Stepper (Span 4) -->
+    <div class="bento-card col-4">
+      <div class="card-header">
+        <span>02 / Execution Stepper</span>
+        <span id="elapsedCounter" class="mono">0.0s</span>
+      </div>
+
+      <div class="step-list">
+        <div class="step-row" id="step1">
+          <div class="step-name"><span class="mono">[1/8]</span> Face Detection (SCRFD)</div>
+          <div class="step-badge pending" id="badge1">PENDING</div>
+        </div>
+        <div class="step-row" id="step2">
+          <div class="step-name"><span class="mono">[2/8]</span> Face Embedding (ArcFace)</div>
+          <div class="step-badge pending" id="badge2">PENDING</div>
+        </div>
+        <div class="step-row" id="step3">
+          <div class="step-name"><span class="mono">[3/8]</span> Web Reverse Discovery</div>
+          <div class="step-badge pending" id="badge3">PENDING</div>
+        </div>
+        <div class="step-row" id="step4">
+          <div class="step-name"><span class="mono">[4/8]</span> Candidate Retrieval</div>
+          <div class="step-badge pending" id="badge4">PENDING</div>
+        </div>
+        <div class="step-row" id="step5">
+          <div class="step-name"><span class="mono">[5/8]</span> Biometric Verification</div>
+          <div class="step-badge pending" id="badge5">PENDING</div>
+        </div>
+        <div class="step-row" id="step6">
+          <div class="step-name"><span class="mono">[6/8]</span> Match Selection & Margin</div>
+          <div class="step-badge pending" id="badge6">PENDING</div>
+        </div>
+        <div class="step-row" id="step7">
+          <div class="step-name"><span class="mono">[7/8]</span> Blockchain Attestation</div>
+          <div class="step-badge pending" id="badge7">PENDING</div>
+        </div>
+        <div class="step-row" id="step8">
+          <div class="step-name"><span class="mono">[8/8]</span> Live Re-Verification</div>
+          <div class="step-badge pending" id="badge8">PENDING</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Biometric Probe Inspector (Span 4) -->
+    <div class="bento-card col-4">
+      <div class="card-header">
+        <span>03 / Probe Face Profile</span>
+        <span class="mono" id="probeSourceBadge">INSIGHTFACE</span>
+      </div>
+
+      <div class="media-box" id="inputImageBox">
+        <span class="media-placeholder">Probe Face Image</span>
+      </div>
+
+      <!-- Multi-Person Selector Strip -->
+      <div id="multiFaceSelector" style="display: none; margin-bottom: 12px; border: 1px solid #222222; background-color: #0c0c0c; padding: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span class="mono bold" style="font-size: 10px; color: #aaaaaa; text-transform: uppercase; letter-spacing: 0.05em;">
+            DETECTED PEOPLE (<span id="detectedPersonsCount">1</span>)
+          </span>
+          <span class="mono muted" style="font-size: 9px; text-transform: uppercase;">CLICK TO INSPECT</span>
+        </div>
+        <div id="faceChipsContainer" style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+
+      <table class="kv-table mono">
+        <tr>
+          <td class="label">Bounding Box</td>
+          <td class="value" id="valBbox">—</td>
+        </tr>
+        <tr>
+          <td class="label">Detection Conf</td>
+          <td class="value" id="valConf">—</td>
+        </tr>
+        <tr>
+          <td class="label">Laplacian Blur</td>
+          <td class="value" id="valSharpness">—</td>
+        </tr>
+        <tr>
+          <td class="label">ArcFace Norm</td>
+          <td class="value" id="valNorm">512-D L2 Normalized</td>
+        </tr>
+      </table>
+
+      <div class="vector-strip mono" id="vectorSample">
+        // 512-D feature vector sample...
+      </div>
+    </div>
+
+    <!-- Card 4: Matched Web Media (Span 4) -->
+    <div class="bento-card col-4">
+      <div class="card-header">
+        <span>04 / Matched Online Media <span id="card4PersonTag" class="mono muted"></span></span>
+        <span class="mono" id="valDomain">DOMAIN: —</span>
+      </div>
+
+      <div class="media-box" id="matchedImageBox">
+        <span class="media-placeholder">Awaiting Pipeline Execution...</span>
+      </div>
+
+      <table class="kv-table mono">
+        <tr>
+          <td class="label">Cosine Similarity</td>
+          <td class="value" id="valSim">—</td>
+        </tr>
+        <tr>
+          <td class="label">Runner-Up Margin</td>
+          <td class="value" id="valMargin">—</td>
+        </tr>
+        <tr>
+          <td class="label">Source Domain</td>
+          <td class="value" id="valDomainText">—</td>
+        </tr>
+        <tr>
+          <td class="label">Discovered URL</td>
+          <td class="value" id="valPageUrl" style="font-size: 11px;">—</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Card 5: Verification Leaderboard (Span 8) -->
+    <div class="bento-card col-8">
+      <div class="card-header">
+        <span>05 / Candidate Verification Leaderboard <span id="card5PersonTag" class="mono muted"></span></span>
+        <span class="mono" id="candCountText">0 CANDIDATES</span>
+      </div>
+
+      <table class="data-table mono" id="leaderboardTable">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Domain</th>
+            <th>Page Title</th>
+            <th>Cosine Sim</th>
+            <th>Verdict</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboardBody">
+          <tr>
+            <td colspan="5" class="muted" style="text-align: center; padding: 24px;">
+              No candidates evaluated yet. Select a target and execute pipeline.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Card 6: Real-time Terminal Log (Span 6) -->
+    <div class="bento-card col-6">
+      <div class="card-header">
+        <span>06 / Real-time Execution Feed</span>
+        <span class="mono">STDOUT</span>
+      </div>
+
+      <div class="terminal-box mono" id="terminalBox">
+[--:--:--] System initialized. Ready to execute pipeline.
+      </div>
+    </div>
+
+    <!-- Card 7: Cryptographic Ledger & Audit (Span 6) -->
+    <div class="bento-card col-6">
+      <div class="card-header">
+        <span>07 / Immutable Attestation <span id="card7PersonTag" class="mono muted"></span></span>
+        <button id="downloadLedgerBtn" class="secondary-btn" style="display: none;">Download JSON</button>
+      </div>
+
+      <table class="kv-table mono">
+        <tr>
+          <td class="label">Content SHA-256</td>
+          <td class="value" id="valContentHash">—</td>
+        </tr>
+        <tr>
+          <td class="label">Canonical RFC-8785</td>
+          <td class="value" id="valRecordHash">—</td>
+        </tr>
+        <tr>
+          <td class="label">Tx Hash</td>
+          <td class="value" id="valTxHash">—</td>
+        </tr>
+        <tr>
+          <td class="label">Submitter / Block</td>
+          <td class="value" id="valSubmitter">—</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Card 8: Final Integrity Verdict Banner (Span 12) -->
+    <div class="col-12">
+      <div class="verdict-banner" id="verdictBanner">
+        <div>
+          <div class="verdict-title" id="verdictTitle">STATUS: READY</div>
+          <div class="verdict-desc mono" id="verdictDesc">Select a portrait preset or upload a custom face image, then run the pipeline.</div>
+        </div>
+        <div class="verdict-badge mono" id="verdictBadge">STANDBY</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let selectedPreset = "jensen_huang_portrait.jpg";
+  let activeUploadId = null;
+  let ws = null;
+  let timerInterval = null;
+  let startTime = null;
+  let currentRunId = null;
+
+  // Multi-face state
+  let currentDetectedFaces = [];
+  let runResultsData = null;
+  let selectedFaceIdx = 0;
+
+  const presetBtns = document.querySelectorAll(".preset-btn");
+  const uploadBox = document.getElementById("uploadBox");
+  const customFileInput = document.getElementById("customFileInput");
+  const uploadText = document.getElementById("uploadText");
+  const uploadSub = document.getElementById("uploadSub");
+  const uploadActions = document.getElementById("uploadActions");
+  const clearUploadBtn = document.getElementById("clearUploadBtn");
+  const terminalBox = document.getElementById("terminalBox");
+  const downloadLedgerBtn = document.getElementById("downloadLedgerBtn");
+  const confSlider = document.getElementById("confSlider");
+  const confValue = document.getElementById("confValue");
+
+  confSlider.addEventListener("input", (e) => {
+    const val = parseFloat(e.target.value);
+    confValue.textContent = `${val.toFixed(2)} (${Math.round(val * 100)}%)`;
+  });
+  confSlider.dispatchEvent(new Event("input"));
+
+  function appendLog(timeStr, message) {
+    const line = document.createElement("div");
+    line.className = "log-line";
+    line.innerHTML = `<span class="log-time">[${timeStr}]</span><span class="log-msg">${message}</span>`;
+    terminalBox.appendChild(line);
+    terminalBox.scrollTop = terminalBox.scrollHeight;
+  }
+
+  // Render clickable face chips for multi-person inspection
+  function renderFaceChips(faces, activeIdx) {
+    const container = document.getElementById("faceChipsContainer");
+    const wrapper = document.getElementById("multiFaceSelector");
+    const countSpan = document.getElementById("detectedPersonsCount");
+    container.innerHTML = "";
+
+    if (!faces || faces.length <= 1) {
+      wrapper.style.display = "none";
+      return;
+    }
+
+    wrapper.style.display = "block";
+    countSpan.textContent = faces.length;
+
+    faces.forEach((f, i) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "face-chip" + (f.face_index === activeIdx ? " active" : "");
+      chip.setAttribute("data-index", f.face_index);
+
+      let imgHtml = "";
+      if (f.crop_b64) {
+        imgHtml = `<img src="${f.crop_b64}" class="face-chip-img" alt="Person #${i+1}" />`;
+      }
+
+      const label = f.is_primary ? `Person #${i+1} (Primary)` : `Person #${i+1}`;
+      chip.innerHTML = `${imgHtml}<span>${label}</span>`;
+
+      chip.addEventListener("click", () => {
+        selectFace(f.face_index);
+      });
+
+      container.appendChild(chip);
+    });
+  }
+
+  // Select active inspected person
+  function selectFace(faceIdx) {
+    selectedFaceIdx = faceIdx;
+
+    // Update active class on chips
+    document.querySelectorAll(".face-chip").forEach(chip => {
+      const idx = parseInt(chip.getAttribute("data-index"), 10);
+      if (idx === faceIdx) {
+        chip.classList.add("active");
+      } else {
+        chip.classList.remove("active");
+      }
+    });
+
+    // Update Card 03 metrics
+    const f = currentDetectedFaces.find(x => x.face_index === faceIdx);
+    if (f) {
+      document.getElementById("valBbox").textContent = `[${f.bbox.join(", ")}]`;
+      document.getElementById("valConf").textContent = `${(f.confidence * 100).toFixed(1)}% (PASS)`;
+      document.getElementById("valSharpness").textContent = `${f.sharpness} (PASS)`;
+      if (f.embedding_sample && f.embedding_sample.length > 0) {
+        document.getElementById("vectorSample").textContent =
+          `[${f.embedding_sample.join(", ")}, ...] // 512-D ArcFace (Person #${faceIdx + 1})`;
+      }
+    }
+
+    // Update Person Tags across Card 4, 5, 7
+    const tagText = currentDetectedFaces.length > 1 ? `[Person #${faceIdx + 1}]` : "";
+    document.getElementById("card4PersonTag").textContent = tagText;
+    document.getElementById("card5PersonTag").textContent = tagText;
+    document.getElementById("card7PersonTag").textContent = tagText;
+
+    // If run results exist, update Card 4, 5, 7
+    if (runResultsData && runResultsData.faces_results && runResultsData.faces_results.length > 0) {
+      const profile = runResultsData.faces_results.find(p => p.face_index === faceIdx) || runResultsData.faces_results[0];
+      renderFaceResultCards(profile);
+    }
+  }
+
+  // Render Card 4, 5, 7 for an individual person profile
+  function renderFaceResultCards(profile) {
+    // 1. Matched Media (Card 4)
+    const matchedBox = document.getElementById("matchedImageBox");
+    if (profile.matched_image_b64) {
+      matchedBox.innerHTML = `<img src="${profile.matched_image_b64}" alt="Matched Online Post" />`;
+    } else {
+      matchedBox.innerHTML = `<span class="media-placeholder">No Online Match Cleared Threshold</span>`;
+    }
+
+    if (profile.best_match) {
+      document.getElementById("valDomain").textContent = `DOMAIN: ${profile.best_match.domain.toUpperCase()}`;
+      document.getElementById("valDomainText").textContent = profile.best_match.domain;
+      document.getElementById("valSim").textContent = `${profile.best_match.similarity.toFixed(4)} (MAX)`;
+      document.getElementById("valMargin").textContent = `+${profile.runner_up_margin.toFixed(4)}`;
+      const pageUrl = profile.best_match.page_url || "";
+      document.getElementById("valPageUrl").textContent = pageUrl.length > 40 ? pageUrl.substring(0, 38) + "..." : pageUrl;
+    } else {
+      document.getElementById("valDomain").textContent = "DOMAIN: —";
+      document.getElementById("valDomainText").textContent = "—";
+      document.getElementById("valSim").textContent = "—";
+      document.getElementById("valMargin").textContent = "—";
+      document.getElementById("valPageUrl").textContent = "—";
+    }
+
+    // 2. Leaderboard (Card 5)
+    const tbody = document.getElementById("leaderboardBody");
+    tbody.innerHTML = "";
+    if (profile.leaderboard && profile.leaderboard.length > 0) {
+      profile.leaderboard.forEach(row => {
+        const tr = document.createElement("tr");
+        if (row.rank === 1) tr.className = "top-match";
+        const tagClass = row.status === "MATCH" ? "match" : (row.status === "RUNNER" ? "runner" : "reject");
+        tr.innerHTML = `
+          <td>${row.rank}</td>
+          <td>${row.domain}</td>
+          <td>${row.title.substring(0, 32)}</td>
+          <td>${row.similarity.toFixed(4)}</td>
+          <td><span class="status-tag ${tagClass}">${row.status}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+      document.getElementById("candCountText").textContent = `${profile.leaderboard.length} CANDIDATES`;
+    } else {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="muted" style="text-align: center; padding: 24px;">
+            ${profile.status_message || "No candidates found for this person"}
+          </td>
+        </tr>
+      `;
+      document.getElementById("candCountText").textContent = "0 CANDIDATES";
+    }
+
+    // 3. Attestation (Card 7)
+    if (profile.attestation) {
+      document.getElementById("valContentHash").textContent = profile.attestation.content_hash || "—";
+      document.getElementById("valRecordHash").textContent = profile.attestation.record_hash || "—";
+      document.getElementById("valTxHash").textContent = profile.attestation.tx_hash || "—";
+      document.getElementById("valSubmitter").textContent = `${profile.attestation.submitter} (Block #${profile.attestation.block_number})`;
+    } else {
+      document.getElementById("valContentHash").textContent = "NOT ATTESTED";
+      document.getElementById("valRecordHash").textContent = "NOT ATTESTED";
+      document.getElementById("valTxHash").textContent = "—";
+      document.getElementById("valSubmitter").textContent = "—";
+    }
+  }
+
+  // Update Probe Profile UI with Face Inspection Data
+  function updateProbeProfile(imgSrc, primaryFace, sample, facesCount, sourceName, allFaces) {
+    const box = document.getElementById("inputImageBox");
+    if (imgSrc) {
+      box.innerHTML = `<img src="${imgSrc}" alt="Probe Face" />`;
+    }
+
+    currentDetectedFaces = allFaces || (primaryFace ? [primaryFace] : []);
+    selectedFaceIdx = primaryFace ? primaryFace.face_index : 0;
+    renderFaceChips(currentDetectedFaces, selectedFaceIdx);
+
+    if (primaryFace) {
+      document.getElementById("valBbox").textContent = `[${primaryFace.bbox.join(", ")}]`;
+      document.getElementById("valConf").textContent = `${(primaryFace.confidence * 100).toFixed(1)}% (PASS)`;
+      document.getElementById("valSharpness").textContent = `${primaryFace.sharpness} (PASS)`;
+    } else {
+      document.getElementById("valBbox").textContent = "NO FACE DETECTED";
+      document.getElementById("valConf").textContent = "0.0%";
+      document.getElementById("valSharpness").textContent = "—";
+    }
+
+    if (sample && sample.length > 0) {
+      document.getElementById("vectorSample").textContent =
+        `[${sample.join(", ")}, ...] // 512 dimensions`;
+    }
+
+    if (sourceName) {
+      document.getElementById("probeSourceBadge").textContent = sourceName.toUpperCase();
+    }
+
+    // Reset Person tags
+    const tagText = currentDetectedFaces.length > 1 ? `[Person #${selectedFaceIdx + 1}]` : "";
+    document.getElementById("card4PersonTag").textContent = tagText;
+    document.getElementById("card5PersonTag").textContent = tagText;
+    document.getElementById("card7PersonTag").textContent = tagText;
+  }
+
+  // Preset Selection
+  presetBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      presetBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      selectedPreset = btn.getAttribute("data-file");
+
+      // Clear any custom upload
+      activeUploadId = null;
+      runResultsData = null;
+      uploadBox.classList.remove("active");
+      uploadText.textContent = "[ + SELECT OR DROP IMAGE ]";
+      uploadSub.textContent = "Supports JPG, PNG, WEBP (Up to 50MB)";
+      uploadActions.style.display = "none";
+      customFileInput.value = "";
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: "preview", preset: selectedPreset }));
+      }
+    });
+  });
+
+  // Upload Box Click Handler
+  uploadBox.addEventListener("click", (e) => {
+    if (e.target === clearUploadBtn) return;
+    customFileInput.click();
+  });
+
+  // Clear Upload Handler
+  clearUploadBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    activeUploadId = null;
+    runResultsData = null;
+    uploadBox.classList.remove("active");
+    uploadText.textContent = "[ + SELECT OR DROP IMAGE ]";
+    uploadSub.textContent = "Supports JPG, PNG, WEBP (Up to 50MB)";
+    uploadActions.style.display = "none";
+    customFileInput.value = "";
+
+    // Re-activate first preset
+    presetBtns[0].click();
+    appendLog(new Date().toLocaleTimeString(), "Cleared custom upload. Switched back to Jensen Huang preset.");
+  });
+
+  // Drag and Drop Handlers on Upload Box
+  uploadBox.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    uploadBox.classList.add("dragover");
+  });
+  uploadBox.addEventListener("dragleave", () => {
+    uploadBox.classList.remove("dragover");
+  });
+  uploadBox.addEventListener("drop", (e) => {
+    e.preventDefault();
+    uploadBox.classList.remove("dragover");
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileSelected(files[0]);
+    }
+  });
+
+  // Window drag/drop prevention
+  window.addEventListener("dragover", (e) => e.preventDefault());
+  window.addEventListener("drop", (e) => {
+    e.preventDefault();
+    if (e.target !== uploadBox && !uploadBox.contains(e.target) && e.dataTransfer.files.length > 0) {
+      handleFileSelected(e.dataTransfer.files[0]);
+    }
+  });
+
+  // File Input Change
+  customFileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      handleFileSelected(file);
+    }
+  });
+
+  // Send File to REST Endpoint /api/upload for Instant Analysis
+  async function handleFileSelected(file) {
+    const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+    appendLog(new Date().toLocaleTimeString(), `Uploading & analyzing probe: ${file.name} (${sizeMb} MB)...`);
+
+    // 1. Immediately deactivate presets and lock execution button to prevent race conditions
+    selectedPreset = null;
+    activeUploadId = null;
+    runResultsData = null;
+    presetBtns.forEach(b => b.classList.remove("active"));
+
+    const runBtn = document.getElementById("runBtn");
+    runBtn.disabled = true;
+    runBtn.textContent = `UPLOADING (${sizeMb} MB)...`;
+
+    uploadBox.classList.remove("active");
+    uploadText.textContent = `UPLOADING (${sizeMb} MB)...`;
+    uploadSub.textContent = `${file.name} — Analyzing biometrics...`;
+    uploadActions.style.display = "none";
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const resp = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await resp.json();
+
+      if (!data.success) {
+        alert("Upload error: " + (data.error || "Failed to process image"));
+        uploadText.textContent = "[ + SELECT OR DROP IMAGE ]";
+        uploadSub.textContent = "Upload failed. Try another photo.";
+        runBtn.textContent = "SELECT OR UPLOAD FACE";
+        runBtn.disabled = true;
+        return;
+      }
+
+      activeUploadId = data.upload_id;
+
+      // Update UI to show Custom Upload is ACTIVE
+      uploadBox.classList.add("active");
+      uploadText.textContent = `[ ACTIVE: ${file.name.substring(0, 18)} ]`;
+      uploadSub.textContent = `${(file.size / 1024).toFixed(1)} KB • ${data.faces_count} face(s) found`;
+      uploadActions.style.display = "flex";
+
+      // Re-enable run button now that upload is 100% complete
+      runBtn.disabled = false;
+      runBtn.textContent = "EXECUTE PIPELINE";
+
+      // Update Card 3 Biometrics Immediately with all faces
+      updateProbeProfile(data.preview_b64, data.primary_face, data.embedding_sample, data.faces_count, "CUSTOM PROBE", data.all_faces);
+
+      if (data.faces_count === 0) {
+        appendLog(new Date().toLocaleTimeString(), `WARNING: No faces detected in ${file.name}. Verification may fail.`);
+      } else {
+        appendLog(
+          new Date().toLocaleTimeString(),
+          `Detected ${data.faces_count} face(s)! Primary BBox: [${data.primary_face.bbox.join(", ")}], Confidence: ${(data.primary_face.confidence * 100).toFixed(1)}%, Sharpness: ${data.primary_face.sharpness}`
+        );
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Failed to upload image: " + err.message);
+      uploadText.textContent = "[ + SELECT OR DROP IMAGE ]";
+      uploadSub.textContent = "Supports JPG, PNG, WEBP (Up to 50MB)";
+      runBtn.textContent = "SELECT OR UPLOAD FACE";
+      runBtn.disabled = true;
+    }
+  }
+
+  function resetStepper() {
+    for (let i = 1; i <= 8; i++) {
+      const b = document.getElementById("badge" + i);
+      b.className = "step-badge pending";
+      b.textContent = "PENDING";
+    }
+  }
+
+  function updateStep(stepNum, status, details, timeStr) {
+    const b = document.getElementById("badge" + stepNum);
+    if (!b) return;
+    if (status === "running") {
+      b.className = "step-badge running";
+      b.textContent = "RUNNING";
+    } else if (status === "completed") {
+      b.className = "step-badge ok";
+      b.textContent = "OK";
+    } else if (status === "failed") {
+      b.className = "step-badge fail";
+      b.textContent = "FAIL";
+    }
+    if (details) {
+      appendLog(timeStr || new Date().toLocaleTimeString(), `Step ${stepNum}: ${details}`);
+    }
+  }
+
+  function connectWs() {
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+
+    ws.onopen = () => {
+      if (!activeUploadId) {
+        ws.send(JSON.stringify({ action: "preview", preset: selectedPreset }));
+      }
+    };
+
+    ws.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+
+      if (msg.type === "preview_ready") {
+        if (!activeUploadId) {
+          updateProbeProfile(msg.image_b64, msg.primary_face, msg.embedding_sample, msg.faces_count, "PRESET: " + msg.preset.split("_")[0], msg.all_faces);
+        }
+      } else if (msg.type === "step_update") {
+        updateStep(msg.step, msg.status, msg.details, msg.timestamp);
+      } else if (msg.type === "run_complete") {
+        clearInterval(timerInterval);
+        document.getElementById("runBtn").disabled = false;
+        document.getElementById("runBtn").textContent = "Execute Pipeline";
+        renderResults(msg);
+      } else if (msg.type === "error") {
+        clearInterval(timerInterval);
+        document.getElementById("runBtn").disabled = false;
+        document.getElementById("runBtn").textContent = "Execute Pipeline";
+        appendLog(new Date().toLocaleTimeString(), `ERROR: ${msg.message}`);
+        alert("Pipeline error: " + msg.message);
+      }
+    };
+
+    ws.onclose = () => {
+      setTimeout(connectWs, 2000);
+    };
+  }
+
+  connectWs();
+
+  // Run Pipeline Execution
+  document.getElementById("runBtn").addEventListener("click", () => {
+    const runBtn = document.getElementById("runBtn");
+
+    if (!activeUploadId && !selectedPreset) {
+      alert("No face target selected. Please select a preset or upload an image before executing.");
+      return;
+    }
+
+    resetStepper();
+    runBtn.disabled = true;
+    runBtn.textContent = "Executing...";
+
+    const tamper = document.getElementById("tamperToggle").checked;
+    const dryRun = document.getElementById("dryRunToggle").checked;
+    const engine = document.getElementById("engineSelect").value;
+
+    startTime = Date.now();
+    timerInterval = setInterval(() => {
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+      document.getElementById("elapsedCounter").textContent = `${elapsed}s`;
+      document.getElementById("headerStatus").innerHTML = `STATE: <strong>RUNNING (${elapsed}s)</strong>`;
+    }, 100);
+
+    const banner = document.getElementById("verdictBanner");
+    banner.className = "verdict-banner";
+    document.getElementById("verdictTitle").textContent = "STATUS: PIPELINE RUNNING";
+    document.getElementById("verdictDesc").textContent = "Executing multi-tiered discovery, biometric verification, and attestation...";
+    document.getElementById("verdictBadge").textContent = "PROCESSING";
+
+    const similarityThreshold = parseFloat(confSlider.value) || 0.80;
+    const targetDesc = activeUploadId ? `Custom Upload [${activeUploadId}]` : `Preset [${selectedPreset}]`;
+    appendLog(new Date().toLocaleTimeString(), `--- Starting Run: Target=${targetDesc} (Confidence: ${similarityThreshold.toFixed(2)}, Tamper: ${tamper}, DryRun: ${dryRun}, Engine: ${engine}) ---`);
+
+    const payload = {
+      action: "run",
+      upload_id: activeUploadId,
+      preset: activeUploadId ? null : selectedPreset,
+      similarity_threshold: similarityThreshold,
+      tamper: tamper,
+      dry_run: dryRun,
+      engine: engine,
+    };
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(payload));
+    } else {
+      alert("WebSocket connection not ready. Please refresh.");
+      runBtn.disabled = false;
+    }
+  });
+
+  function renderResults(data) {
+    document.getElementById("headerStatus").innerHTML = `STATE: <strong>COMPLETED (${data.elapsed_seconds}s)</strong>`;
+    currentRunId = data.run_id;
+    runResultsData = data;
+
+    if (currentRunId) {
+      downloadLedgerBtn.style.display = "inline-block";
+      downloadLedgerBtn.onclick = () => {
+        window.location.href = `/api/ledger/${currentRunId}`;
+      };
+    }
+
+    // 1. Input Image
+    if (data.input_image_b64) {
+      const box = document.getElementById("inputImageBox");
+      box.innerHTML = `<img src="${data.input_image_b64}" alt="Input Face" />`;
+    }
+
+    // 2. Handle Multi-Face or Single-Face Results
+    if (data.faces_results && data.faces_results.length > 0) {
+      currentDetectedFaces = data.faces_results;
+      const targetFace = data.faces_results.find(p => p.face_index === selectedFaceIdx) || data.faces_results[0];
+      selectedFaceIdx = targetFace.face_index;
+
+      renderFaceChips(data.faces_results, selectedFaceIdx);
+      selectFace(selectedFaceIdx);
+
+      // Final Verdict Banner
+      const banner = document.getElementById("verdictBanner");
+      const vTitle = document.getElementById("verdictTitle");
+      const vDesc = document.getElementById("verdictDesc");
+      const vBadge = document.getElementById("verdictBadge");
+
+      const totalFaces = data.faces_results.length;
+      const attestedCount = data.faces_results.filter(p => p.attestation !== null).length;
+
+      if (totalFaces > 1) {
+        if (attestedCount === totalFaces && !data.tamper_mode_active) {
+          banner.className = "verdict-banner verified";
+          vTitle.textContent = `STATUS: VERIFIED — ${totalFaces} OF ${totalFaces} PERSONS IDENTIFIED & ATTESTED ON-CHAIN`;
+          vDesc.textContent = `All detected people independently verified against immutable Sepolia records. Total runtime: ${data.elapsed_seconds}s.`;
+          vBadge.textContent = "ALL VERIFIED";
+        } else if (data.tamper_mode_active) {
+          banner.className = "verdict-banner tampered";
+          vTitle.textContent = "STATUS: TAMPER DETECTED — ON-CHAIN HASH MISMATCH";
+          vDesc.textContent = `Mutated payload failed validation against immutable Sepolia registry. Zero tampering permitted.`;
+          vBadge.textContent = "TAMPER DETECTED";
+        } else if (attestedCount > 0) {
+          banner.className = "verdict-banner verified";
+          vTitle.textContent = `STATUS: PARTIAL MATCH — ${attestedCount} OF ${totalFaces} PERSONS IDENTIFIED ON-CHAIN`;
+          vDesc.textContent = `${attestedCount} face(s) cleared threshold and attested to Sepolia. Total runtime: ${data.elapsed_seconds}s.`;
+          vBadge.textContent = "PARTIAL MATCH";
+        } else {
+          banner.className = "verdict-banner";
+          vTitle.textContent = `STATUS: NO MATCHES CLEARED THRESHOLD FOR ${totalFaces} PERSONS`;
+          vDesc.textContent = `Evaluated ${totalFaces} face(s) in ${data.elapsed_seconds}s.`;
+          vBadge.textContent = "NO MATCH";
+        }
+      } else {
+        if (data.re_verification_passed && !data.tamper_mode_active) {
+          banner.className = "verdict-banner verified";
+          vTitle.textContent = "STATUS: VERIFIED — ON-CHAIN CRYPTOGRAPHIC INTEGRITY MATCH";
+          vDesc.textContent = `Re-fetched media SHA-256 identical to immutable Sepolia record. Total runtime: ${data.elapsed_seconds}s.`;
+          vBadge.textContent = "VERIFIED";
+        } else if (data.tamper_mode_active) {
+          banner.className = "verdict-banner tampered";
+          vTitle.textContent = "STATUS: TAMPER DETECTED — ON-CHAIN HASH MISMATCH";
+          vDesc.textContent = `Mutated payload failed validation against immutable Sepolia registry. Zero tampering permitted.`;
+          vBadge.textContent = "TAMPER DETECTED";
+        } else {
+          banner.className = "verdict-banner";
+          vTitle.textContent = `STATUS: ${data.status_message.toUpperCase()}`;
+          vDesc.textContent = `Pipeline completed in ${data.elapsed_seconds}s.`;
+          vBadge.textContent = "COMPLETED";
+        }
+      }
+    } else {
+      // Fallback single-face rendering
+      if (data.primary_face) {
+        document.getElementById("valBbox").textContent = `[${data.primary_face.bbox.join(", ")}]`;
+        document.getElementById("valConf").textContent = `${(data.primary_face.confidence * 100).toFixed(1)}% (PASS)`;
+        document.getElementById("valSharpness").textContent = `${data.primary_face.sharpness} (PASS)`;
+      }
+      if (data.embedding_sample && data.embedding_sample.length > 0) {
+        document.getElementById("vectorSample").textContent =
+          `[${data.embedding_sample.join(", ")}, ...] // 512 dimensions`;
+      }
+      if (data.matched_image_b64) {
+        document.getElementById("matchedImageBox").innerHTML = `<img src="${data.matched_image_b64}" alt="Matched Online Post" />`;
+      }
+      const banner = document.getElementById("verdictBanner");
+      banner.className = data.re_verification_passed ? "verdict-banner verified" : "verdict-banner";
+      document.getElementById("verdictTitle").textContent = `STATUS: ${data.status_message.toUpperCase()}`;
+      document.getElementById("verdictDesc").textContent = `Pipeline completed in ${data.elapsed_seconds}s.`;
+      document.getElementById("verdictBadge").textContent = data.re_verification_passed ? "VERIFIED" : "COMPLETED";
+    }
+
+    appendLog(new Date().toLocaleTimeString(), `Execution complete in ${data.elapsed_seconds}s. Run ID: ${data.run_id}`);
+  }
+</script>
+
+</body>
+</html>

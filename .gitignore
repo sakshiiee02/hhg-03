@@ -1,0 +1,100 @@
+# --- Python & Bytecode ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# --- Virtual Environments ---
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# --- Environment & Secret Credentials ---
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+private_key*.txt
+# Ensure example configuration is tracked
+! .env.example
+
+# --- Testing & Code Coverage ---
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+nosetests.xml
+coverage.xml
+*.cover
+
+# --- Runtime Runs, Uploads & Ledgers ---
+# Ignore all execution runs and user uploads while preserving folder structure
+runs/*
+!runs/.gitkeep
+!runs/uploads/
+runs/uploads/*
+!runs/uploads/.gitkeep
+
+# --- Documentation ---
+docs/
+
+# --- Debug & Temporary Artifacts ---
+*.log
+*.tmp
+*.temp
+yandex_debug*.png
+debug_*.png
+test_debug*.png
+
+# --- Playwright & Browser Automation ---
+.playwright/
+test-results/
+
+# --- Local Large Model Weights (if downloaded locally) ---
+models/*.onnx
+models/*.pth
+models/*.pt
+models/*.bin
+*.onnx
+
+# --- Operating System & Editor Artifacts ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDEs & Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
