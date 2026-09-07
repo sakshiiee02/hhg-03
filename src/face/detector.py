@@ -55,18 +55,38 @@ class FaceDetector:
         det_size: Tuple[int, int] = (640, 640),
         silent: bool = True,
     ):
-        # Prevent ONNX Runtime UserWarning by only requesting providers that are actually available
+        # Prioritize DirectML (DirectX 12 on NVIDIA/AMD/Intel) and CUDA before CPU
         available_providers = onnxruntime.get_available_providers()
-        providers = ["CUDAExecutionProvider", "CPUExecutionProvider"] if "CUDAExecutionProvider" in available_providers else ["CPUExecutionProvider"]
+        if "DmlExecutionProvider" in available_providers:
+            providers = ["DmlExecutionProvider", "CPUExecutionProvider"]
+            resolved_ctx_id = 0 if ctx_id == -1 else ctx_id
+        elif "CUDAExecutionProvider" in available_providers:
+            providers = ["CUDAExecutionProvider", "CPUExecutionProvider"]
+            resolved_ctx_id = 0 if ctx_id == -1 else ctx_id
+        else:
+            providers = ["CPUExecutionProvider"]
+            resolved_ctx_id = -1
+
+        # Prune unused neural networks (3D landmark, 2D landmark, gender/age)
+        # We only need detection (det_10g) and recognition (ArcFace w600k_r50)
+        allowed_modules = ["detection", "recognition"]
 
         # Suppress InsightFace's hardcoded stdout print statements during model loading
         if silent:
             with contextlib.redirect_stdout(io.StringIO()):
-                self.app = FaceAnalysis(name=model_name, providers=providers)
-                self.app.prepare(ctx_id=ctx_id, det_size=det_size)
+                self.app = FaceAnalysis(
+                    name=model_name,
+                    providers=providers,
+                    allowed_modules=allowed_modules,
+                )
+                self.app.prepare(ctx_id=resolved_ctx_id, det_size=det_size)
         else:
-            self.app = FaceAnalysis(name=model_name, providers=providers)
-            self.app.prepare(ctx_id=ctx_id, det_size=det_size)
+            self.app = FaceAnalysis(
+                name=model_name,
+                providers=providers,
+                allowed_modules=allowed_modules,
+            )
+            self.app.prepare(ctx_id=resolved_ctx_id, det_size=det_size)
 
     @classmethod
     def get_shared_instance(cls) -> "FaceDetector":

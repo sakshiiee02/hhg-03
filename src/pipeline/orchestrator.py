@@ -241,10 +241,59 @@ class PipelineOrchestrator:
         notify(3, "Web Discovery", "completed", f"Discovered {len(candidates)} candidates across public web indexes.")
 
         # -------------------------------------------------------------
-        # STEP 4: Candidate Download (Multi-Tiered Bounded Ingestion)
+        # STEP 4 & 5: Pipelined Streaming Retrieval & Biometric Scoring
         # -------------------------------------------------------------
-        notify(4, "Candidate Retrieval", "running", f"Fetching candidates with {self.config.concurrency_limit} concurrent workers...")
-        downloaded = await self.downloader.download_candidates(candidates)
+        notify(4, "Candidate Retrieval", "running", f"Streaming candidates with {self.config.concurrency_limit} concurrent workers...")
+        notify(5, "Face Verification", "running", f"Evaluating biometric similarity across {len(faces)} face(s)...")
+
+        downloaded: List[DownloadedCandidate] = []
+        downloaded_by_id: Dict[str, DownloadedCandidate] = {}
+        candidate_detected_faces: Dict[str, List[DetectedFace]] = {}
+        per_face_verifications: Dict[int, List[CandidateVerificationResult]] = {f.face_index: [] for f in faces}
+
+        early_stopped = False
+        async for item in self.downloader.download_stream(candidates):
+            downloaded.append(item)
+            downloaded_by_id[item.candidate_id] = item
+
+            # 1. Real-time face detection on downloaded candidate
+            try:
+                cand_faces = self.detector.detect(item.image_bgr)
+            except Exception as e:
+                logger.warning(f"Detection failed on candidate {item.candidate_id}: {e}")
+                cand_faces = []
+            candidate_detected_faces[item.candidate_id] = cand_faces
+
+            # 2. Score candidate against each probe face
+            for f in faces:
+                res = self.matcher.score_candidate_faces(
+                    target_embedding=f.embedding,
+                    faces=cand_faces,
+                    candidate_id=item.candidate_id,
+                    image_url=item.image_url,
+                    page_url=item.canonical_url,
+                    source_domain=item.source_domain,
+                    title=item.title,
+                )
+                per_face_verifications[f.face_index].append(res)
+
+            # 3. Confident Early Stop Heuristic:
+            # If at least 3 candidates evaluated, and primary face found an unequivocal match (>= 0.92)
+            # with clear margin (>= 0.15) or ultra-high match (>= 0.96), stop streaming early!
+            if len(downloaded) >= 3:
+                pri_scores = sorted([r.best_similarity for r in per_face_verifications[primary_face.face_index]], reverse=True)
+                top_score = pri_scores[0]
+                runner_score = pri_scores[1] if len(pri_scores) > 1 else 0.0
+                score_margin = top_score - runner_score
+
+                if top_score >= 0.96 or (top_score >= 0.92 and score_margin >= 0.15):
+                    logger.info(
+                        f"Confident early-stop triggered: Top score {top_score:.4f}, Margin {score_margin:.4f} "
+                        f"after {len(downloaded)} candidates."
+                    )
+                    early_stopped = True
+                    break
+
         if not downloaded:
             notify(4, "Candidate Retrieval", "failed", "Could not retrieve candidate imagery.")
             return PipelineRunResult(
@@ -266,43 +315,13 @@ class PipelineOrchestrator:
                 tamper_mode_active=tamper,
                 evidence_saved=False,
             )
-        notify(4, "Candidate Retrieval", "completed", f"Retrieved {len(downloaded)} usable candidate images.")
 
-        # -------------------------------------------------------------
-        # STEP 5: Face Verification & Multi-Face Scoring
-        # -------------------------------------------------------------
-        notify(5, "Face Verification", "running", f"Evaluating biometric similarity across {len(faces)} face(s)...")
-        downloaded_by_id: Dict[str, DownloadedCandidate] = {}
-        candidate_detected_faces: Dict[str, List[DetectedFace]] = {}
-
-        # 1. Detect candidate faces once per candidate image
-        for item in downloaded:
-            downloaded_by_id[item.candidate_id] = item
-            try:
-                candidate_detected_faces[item.candidate_id] = self.detector.detect(item.image_bgr)
-            except Exception as e:
-                logger.warning(f"Detection failed on candidate {item.candidate_id}: {e}")
-                candidate_detected_faces[item.candidate_id] = []
-
-        # 2. Score candidate imagery against each detected probe face
-        per_face_verifications: Dict[int, List[CandidateVerificationResult]] = {}
-        for f in faces:
-            results_for_f: List[CandidateVerificationResult] = []
-            for item in downloaded:
-                cand_faces = candidate_detected_faces.get(item.candidate_id, [])
-                res = self.matcher.score_candidate_faces(
-                    target_embedding=f.embedding,
-                    faces=cand_faces,
-                    candidate_id=item.candidate_id,
-                    image_url=item.image_url,
-                    page_url=item.canonical_url,
-                    source_domain=item.source_domain,
-                    title=item.title,
-                )
-                results_for_f.append(res)
-            per_face_verifications[f.face_index] = results_for_f
-
-        notify(5, "Face Verification", "completed", f"Evaluated {len(downloaded)} candidates against {len(faces)} face(s).")
+        if early_stopped:
+            notify(4, "Candidate Retrieval", "completed", f"Retrieved {len(downloaded)} candidates (early-stopped on confident match).")
+            notify(5, "Face Verification", "completed", f"Evaluated {len(downloaded)} candidates (confident match confirmed).")
+        else:
+            notify(4, "Candidate Retrieval", "completed", f"Retrieved {len(downloaded)} usable candidate images.")
+            notify(5, "Face Verification", "completed", f"Evaluated {len(downloaded)} candidates against {len(faces)} face(s).")
 
         # -------------------------------------------------------------
         # STEP 6: Match Selection & Margin Evaluation

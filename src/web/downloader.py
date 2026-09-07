@@ -43,9 +43,9 @@ class DownloadedCandidate:
 
 
 class CandidateDownloader:
-    """Bounded async candidate downloader implementing multi-tiered fallback with SSRF protection."""
+    """Bounded async candidate downloader implementing direct CDN retrieval with multi-tiered fallback and SSRF protection."""
 
-    def __init__(self, concurrency_limit: int = 8, timeout_seconds: float = 6.0):
+    def __init__(self, concurrency_limit: int = 16, timeout_seconds: float = 4.0):
         self.semaphore = asyncio.Semaphore(concurrency_limit)
         self.timeout = aiohttp.ClientTimeout(total=timeout_seconds)
 
@@ -77,12 +77,25 @@ class CandidateDownloader:
             canonical_url = candidate.page_url
             title = candidate.title or candidate.source_domain
             excerpt = ""
-            tier_used = "tier2_indexed_cdn"
+            tier_used = "tier1_direct_cdn"
 
             # -------------------------------------------------------------
-            # Tier 1: Attempt direct page extraction (if public safe)
+            # Tier 1 (Fast Path): Direct search engine CDN image preview
+            # Visual search engines return direct indexed image CDN URLs.
+            # Fetching this directly is 5x-10x faster than visiting publisher HTML.
             # -------------------------------------------------------------
-            if is_safe_public_url(candidate.page_url):
+            if candidate.image_url and is_safe_public_url(candidate.image_url):
+                img_data = await self._fetch_bytes(session, candidate.image_url)
+                if img_data:
+                    image_bytes = img_data
+                    resolved_img_url = candidate.image_url
+                    tier_used = "tier1_direct_cdn"
+
+            # -------------------------------------------------------------
+            # Tier 2 (Fallback): Direct page DOM extraction
+            # Only executed if the direct CDN image was missing or failed.
+            # -------------------------------------------------------------
+            if not image_bytes and candidate.page_url and is_safe_public_url(candidate.page_url):
                 try:
                     headers = {"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml"}
                     async with session.get(candidate.page_url, headers=headers, timeout=self.timeout) as page_resp:
@@ -96,27 +109,14 @@ class CandidateDownloader:
                             if meta.description:
                                 excerpt = meta.description
 
-                            # If page provided an og:image, attempt to download it
                             if meta.image_url and is_safe_public_url(meta.image_url):
                                 img_data = await self._fetch_bytes(session, meta.image_url)
                                 if img_data:
                                     image_bytes = img_data
                                     resolved_img_url = meta.image_url
-                                    tier_used = "tier1_page_dom"
+                                    tier_used = "tier2_page_dom"
                 except Exception as e:
-                    logger.debug(f"Tier 1 page visit failed for {candidate.page_url} ({e}). Falling back to Tier 2.")
-            else:
-                logger.debug(f"Skipping Tier 1 DOM visit for unsafe URL: {candidate.page_url}")
-
-            # -------------------------------------------------------------
-            # Tier 2: Fallback to direct search engine CDN image preview
-            # -------------------------------------------------------------
-            if not image_bytes and candidate.image_url and is_safe_public_url(candidate.image_url):
-                img_data = await self._fetch_bytes(session, candidate.image_url)
-                if img_data:
-                    image_bytes = img_data
-                    resolved_img_url = candidate.image_url
-                    tier_used = "tier2_indexed_cdn"
+                    logger.debug(f"Tier 2 page visit fallback failed for {candidate.page_url} ({e})")
 
             if not image_bytes:
                 return None
@@ -149,8 +149,29 @@ class CandidateDownloader:
         candidates: List[CandidateResult],
     ) -> List[DownloadedCandidate]:
         """Concurrently downloads candidate imagery with bounded async concurrency and SSRF safety."""
-        conn = aiohttp.TCPConnector(ssl=False, limit=20)
+        conn = aiohttp.TCPConnector(ssl=False, limit=30)
         async with aiohttp.ClientSession(connector=conn) as session:
             tasks = [self._download_single(session, c) for c in candidates]
             results = await asyncio.gather(*tasks, return_exceptions=False)
             return [r for r in results if r is not None]
+
+    async def download_stream(
+        self,
+        candidates: List[CandidateResult],
+    ):
+        """
+        Asynchronously streams DownloadedCandidate objects as soon as each finishes downloading,
+        enabling pipelined biometric inference and early-stopping on high-confidence matches.
+        """
+        conn = aiohttp.TCPConnector(ssl=False, limit=30)
+        async with aiohttp.ClientSession(connector=conn) as session:
+            tasks = [asyncio.create_task(self._download_single(session, c)) for c in candidates]
+            try:
+                for coro in asyncio.as_completed(tasks):
+                    res = await coro
+                    if res is not None:
+                        yield res
+            finally:
+                for t in tasks:
+                    if not t.done():
+                        t.cancel()
