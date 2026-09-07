@@ -3,285 +3,503 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HH Goa 2026 — Task 3 | Face ID & Blockchain Verification</title>
+  <title>Aegis | Enterprise Facial Intelligence & Cryptographic Attestation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
   <style>
-    /* ==========================================================================
-       STRICT MONOCHROME BENTO GRID
-       - Zero animations
-       - Zero gradients
-       - Zero colors (Pure grayscale: #000000 to #ffffff)
-       - Strict modular Bento grid layout
-       ========================================================================== */
-    *, *::before, *::after {
+    :root {
+      --bg-canvas: #090a0c;
+      --bg-surface: #111317;
+      --bg-surface-elevated: #181b20;
+      --bg-surface-active: #20242a;
+      --border-subtle: #1f2329;
+      --border-default: #2a2f37;
+      --border-focus: #4b5563;
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --text-disabled: #4b5563;
+      --accent-white: #ffffff;
+      --accent-primary: #3b82f6;
+      --status-success-bg: #064e3b;
+      --status-success-border: #059669;
+      --status-success-text: #34d399;
+      --status-danger-bg: #4c0519;
+      --status-danger-border: #e11d48;
+      --status-danger-text: #fda4af;
+      --status-warning-bg: #451a03;
+      --status-warning-border: #d97706;
+      --status-warning-text: #fcd34d;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', Consolas, "SF Mono", monospace;
+    }
+
+    * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      animation: none !important;
-      transition: none !important;
     }
 
     body {
-      background-color: #080808;
-      color: #e0e0e0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
       font-size: 13px;
-      line-height: 1.45;
-      padding: 24px;
+      line-height: 1.5;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
-    /* Typography */
     .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-    }
-    .muted {
-      color: #777777;
-    }
-    .bold {
-      font-weight: 700;
+      font-family: var(--font-mono);
     }
 
-    /* Container */
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    /* Header Bar */
-    header {
-      border: 1px solid #222222;
-      background-color: #101010;
-      padding: 14px 20px;
-      margin-bottom: 16px;
+    /* App Shell Layout */
+    .app-layout {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .header-title {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .header-meta {
-      display: flex;
-      gap: 20px;
-      font-size: 11px;
-    }
-    .header-meta span {
-      color: #888888;
-    }
-    .header-meta span strong {
-      color: #ffffff;
+      height: 100vh;
+      overflow: hidden;
     }
 
-    /* Bento Grid Framework */
-    .bento-grid {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 16px;
-    }
-
-    .bento-card {
-      background-color: #101010;
-      border: 1px solid #222222;
-      padding: 18px;
+    /* Left Sidebar Navigation */
+    .sidebar {
+      width: 240px;
+      background-color: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
       display: flex;
       flex-direction: column;
+      flex-shrink: 0;
+      z-index: 10;
     }
 
-    .card-header {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #888888;
-      border-bottom: 1px solid #222222;
-      padding-bottom: 10px;
-      margin-bottom: 14px;
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-subtle);
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      gap: 10px;
     }
 
-    /* Column Widths */
-    .col-4 { grid-column: span 4; }
-    .col-6 { grid-column: span 6; }
-    .col-8 { grid-column: span 8; }
-    .col-12 { grid-column: span 12; }
-
-    @media (max-width: 1100px) {
-      .col-4 { grid-column: span 6; }
-      .col-8 { grid-column: span 12; }
-    }
-    @media (max-width: 768px) {
-      .col-4, .col-6, .col-8, .col-12 { grid-column: span 12; }
-    }
-
-    /* Form Elements */
-    label {
-      display: block;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #888888;
-      margin-bottom: 6px;
-    }
-
-    .preset-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-bottom: 14px;
-    }
-
-    .preset-btn {
-      background-color: #161616;
-      border: 1px solid #282828;
-      color: #cccccc;
-      padding: 8px 10px;
-      text-align: left;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .preset-btn:hover {
-      background-color: #222222;
-      color: #ffffff;
-      border-color: #444444;
-    }
-    .preset-btn.active {
-      background-color: #ffffff;
+    .brand-icon {
+      width: 28px;
+      height: 28px;
+      background-color: var(--accent-white);
       color: #000000;
-      font-weight: 700;
-      border-color: #ffffff;
-    }
-
-    /* Upload Target & Drag-Drop */
-    .upload-box {
-      border: 1px dashed #333333;
-      background-color: #141414;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-      cursor: pointer;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      user-select: none;
-    }
-    .upload-box:hover {
-      border-color: #666666;
-      background-color: #181818;
-    }
-    .upload-box.dragover {
-      border-color: #ffffff;
-      border-style: solid;
-      background-color: #222222;
-    }
-    .upload-box.active {
-      border-color: #ffffff;
-      border-style: solid;
-      background-color: #1a1a1a;
-    }
-    .upload-box input[type="file"] {
-      display: none;
-    }
-    .upload-text {
-      font-size: 11px;
-      font-weight: 700;
-      color: #ffffff;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-    .upload-sub {
-      font-size: 10px;
-      color: #777777;
-      text-transform: uppercase;
-    }
-    .upload-actions {
-      margin-top: 4px;
-      display: flex;
-      gap: 8px;
-    }
-    .mini-btn {
-      background-color: #000000;
-      border: 1px solid #444444;
-      color: #cccccc;
-      font-size: 9px;
-      font-weight: 700;
-      padding: 2px 8px;
-      text-transform: uppercase;
-      cursor: pointer;
-    }
-    .mini-btn:hover {
-      background-color: #ffffff;
-      color: #000000;
-      border-color: #ffffff;
+      font-weight: 800;
+      font-size: 13px;
     }
 
-    /* Range Slider Styling */
-    .slider-group {
-      margin-bottom: 14px;
+    .brand-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-primary);
     }
-    .slider-header {
+
+    .brand-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 0.03em;
+    }
+
+    .sidebar-nav {
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      background-color: transparent;
+    }
+
+    .nav-item:hover {
+      background-color: var(--bg-surface-elevated);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background-color: var(--bg-surface-active);
+      color: var(--accent-white);
+      border-color: var(--border-default);
+      font-weight: 600;
+    }
+
+    .nav-icon {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: 14px 16px;
+      border-top: 1px solid var(--border-subtle);
+      background-color: var(--bg-surface);
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #10b981;
+      display: inline-block;
+    }
+
+    /* Main Content Area */
+    .main-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background-color: var(--bg-canvas);
+    }
+
+    /* Top Application Bar */
+    .top-bar {
+      height: 52px;
+      border-bottom: 1px solid var(--border-subtle);
+      background-color: var(--bg-surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      flex-shrink: 0;
+    }
+
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .breadcrumbs span.current {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .network-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      background-color: var(--bg-surface-elevated);
+      border: 1px solid var(--border-default);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .network-dot {
+      width: 6px;
+      height: 6px;
+      background-color: #3b82f6;
+    }
+
+    /* Screen Views */
+    .screen-view {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .screen-view.active {
+      display: flex;
+    }
+
+    /* Investigation Studio (2-Column Workspace) */
+    .studio-layout {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Left Control & Inspector Pane */
+    .studio-left-pane {
+      width: 380px;
+      border-right: 1px solid var(--border-subtle);
+      background-color: var(--bg-surface);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .pane-section {
+      padding: 18px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
     }
-    .slider-header label {
-      margin-bottom: 0;
-    }
-    .slider-header span {
-      font-size: 11px;
-      color: #ffffff;
-    }
-    input[type="range"] {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100%;
-      height: 6px;
-      background: #1c1c1c;
-      border: 1px solid #333333;
-      outline: none;
-      margin: 6px 0 4px 0;
-      cursor: pointer;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 14px;
-      height: 14px;
-      background: #ffffff;
-      border: 1px solid #ffffff;
-      cursor: pointer;
-    }
-    input[type="range"]::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      background: #ffffff;
-      border: 1px solid #ffffff;
-      cursor: pointer;
-    }
-    .slider-labels {
+
+    /* Tab controls */
+    .segmented-control {
       display: flex;
-      justify-content: space-between;
+      background-color: var(--bg-canvas);
+      border: 1px solid var(--border-default);
+      padding: 2px;
+      margin-bottom: 14px;
+    }
+
+    .seg-btn {
+      flex: 1;
+      padding: 6px 10px;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .seg-btn.active {
+      background-color: var(--bg-surface-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-focus);
+    }
+
+    /* Presets list */
+    .presets-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .preset-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      background-color: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+
+    .preset-card:hover {
+      border-color: var(--border-default);
+      color: var(--text-primary);
+    }
+
+    .preset-card.active {
+      background-color: var(--bg-surface-active);
+      border-color: var(--accent-white);
+      color: var(--text-primary);
+    }
+
+    .preset-avatar {
+      width: 32px;
+      height: 32px;
+      background-color: #222222;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .preset-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .preset-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: inherit;
+    }
+
+    .preset-role {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    /* Drag Drop Upload */
+    .upload-dropzone {
+      border: 1px dashed var(--border-default);
+      background-color: var(--bg-canvas);
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .upload-dropzone:hover, .upload-dropzone.dragover {
+      border-color: var(--accent-white);
+      background-color: var(--bg-surface-elevated);
+    }
+
+    .upload-icon {
+      width: 24px;
+      height: 24px;
+      color: var(--text-secondary);
+    }
+
+    /* Probe Image Viewport */
+    .probe-viewport {
+      position: relative;
+      background-color: #000000;
+      border: 1px solid var(--border-subtle);
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .probe-viewport img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Multi-person Chips */
+    .people-strip {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+    }
+
+    .person-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      background-color: var(--bg-surface-elevated);
+      border: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      font-size: 11px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .person-chip.active {
+      border-color: var(--accent-white);
+      color: var(--accent-white);
+      background-color: var(--bg-surface-active);
+      font-weight: 600;
+    }
+
+    .person-chip-crop {
+      width: 20px;
+      height: 20px;
+      object-fit: cover;
+    }
+
+    /* Telemetry Table */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .telemetry-cell {
+      background-color: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 10px;
+    }
+
+    .telemetry-label {
       font-size: 9px;
-      color: #666666;
       text-transform: uppercase;
+      color: var(--text-muted);
       letter-spacing: 0.05em;
     }
 
-    select {
+    .telemetry-value {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-top: 2px;
+    }
+
+    /* Controls form */
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .slider-range {
       width: 100%;
-      background-color: #161616;
-      border: 1px solid #282828;
-      color: #e0e0e0;
+      height: 4px;
+      background-color: var(--border-focus);
+      accent-color: var(--accent-white);
+      cursor: pointer;
+    }
+
+    .select-input {
+      width: 100%;
+      background-color: var(--bg-canvas);
+      border: 1px solid var(--border-default);
+      color: var(--text-primary);
       padding: 8px 10px;
       font-size: 12px;
-      margin-bottom: 14px;
+      outline: none;
+    }
+
+    .select-input:focus {
+      border-color: var(--accent-white);
     }
 
     .toggle-row {
@@ -289,1076 +507,1423 @@
       align-items: center;
       justify-content: space-between;
       padding: 8px 10px;
-      background-color: #141414;
-      border: 1px solid #222222;
-      margin-bottom: 8px;
-      font-size: 12px;
-    }
-    .toggle-row input[type="checkbox"] {
-      cursor: pointer;
-      width: 15px;
-      height: 15px;
-      accent-color: #ffffff;
+      background-color: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
     }
 
-    .primary-btn {
+    /* Primary Run Action Button */
+    .btn-execute {
       width: 100%;
-      background-color: #ffffff;
+      padding: 12px;
+      background-color: var(--accent-white);
       color: #000000;
-      border: 1px solid #ffffff;
-      font-weight: 800;
+      border: 1px solid var(--accent-white);
       font-size: 12px;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      padding: 12px;
       cursor: pointer;
-      margin-top: 8px;
-    }
-    .primary-btn:hover {
-      background-color: #cccccc;
-      border-color: #cccccc;
-    }
-    .primary-btn:disabled {
-      background-color: #222222;
-      color: #555555;
-      border-color: #222222;
-      cursor: not-allowed;
-    }
-
-    .secondary-btn {
-      background-color: #161616;
-      color: #ffffff;
-      border: 1px solid #333333;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 6px 12px;
-      cursor: pointer;
-    }
-    .secondary-btn:hover {
-      background-color: #282828;
-      border-color: #666666;
-    }
-
-    /* Stepper */
-    .step-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .step-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 10px;
-      border: 1px solid #1c1c1c;
-      background-color: #141414;
-      font-size: 12px;
-    }
-    .step-name {
-      display: flex;
-      gap: 8px;
-    }
-    .step-badge {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border: 1px solid #333333;
-      text-transform: uppercase;
-    }
-    .step-badge.pending {
-      color: #555555;
-      border-color: #222222;
-      background-color: #0c0c0c;
-    }
-    .step-badge.running {
-      color: #ffffff;
-      border-color: #888888;
-      background-color: #222222;
-    }
-    .step-badge.ok {
-      background-color: #ffffff;
-      color: #000000;
-      border-color: #ffffff;
-    }
-    .step-badge.fail {
-      background-color: #000000;
-      color: #ffffff;
-    }
-
-    /* Multi-Face Person Chips */
-    .face-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background-color: #141414;
-      border: 1px solid #2c2c2c;
-      padding: 4px 8px;
-      cursor: pointer;
-      font-size: 11px;
-      color: #bbbbbb;
-      user-select: none;
-    }
-    .face-chip:hover {
-      background-color: #222222;
-      border-color: #555555;
-      color: #ffffff;
-    }
-    .face-chip.active {
-      background-color: #ffffff;
-      color: #000000;
-      border-color: #ffffff;
-      font-weight: 700;
-    }
-    .face-chip-img {
-      width: 22px;
-      height: 22px;
-      object-fit: cover;
-      border: 1px solid #444444;
-      display: block;
-    }
-    .face-chip.active .face-chip-img {
-      border-color: #000000;
-    }
-
-    /* Image Display Boxes */
-    .media-box {
-      width: 100%;
-      height: 200px;
-      background-color: #050505;
-      border: 1px solid #222222;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-    .media-box img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      display: block;
-    }
-    .media-placeholder {
-      color: #444444;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      gap: 8px;
     }
 
-    /* Key Value Matrix */
-    .kv-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .kv-table tr {
-      border-bottom: 1px solid #1a1a1a;
-    }
-    .kv-table td {
-      padding: 6px 0;
-      font-size: 12px;
-    }
-    .kv-table td.label {
-      color: #777777;
-      width: 38%;
-    }
-    .kv-table td.value {
-      color: #ffffff;
-      word-break: break-all;
+    .btn-execute:hover:not(:disabled) {
+      background-color: #e5e7eb;
     }
 
-    /* Vector Monospace Strip */
-    .vector-strip {
-      background-color: #0c0c0c;
-      border: 1px solid #1f1f1f;
-      padding: 8px;
-      font-size: 11px;
-      color: #888888;
-      word-break: break-all;
-      margin-top: 8px;
-      max-height: 56px;
+    .btn-execute:disabled {
+      background-color: #2a2f37;
+      border-color: #2a2f37;
+      color: #6b7280;
+      cursor: not-allowed;
+    }
+
+    /* Right Main Workspace */
+    .studio-main-workspace {
+      flex: 1;
+      padding: 24px;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
-    /* Leaderboard Table */
-    table.data-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
-    table.data-table th {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #777777;
-      border-bottom: 1px solid #282828;
-      padding: 8px 6px;
-    }
-    table.data-table td {
-      font-size: 12px;
-      border-bottom: 1px solid #1a1a1a;
-      padding: 8px 6px;
-    }
-    table.data-table tr.top-match td {
-      background-color: #181818;
-      font-weight: 700;
-      color: #ffffff;
-    }
-
-    .status-tag {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 6px;
-      text-transform: uppercase;
-      border: 1px solid #333333;
-      display: inline-block;
-    }
-    .status-tag.match {
-      background-color: #ffffff;
-      color: #000000;
-      border-color: #ffffff;
-    }
-    .status-tag.runner {
-      border-color: #666666;
-      color: #bbbbbb;
-    }
-    .status-tag.reject {
-      color: #444444;
-      border-color: #222222;
-    }
-
-    /* Social Media Profile Badges */
-    .social-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background-color: #141414;
-      border: 1px solid #2a2a2a;
-      color: #e0e0e0;
-      padding: 5px 8px;
-      font-size: 11px;
-      text-decoration: none;
-      font-family: inherit;
-    }
-    .social-badge:hover {
-      background-color: #ffffff;
-      color: #000000;
-      border-color: #ffffff;
-    }
-    .social-badge-platform {
-      font-weight: 800;
-      text-transform: uppercase;
-      font-size: 9px;
-      color: #777777;
-      letter-spacing: 0.05em;
-    }
-    .social-badge:hover .social-badge-platform {
-      color: #222222;
-    }
-    .social-badge-handle {
-      font-weight: 600;
-    }
-
-    /* Terminal Log Box */
-    .terminal-box {
-      background-color: #080808;
-      border: 1px solid #1f1f1f;
-      padding: 10px 12px;
-      font-size: 11px;
-      line-height: 1.6;
-      color: #999999;
-      height: 140px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
-    .log-line {
-      margin-bottom: 2px;
-    }
-    .log-time {
-      color: #555555;
-      margin-right: 6px;
-    }
-    .log-msg {
-      color: #cccccc;
-    }
-
-    /* Cryptographic Verdict Banner */
-    .verdict-banner {
-      border: 2px solid #222222;
-      background-color: #101010;
+    /* Executive Verdict Banner */
+    .verdict-card {
+      border: 1px solid var(--border-default);
+      background-color: var(--bg-surface);
       padding: 16px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .verdict-banner.verified {
+
+    .verdict-card.verified {
+      background-color: var(--status-success-bg);
+      border-color: var(--status-success-border);
+    }
+
+    .verdict-card.tampered {
+      background-color: var(--status-danger-bg);
+      border-color: var(--status-danger-border);
+    }
+
+    .verdict-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .verdict-card.verified .verdict-title { color: var(--status-success-text); }
+    .verdict-card.tampered .verdict-title { color: var(--status-danger-text); }
+
+    .verdict-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Entity Intelligence Card */
+    .entity-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 20px;
+    }
+
+    .entity-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .entity-name {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .entity-bio {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      max-width: 900px;
+    }
+
+    .social-chips-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .social-link-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--bg-surface-elevated);
+      border: 1px solid var(--border-default);
+      color: var(--text-primary);
+      padding: 6px 12px;
+      font-size: 11px;
+      text-decoration: none;
+    }
+
+    .social-link-badge:hover {
+      background-color: var(--accent-white);
+      color: #000000;
+      border-color: var(--accent-white);
+    }
+
+    .social-link-badge .platform-tag {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .social-link-badge:hover .platform-tag {
+      color: #374151;
+    }
+
+    /* Visual Candidate Gallery (Photos First) */
+    .gallery-container {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      padding: 20px;
+    }
+
+    .gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+    }
+
+    .view-mode-toggle {
+      display: flex;
+      border: 1px solid var(--border-default);
+      background-color: var(--bg-canvas);
+    }
+
+    .view-mode-btn {
+      padding: 4px 10px;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .view-mode-btn.active {
+      background-color: var(--bg-surface-elevated);
+      color: var(--accent-white);
+      font-weight: 600;
+    }
+
+    /* Candidate Visual Cards Grid */
+    .candidate-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .candidate-card {
+      background-color: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .candidate-card.winner {
+      border-color: var(--accent-white);
+      background-color: var(--bg-surface-active);
+    }
+
+    .candidate-thumb-box {
+      width: 100%;
+      height: 160px;
+      background-color: #000000;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .candidate-thumb-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .candidate-rank-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background-color: #000000;
+      border: 1px solid #333333;
+      padding: 2px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .candidate-status-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 2px 8px;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+
+    .candidate-status-tag.match {
       background-color: #ffffff;
       color: #000000;
       border-color: #ffffff;
     }
-    .verdict-banner.tampered {
+    .candidate-status-tag.runner {
       background-color: #000000;
-      color: #ffffff;
-      border: 2px solid #ffffff;
+      color: #fcd34d;
+      border-color: #d97706;
     }
-    .verdict-title {
+    .candidate-status-tag.reject {
+      background-color: #000000;
+      color: #9ca3af;
+      border-color: #374151;
+    }
+
+    .candidate-details {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .candidate-sim-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sim-score-text {
       font-size: 13px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      font-weight: 700;
     }
-    .verdict-desc {
-      font-size: 11px;
-      margin-top: 3px;
-      opacity: 0.8;
+
+    .candidate-card.winner .sim-score-text {
+      color: var(--accent-white);
     }
-    .verdict-badge {
+
+    .sim-bar-bg {
+      width: 100%;
+      height: 4px;
+      background-color: #22252a;
+    }
+
+    .sim-bar-fill {
+      height: 100%;
+      background-color: var(--accent-white);
+    }
+
+    .candidate-source-title {
       font-size: 11px;
-      font-weight: 800;
-      padding: 5px 12px;
-      border: 1px solid currentColor;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .candidate-domain-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 8px;
+      margin-top: auto;
+    }
+
+    .candidate-domain-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .candidate-domain-link:hover {
+      color: var(--accent-white);
+    }
+
+    /* Candidate Data Table (Alternative View) */
+    .data-table-container {
+      display: none;
+      overflow-x: auto;
+    }
+
+    .table-view-active .candidate-grid { display: none; }
+    .table-view-active .data-table-container { display: block; }
+
+    table.saas-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    table.saas-table th {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-default);
+      color: var(--text-muted);
+      font-weight: 600;
       text-transform: uppercase;
+      font-size: 10px;
       letter-spacing: 0.05em;
     }
+
+    table.saas-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    table.saas-table tr.winner-row td {
+      background-color: var(--bg-surface-elevated);
+      color: var(--accent-white);
+      font-weight: 600;
+    }
+
+    /* Cryptographic & Log Drawer */
+    .drawer-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .drawer-nav {
+      display: flex;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .drawer-tab {
+      padding: 12px 18px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+    }
+
+    .drawer-tab.active {
+      color: var(--accent-white);
+      border-bottom-color: var(--accent-white);
+    }
+
+    .drawer-content {
+      padding: 16px;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    .code-preview-box {
+      background-color: var(--bg-canvas);
+      border: 1px solid var(--border-subtle);
+      padding: 12px;
+      font-size: 11px;
+      line-height: 1.6;
+      max-height: 220px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: #d1d5db;
+    }
+
+    /* Audit Ledger Screen */
+    .screen-inner-container {
+      padding: 28px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .screen-header-block {
+      margin-bottom: 24px;
+    }
+
+    .screen-heading {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .screen-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Buttons */
+    .btn-secondary {
+      background-color: var(--bg-surface-elevated);
+      border: 1px solid var(--border-default);
+      color: var(--text-primary);
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--bg-surface-active);
+      border-color: var(--border-focus);
+    }
+
+    /* Utilities */
+    .truncate {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Stepper Row */
+    .stepper-progress {
+      display: flex;
+      gap: 4px;
+      margin-top: 10px;
+    }
+
+    .stepper-bar {
+      flex: 1;
+      height: 3px;
+      background-color: var(--border-subtle);
+    }
+
+    .stepper-bar.done { background-color: #10b981; }
+    .stepper-bar.running { background-color: #ffffff; }
+    .stepper-bar.fail { background-color: #ef4444; }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <!-- Top Navigation Header -->
-  <header>
-    <div class="header-title">HH Goa 2026 — Task 3 : Facial Discovery & Cryptographic Verification</div>
-    <div class="header-meta mono">
-      <span>NETWORK: <strong>SEPOLIA</strong></span>
-      <span>MODEL: <strong>ARCFACE (512-D)</strong></span>
-      <span id="headerStatus">STATE: <strong>IDLE</strong></span>
+<div class="app-layout">
+
+  <!-- 1. LEFT SIDEBAR NAVIGATION -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-icon">A</div>
+      <div>
+        <div class="brand-title">Aegis Biometrics</div>
+        <div class="brand-sub mono">Task 3 | HH Goa 2026</div>
+      </div>
     </div>
-  </header>
 
-  <!-- Bento Grid Structure -->
-  <div class="bento-grid">
+    <nav class="sidebar-nav">
+      <button type="button" class="nav-item active" data-screen="studioScreen">
+        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <span>Investigation Studio</span>
+      </button>
+      <button type="button" class="nav-item" data-screen="ledgerScreen">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        <span>Audit Ledger & Runs</span>
+      </button>
+      <button type="button" class="nav-item" data-screen="registryScreen">
+        <svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+        <span>On-Chain Registry</span>
+      </button>
+      <button type="button" class="nav-item" data-screen="settingsScreen">
+        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Engine Settings</span>
+      </button>
+    </nav>
 
-    <!-- Card 1: Configuration & Controls (Span 4) -->
-    <div class="bento-card col-4">
-      <div class="card-header">
-        <span>01 / Pipeline Input</span>
-        <span class="mono">CONFIG</span>
+    <div class="sidebar-footer">
+      <div class="status-indicator">
+        <span class="status-dot"></span>
+        <span class="mono">Sepolia EVM Ready</span>
+      </div>
+      <div class="mono" style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">
+        InsightFace SCRFD / ArcFace
+      </div>
+    </div>
+  </aside>
+
+  <!-- 2. MAIN APPLICATION WORKSPACE -->
+  <main class="main-container">
+
+    <!-- Top Application Bar -->
+    <header class="top-bar">
+      <div class="breadcrumbs mono">
+        <span>Investigation Studio</span>
+        <span>/</span>
+        <span class="current" id="activeBreadcrumb">Live Probe Scanner</span>
       </div>
 
-      <label>Portrait Presets</label>
-      <div class="preset-group">
-        <button type="button" class="preset-btn active" data-file="jensen_huang_portrait.jpg">
-          Jensen Huang (NVIDIA CEO)
+      <div class="top-actions">
+        <div class="network-badge mono">
+          <span class="network-dot"></span>
+          <span>ETH SEPOLIA</span>
+        </div>
+        <button type="button" class="btn-secondary mono" id="downloadLedgerTopBtn" style="display: none;">
+          <svg class="nav-icon" style="width: 13px; height: 13px;" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>EXPORT LEDGER</span>
         </button>
-        <button type="button" class="preset-btn" data-file="sam_altman_portrait.jpg">
-          Sam Altman (OpenAI CEO)
-        </button>
-        <button type="button" class="preset-btn" data-file="negative_control.jpg">
-          Negative Control (Linus Torvalds)
+        <button type="button" class="btn-secondary mono" id="resetAppBtn">
+          <span>RESET</span>
         </button>
       </div>
+    </header>
 
-      <label>Or Upload Custom Image</label>
-      <div class="upload-box" id="uploadBox">
-        <div class="upload-text" id="uploadText">[ + SELECT OR DROP IMAGE ]</div>
-        <div class="upload-sub" id="uploadSub">Supports JPG, PNG, WEBP (Up to 50MB)</div>
-        <div class="upload-actions" id="uploadActions" style="display: none;">
-          <button type="button" class="mini-btn" id="clearUploadBtn">CLEAR UPLOAD</button>
+    <!-- SCREEN 1: INVESTIGATION STUDIO -->
+    <div class="screen-view active" id="studioScreen">
+      <div class="studio-layout">
+
+        <!-- Left Inspector & Control Pane -->
+        <div class="studio-left-pane">
+
+          <!-- Target Source Switcher -->
+          <div class="pane-section">
+            <div class="section-title">
+              <span>Target Probe Source</span>
+              <span class="mono" id="sourceBadge">PRESET</span>
+            </div>
+
+            <div class="segmented-control">
+              <button type="button" class="seg-btn active" id="segPresetsBtn">PRESET LIBRARY</button>
+              <button type="button" class="seg-btn" id="segUploadBtn">CUSTOM UPLOAD</button>
+            </div>
+
+            <!-- Presets Tab Container -->
+            <div id="presetContainer" class="presets-list">
+              <div class="preset-card active" data-file="jensen_huang_portrait.jpg">
+                <div class="preset-info">
+                  <div class="preset-name">Jensen Huang</div>
+                  <div class="preset-role mono">CEO, NVIDIA</div>
+                </div>
+              </div>
+              <div class="preset-card" data-file="sam_altman_portrait.jpg">
+                <div class="preset-info">
+                  <div class="preset-name">Sam Altman</div>
+                  <div class="preset-role mono">CEO, OpenAI</div>
+                </div>
+              </div>
+              <div class="preset-card" data-file="negative_control.jpg">
+                <div class="preset-info">
+                  <div class="preset-name">Linus Torvalds</div>
+                  <div class="preset-role mono">Creator, Linux (Control)</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upload Tab Container -->
+            <div id="uploadContainer" style="display: none;">
+              <div class="upload-dropzone" id="uploadDropzone">
+                <svg class="upload-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <div style="font-weight: 600; font-size: 12px;" id="uploadLabel">Drop probe image here</div>
+                <div class="mono" style="font-size: 10px; color: var(--text-muted);">JPG, PNG, WEBP (Up to 50MB)</div>
+                <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" style="display: none;" />
+              </div>
+              <button type="button" class="btn-secondary" id="clearUploadBtn" style="display: none; width: 100%; margin-top: 8px; justify-content: center;">
+                CLEAR UPLOAD
+              </button>
+            </div>
+          </div>
+
+          <!-- Probe Image & Multi-Subject Selector -->
+          <div class="pane-section">
+            <div class="section-title">
+              <span>Probe Analysis</span>
+              <span class="mono" id="facesCountBadge">1 FACE</span>
+            </div>
+
+            <div class="probe-viewport" id="probeViewport">
+              <span class="mono" style="color: var(--text-muted);">Awaiting probe image...</span>
+            </div>
+
+            <!-- Multi-Person Selector Strip -->
+            <div id="peopleSelectorStrip" style="display: none;">
+              <div class="form-label">Detected Subjects (<span id="peopleCountSpan">1</span>)</div>
+              <div class="people-strip" id="peopleStrip"></div>
+            </div>
+
+            <!-- Biometric Telemetry -->
+            <div class="telemetry-grid mono">
+              <div class="telemetry-cell">
+                <div class="telemetry-label">Bounding Box</div>
+                <div class="telemetry-value" id="valBbox">—</div>
+              </div>
+              <div class="telemetry-cell">
+                <div class="telemetry-label">Confidence</div>
+                <div class="telemetry-value" id="valConf">—</div>
+              </div>
+              <div class="telemetry-cell">
+                <div class="telemetry-label">Sharpness</div>
+                <div class="telemetry-value" id="valSharpness">—</div>
+              </div>
+              <div class="telemetry-cell">
+                <div class="telemetry-label">Embedding</div>
+                <div class="telemetry-value">512-D L2</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pipeline Execution Controls -->
+          <div class="pane-section">
+            <div class="section-title">
+              <span>Execution Controls</span>
+              <span class="mono">CONFIG</span>
+            </div>
+
+            <div class="form-group">
+              <div class="form-label">
+                <span>Confidence Threshold</span>
+                <span class="mono" id="thresholdValue">0.80 (80%)</span>
+              </div>
+              <input type="range" class="slider-range" id="thresholdSlider" min="0.50" max="0.95" step="0.01" value="0.80" />
+            </div>
+
+            <div class="form-group">
+              <div class="form-label">Search Discovery Engine</div>
+              <select class="select-input mono" id="engineSelect">
+                <option value="auto">Auto Router (Yandex -> Lens -> SerpApi)</option>
+                <option value="yandex">Yandex Images (Stealth Chromium)</option>
+                <option value="google_lens">Google Lens (Direct)</option>
+                <option value="serpapi">SerpApi Safety Net</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <div class="toggle-row">
+                <div>
+                  <div style="font-weight: 600; font-size: 11px;">Simulate Attack (Tamper)</div>
+                  <div class="mono" style="font-size: 10px; color: var(--text-muted);">Mutate off-chain payload</div>
+                </div>
+                <input type="checkbox" id="tamperToggle" />
+              </div>
+            </div>
+
+            <button type="button" class="btn-execute" id="runPipelineBtn">
+              <svg class="nav-icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <span>EXECUTE IDENTIFICATION</span>
+            </button>
+
+            <!-- 8-Step Stepper Progress Bar -->
+            <div class="stepper-progress" id="stepperBars">
+              <div class="stepper-bar" id="bar1"></div>
+              <div class="stepper-bar" id="bar2"></div>
+              <div class="stepper-bar" id="bar3"></div>
+              <div class="stepper-bar" id="bar4"></div>
+              <div class="stepper-bar" id="bar5"></div>
+              <div class="stepper-bar" id="bar6"></div>
+              <div class="stepper-bar" id="bar7"></div>
+              <div class="stepper-bar" id="bar8"></div>
+            </div>
+            <div class="mono" id="stepperStatusText" style="font-size: 10px; color: var(--text-muted); margin-top: 6px; text-align: center;">
+              Ready to execute
+            </div>
+          </div>
+
         </div>
-        <input type="file" id="customFileInput" accept="image/jpeg,image/png,image/webp" />
-      </div>
 
-      <label>Search Discovery Engine</label>
-      <select id="engineSelect">
-        <option value="auto">Auto Router (Yandex -> Lens -> SerpApi)</option>
-        <option value="yandex">Yandex Images (Stealth Chromium)</option>
-        <option value="google_lens">Google Lens</option>
-        <option value="serpapi">SerpApi Safety Net</option>
-      </select>
+        <!-- Right Investigation & Evidence Workspace -->
+        <div class="studio-main-workspace">
 
-      <div class="slider-group">
-        <div class="slider-header">
-          <label for="confSlider">Match Confidence Threshold</label>
-          <span class="mono bold" id="confValue">0.80 (80%)</span>
+          <!-- 1. Executive Verdict & Cryptographic Summary Banner -->
+          <div class="verdict-card" id="verdictCard">
+            <div>
+              <div class="verdict-title" id="verdictTitleText">STATUS: READY TO SCAN</div>
+              <div class="verdict-subtitle mono" id="verdictSubtitle">
+                Select a preset portrait or upload a target face to begin facial intelligence discovery.
+              </div>
+            </div>
+            <div class="mono" id="verdictMetricBadge" style="font-size: 12px; font-weight: 700; padding: 6px 12px; border: 1px solid var(--border-focus); background: var(--bg-surface-elevated);">
+              STANDBY
+            </div>
+          </div>
+
+          <!-- 2. Identified Identity & Verified Social Accounts Card -->
+          <div class="entity-card" id="entityCard" style="display: none;">
+            <div class="entity-header">
+              <div>
+                <div class="mono" style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+                  IDENTIFIED SUBJECT <span id="entityPersonTag"></span>
+                </div>
+                <div class="entity-name" id="entityNameText">—</div>
+              </div>
+              <div class="mono" id="socialCountBadge" style="font-size: 11px; padding: 4px 8px; background-color: var(--bg-surface-elevated); border: 1px solid var(--border-default);">
+                0 PROFILES
+              </div>
+            </div>
+
+            <div class="entity-bio mono" id="entityBioText"></div>
+
+            <div class="social-chips-row" id="socialChipsRow">
+              <!-- Dynamically populated social badges -->
+            </div>
+          </div>
+
+          <!-- 3. Candidate Verification Gallery (Photos First) -->
+          <div class="gallery-container" id="galleryContainer">
+            <div class="gallery-header">
+              <div>
+                <div style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
+                  Discovered Candidate Imagery <span id="galleryPersonTag" class="mono" style="color: var(--text-muted);"></span>
+                </div>
+                <div class="mono" style="font-size: 11px; color: var(--text-muted); margin-top: 2px;" id="galleryCountText">
+                  Photos-First Biometric Evaluation
+                </div>
+              </div>
+
+              <div class="view-mode-toggle mono">
+                <button type="button" class="view-mode-btn active" id="viewModeGridBtn">
+                  <svg class="nav-icon" style="width: 12px; height: 12px;" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                  <span>GALLERY</span>
+                </button>
+                <button type="button" class="view-mode-btn" id="viewModeTableBtn">
+                  <svg class="nav-icon" style="width: 12px; height: 12px;" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                  <span>TABLE</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- View A: Photos-First Grid Cards -->
+            <div class="candidate-grid" id="candidateGrid">
+              <div class="mono" style="grid-column: 1 / -1; padding: 36px 0; text-align: center; color: var(--text-muted);">
+                Candidate imagery will appear here upon pipeline execution.
+              </div>
+            </div>
+
+            <!-- View B: Compact Data Table -->
+            <div class="data-table-container" id="dataTableContainer">
+              <table class="saas-table mono">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Source Domain</th>
+                    <th>Page Title</th>
+                    <th>Cosine Similarity</th>
+                    <th>Classification</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="candidateTableBody">
+                  <tr>
+                    <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">
+                      Awaiting pipeline execution...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 4. Cryptographic Attestation & Execution Drawer -->
+          <div class="drawer-card">
+            <div class="drawer-nav">
+              <button type="button" class="drawer-tab active" data-tab="tabAttestation">On-Chain Attestation Record</button>
+              <button type="button" class="drawer-tab" data-tab="tabLogs">Execution Console Log</button>
+            </div>
+
+            <div class="drawer-content">
+              <!-- Tab 1: Attestation Hashes & Record -->
+              <div class="tab-pane active" id="tabAttestation">
+                <div class="telemetry-grid mono" style="margin-bottom: 12px;">
+                  <div class="telemetry-cell">
+                    <div class="telemetry-label">Content SHA-256 (Image)</div>
+                    <div class="telemetry-value truncate" id="valContentSha">—</div>
+                  </div>
+                  <div class="telemetry-cell">
+                    <div class="telemetry-label">Canonical Record SHA-256</div>
+                    <div class="telemetry-value truncate" id="valRecordSha">—</div>
+                  </div>
+                  <div class="telemetry-cell">
+                    <div class="telemetry-label">Ethereum Sepolia Tx</div>
+                    <div class="telemetry-value truncate" id="valTxHash">—</div>
+                  </div>
+                  <div class="telemetry-cell">
+                    <div class="telemetry-label">Submitter / Block</div>
+                    <div class="telemetry-value truncate" id="valBlockSubmitter">—</div>
+                  </div>
+                </div>
+
+                <div class="form-label">
+                  <span>Canonical RFC-8785 JSON Payload</span>
+                  <button type="button" class="btn-secondary mono" id="copyRecordBtn" style="padding: 2px 6px; font-size: 10px;">COPY JSON</button>
+                </div>
+                <div class="code-preview-box mono" id="canonicalJsonBox">// Canonical cryptographic record will appear here...</div>
+              </div>
+
+              <!-- Tab 2: Execution Logs Stream -->
+              <div class="tab-pane" id="tabLogs">
+                <div class="code-preview-box mono" id="terminalLogBox" style="height: 200px;">[--:--:--] System initialized. Ready to execute pipeline.</div>
+              </div>
+            </div>
+          </div>
+
         </div>
-        <input type="range" id="confSlider" min="0.50" max="0.95" step="0.01" value="0.80" />
-        <div class="slider-labels mono">
-          <span>0.50 (Permissive)</span>
-          <span>0.80 (Default)</span>
-          <span>0.95 (Strict)</span>
-        </div>
-      </div>
 
-      <label>Security & Verification Guard</label>
-      <div class="toggle-row">
-        <span>Tamper Mode (--tamper)</span>
-        <input type="checkbox" id="tamperToggle" />
       </div>
-      <div class="toggle-row">
-        <span>Dry Run (Biometrics Only)</span>
-        <input type="checkbox" id="dryRunToggle" />
-      </div>
-
-      <button id="runBtn" class="primary-btn">Execute Pipeline</button>
     </div>
 
-    <!-- Card 2: 8-Step Pipeline Stepper (Span 4) -->
-    <div class="bento-card col-4">
-      <div class="card-header">
-        <span>02 / Execution Stepper</span>
-        <span id="elapsedCounter" class="mono">0.0s</span>
-      </div>
+    <!-- SCREEN 2: AUDIT LEDGER & HISTORY -->
+    <div class="screen-view" id="ledgerScreen">
+      <div class="screen-inner-container">
+        <div class="screen-header-block">
+          <div class="screen-heading">Historical Audit Ledger</div>
+          <div class="screen-desc mono">Permanent cryptographic run records saved to the immutable evidence store.</div>
+        </div>
 
-      <div class="step-list">
-        <div class="step-row" id="step1">
-          <div class="step-name"><span class="mono">[1/8]</span> Face Detection (SCRFD)</div>
-          <div class="step-badge pending" id="badge1">PENDING</div>
+        <table class="saas-table mono" id="ledgerRunsTable">
+          <thead>
+            <tr>
+              <th>Run Identifier</th>
+              <th>Timestamp</th>
+              <th>Identified Person</th>
+              <th>Candidates</th>
+              <th>Integrity Verdict</th>
+              <th>Export</th>
+            </tr>
+          </thead>
+          <tbody id="ledgerRunsBody">
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">
+                Loading audit ledger records...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: ON-CHAIN REGISTRY -->
+    <div class="screen-view" id="registryScreen">
+      <div class="screen-inner-container">
+        <div class="screen-header-block">
+          <div class="screen-heading">Ethereum Sepolia Smart Contract Registry</div>
+          <div class="screen-desc mono">Decentralized, tamper-evident attestation storage for biometric verification hashes.</div>
         </div>
-        <div class="step-row" id="step2">
-          <div class="step-name"><span class="mono">[2/8]</span> Face Embedding (ArcFace)</div>
-          <div class="step-badge pending" id="badge2">PENDING</div>
+
+        <div class="telemetry-grid mono" style="margin-bottom: 20px;">
+          <div class="telemetry-cell">
+            <div class="telemetry-label">Contract Standard</div>
+            <div class="telemetry-value">FaceVerificationRegistry.sol</div>
+          </div>
+          <div class="telemetry-cell">
+            <div class="telemetry-label">Network</div>
+            <div class="telemetry-value">Ethereum Sepolia (Chain ID 11155111)</div>
+          </div>
+          <div class="telemetry-cell">
+            <div class="telemetry-label">Registry Method</div>
+            <div class="telemetry-value">attest(bytes32 contentHash, bytes32 recordHash)</div>
+          </div>
+          <div class="telemetry-cell">
+            <div class="telemetry-label">EVM Mode</div>
+            <div class="telemetry-value">Active (Simulated EVM Zero-Failure Demo)</div>
+          </div>
         </div>
-        <div class="step-row" id="step3">
-          <div class="step-name"><span class="mono">[3/8]</span> Web Reverse Discovery</div>
-          <div class="step-badge pending" id="badge3">PENDING</div>
+
+        <div class="form-label">Smart Contract Interface (ABI Summary)</div>
+        <div class="code-preview-box mono" style="height: 240px;">// SPDX-License-Identifier: MIT
+contract FaceVerificationRegistry {
+    struct Attestation {
+        bytes32 contentHash;
+        bytes32 recordHash;
+        uint256 timestamp;
+        address submitter;
+    }
+
+    event Attested(bytes32 indexed contentHash, bytes32 indexed recordHash, uint256 timestamp, address indexed submitter);
+
+    function attest(bytes32 _contentHash, bytes32 _recordHash) external returns (bytes32);
+    function getRecord(bytes32 _recordHash) external view returns (bytes32, bytes32, uint256, address);
+}</div>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: ENGINE SETTINGS -->
+    <div class="screen-view" id="settingsScreen">
+      <div class="screen-inner-container">
+        <div class="screen-header-block">
+          <div class="screen-heading">Engine & Subsystem Configuration</div>
+          <div class="screen-desc mono">Control reverse-image search routers, biometric thresholds, and concurrency.</div>
         </div>
-        <div class="step-row" id="step4">
-          <div class="step-name"><span class="mono">[4/8]</span> Candidate Retrieval</div>
-          <div class="step-badge pending" id="badge4">PENDING</div>
-        </div>
-        <div class="step-row" id="step5">
-          <div class="step-name"><span class="mono">[5/8]</span> Biometric Verification</div>
-          <div class="step-badge pending" id="badge5">PENDING</div>
-        </div>
-        <div class="step-row" id="step6">
-          <div class="step-name"><span class="mono">[6/8]</span> Match Selection & Margin</div>
-          <div class="step-badge pending" id="badge6">PENDING</div>
-        </div>
-        <div class="step-row" id="step7">
-          <div class="step-name"><span class="mono">[7/8]</span> Blockchain Attestation</div>
-          <div class="step-badge pending" id="badge7">PENDING</div>
-        </div>
-        <div class="step-row" id="step8">
-          <div class="step-name"><span class="mono">[8/8]</span> Live Re-Verification</div>
-          <div class="step-badge pending" id="badge8">PENDING</div>
+
+        <div class="entity-card">
+          <div class="form-group">
+            <div class="form-label">Search Router Engine Priorities</div>
+            <div class="mono" style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+              1. <strong>Yandex Images (Stealth Chromium)</strong>: Direct automated image upload with zero API keys and no rate limits.<br />
+              2. <strong>Google Lens (Direct Playwright)</strong>: Direct headless upload (fallback to SerpApi on CAPTCHA).<br />
+              3. <strong>SerpApi Safety Net</strong>: Commercial proxy API for Google Lens (requires SERPAPI_API_KEY in .env).
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 16px;">
+            <div class="form-label">Biometric Model Specifications</div>
+            <div class="mono" style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+              • <strong>Detector</strong>: InsightFace SCRFD 10G (Single-shot Scale-aware Face Detector)<br />
+              • <strong>Embedder</strong>: ArcFace ResNet-50 (w600k_r50.onnx) 512-Dimensional L2-Normalized Vectors<br />
+              • <strong>Quality Gating</strong>: Laplacian Variance Blur Filter (&ge; 40.0) + Bounding Box Resolution (&ge; 40x40px)
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Card 3: Biometric Probe Inspector (Span 4) -->
-    <div class="bento-card col-4">
-      <div class="card-header">
-        <span>03 / Probe Face Profile</span>
-        <span class="mono" id="probeSourceBadge">INSIGHTFACE</span>
-      </div>
-
-      <div class="media-box" id="inputImageBox">
-        <span class="media-placeholder">Probe Face Image</span>
-      </div>
-
-      <!-- Multi-Person Selector Strip -->
-      <div id="multiFaceSelector" style="display: none; margin-bottom: 12px; border: 1px solid #222222; background-color: #0c0c0c; padding: 10px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span class="mono bold" style="font-size: 10px; color: #aaaaaa; text-transform: uppercase; letter-spacing: 0.05em;">
-            DETECTED PEOPLE (<span id="detectedPersonsCount">1</span>)
-          </span>
-          <span class="mono muted" style="font-size: 9px; text-transform: uppercase;">CLICK TO INSPECT</span>
-        </div>
-        <div id="faceChipsContainer" style="display: flex; gap: 8px; flex-wrap: wrap;">
-          <!-- Injected dynamically -->
-        </div>
-      </div>
-
-      <table class="kv-table mono">
-        <tr>
-          <td class="label">Bounding Box</td>
-          <td class="value" id="valBbox">—</td>
-        </tr>
-        <tr>
-          <td class="label">Detection Conf</td>
-          <td class="value" id="valConf">—</td>
-        </tr>
-        <tr>
-          <td class="label">Laplacian Blur</td>
-          <td class="value" id="valSharpness">—</td>
-        </tr>
-        <tr>
-          <td class="label">ArcFace Norm</td>
-          <td class="value" id="valNorm">512-D L2 Normalized</td>
-        </tr>
-      </table>
-
-      <div class="vector-strip mono" id="vectorSample">
-        // 512-D feature vector sample...
-      </div>
-    </div>
-
-    <!-- Card 4: Matched Web Media (Span 4) -->
-    <div class="bento-card col-4">
-      <div class="card-header">
-        <span>04 / Matched Online Media <span id="card4PersonTag" class="mono muted"></span></span>
-        <span class="mono" id="valDomain">DOMAIN: —</span>
-      </div>
-
-      <div class="media-box" id="matchedImageBox">
-        <span class="media-placeholder">Awaiting Pipeline Execution...</span>
-      </div>
-
-      <table class="kv-table mono">
-        <tr>
-          <td class="label">Cosine Similarity</td>
-          <td class="value" id="valSim">—</td>
-        </tr>
-        <tr>
-          <td class="label">Runner-Up Margin</td>
-          <td class="value" id="valMargin">—</td>
-        </tr>
-        <tr>
-          <td class="label">Source Domain</td>
-          <td class="value" id="valDomainText">—</td>
-        </tr>
-        <tr>
-          <td class="label">Discovered URL</td>
-          <td class="value" id="valPageUrl" style="font-size: 11px;">—</td>
-        </tr>
-      </table>
-
-      <!-- Discovered Social Profiles Subpanel -->
-      <div id="socialProfilesBox" style="display: none; margin-top: 14px; border-top: 1px solid #222222; padding-top: 12px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span class="mono bold" style="font-size: 10px; color: #ffffff; text-transform: uppercase; letter-spacing: 0.06em;">
-            IDENTIFIED: <span id="valIdentifiedName" style="color: #ffffff;">—</span>
-          </span>
-          <span class="mono" id="valSocialCount" style="font-size: 9px; color: #888888; text-transform: uppercase;">0 PROFILES</span>
-        </div>
-        <div id="valBioSummary" class="mono" style="font-size: 10px; color: #888888; margin-bottom: 10px; line-height: 1.4; display: none;"></div>
-        <div id="socialBadgesContainer" style="display: flex; gap: 6px; flex-wrap: wrap;">
-          <!-- Injected dynamically -->
-        </div>
-      </div>
-    </div>
-
-    <!-- Card 5: Verification Leaderboard (Span 8) -->
-    <div class="bento-card col-8">
-      <div class="card-header">
-        <span>05 / Candidate Verification Leaderboard <span id="card5PersonTag" class="mono muted"></span></span>
-        <span class="mono" id="candCountText">0 CANDIDATES</span>
-      </div>
-
-      <table class="data-table mono" id="leaderboardTable">
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Domain</th>
-            <th>Page Title</th>
-            <th>Cosine Sim</th>
-            <th>Verdict</th>
-          </tr>
-        </thead>
-        <tbody id="leaderboardBody">
-          <tr>
-            <td colspan="5" class="muted" style="text-align: center; padding: 24px;">
-              No candidates evaluated yet. Select a target and execute pipeline.
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Card 6: Real-time Terminal Log (Span 6) -->
-    <div class="bento-card col-6">
-      <div class="card-header">
-        <span>06 / Real-time Execution Feed</span>
-        <span class="mono">STDOUT</span>
-      </div>
-
-      <div class="terminal-box mono" id="terminalBox">
-[--:--:--] System initialized. Ready to execute pipeline.
-      </div>
-    </div>
-
-    <!-- Card 7: Cryptographic Ledger & Audit (Span 6) -->
-    <div class="bento-card col-6">
-      <div class="card-header">
-        <span>07 / Immutable Attestation <span id="card7PersonTag" class="mono muted"></span></span>
-        <button id="downloadLedgerBtn" class="secondary-btn" style="display: none;">Download JSON</button>
-      </div>
-
-      <table class="kv-table mono">
-        <tr>
-          <td class="label">Content SHA-256</td>
-          <td class="value" id="valContentHash">—</td>
-        </tr>
-        <tr>
-          <td class="label">Canonical RFC-8785</td>
-          <td class="value" id="valRecordHash">—</td>
-        </tr>
-        <tr>
-          <td class="label">Tx Hash</td>
-          <td class="value" id="valTxHash">—</td>
-        </tr>
-        <tr>
-          <td class="label">Submitter / Block</td>
-          <td class="value" id="valSubmitter">—</td>
-        </tr>
-      </table>
-    </div>
-
-    <!-- Card 8: Final Integrity Verdict Banner (Span 12) -->
-    <div class="col-12">
-      <div class="verdict-banner" id="verdictBanner">
-        <div>
-          <div class="verdict-title" id="verdictTitle">STATUS: READY</div>
-          <div class="verdict-desc mono" id="verdictDesc">Select a portrait preset or upload a custom face image, then run the pipeline.</div>
-        </div>
-        <div class="verdict-badge mono" id="verdictBadge">STANDBY</div>
-      </div>
-    </div>
-
-  </div>
+  </main>
 </div>
 
 <script>
-  let selectedPreset = "jensen_huang_portrait.jpg";
+  // Global State
+  let currentScreen = "studioScreen";
   let activeUploadId = null;
+  let selectedPreset = "jensen_huang_portrait.jpg";
+  let currentDetectedFaces = [];
+  let selectedFaceIdx = 0;
+  let runResultsData = null;
   let ws = null;
-  let timerInterval = null;
-  let startTime = null;
   let currentRunId = null;
 
-  // Multi-face state
-  let currentDetectedFaces = [];
-  let runResultsData = null;
-  let selectedFaceIdx = 0;
-
-  const presetBtns = document.querySelectorAll(".preset-btn");
-  const uploadBox = document.getElementById("uploadBox");
-  const customFileInput = document.getElementById("customFileInput");
-  const uploadText = document.getElementById("uploadText");
-  const uploadSub = document.getElementById("uploadSub");
-  const uploadActions = document.getElementById("uploadActions");
+  // DOM References
+  const segPresetsBtn = document.getElementById("segPresetsBtn");
+  const segUploadBtn = document.getElementById("segUploadBtn");
+  const presetContainer = document.getElementById("presetContainer");
+  const uploadContainer = document.getElementById("uploadContainer");
+  const uploadDropzone = document.getElementById("uploadDropzone");
+  const fileInput = document.getElementById("fileInput");
   const clearUploadBtn = document.getElementById("clearUploadBtn");
-  const terminalBox = document.getElementById("terminalBox");
-  const downloadLedgerBtn = document.getElementById("downloadLedgerBtn");
-  const confSlider = document.getElementById("confSlider");
-  const confValue = document.getElementById("confValue");
+  const thresholdSlider = document.getElementById("thresholdSlider");
+  const thresholdValue = document.getElementById("thresholdValue");
+  const engineSelect = document.getElementById("engineSelect");
+  const tamperToggle = document.getElementById("tamperToggle");
+  const runPipelineBtn = document.getElementById("runPipelineBtn");
+  const downloadLedgerTopBtn = document.getElementById("downloadLedgerTopBtn");
+  const resetAppBtn = document.getElementById("resetAppBtn");
+  const terminalLogBox = document.getElementById("terminalLogBox");
 
-  confSlider.addEventListener("input", (e) => {
+  // Sidebar Navigation
+  document.querySelectorAll(".nav-item").forEach(item => {
+    item.addEventListener("click", () => {
+      document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+      item.classList.add("active");
+
+      const screenId = item.getAttribute("data-screen");
+      document.querySelectorAll(".screen-view").forEach(s => s.classList.remove("active"));
+      document.getElementById(screenId).classList.add("active");
+      currentScreen = screenId;
+
+      const breadcrumbMap = {
+        studioScreen: "Live Probe Scanner",
+        ledgerScreen: "Historical Audit Ledger",
+        registryScreen: "Ethereum Sepolia Smart Contract",
+        settingsScreen: "Engine Settings & Telemetry",
+      };
+      document.getElementById("activeBreadcrumb").textContent = breadcrumbMap[screenId] || "Dashboard";
+
+      if (screenId === "ledgerScreen") {
+        fetchLedgerRuns();
+      }
+    });
+  });
+
+  // Slider Input
+  thresholdSlider.addEventListener("input", (e) => {
     const val = parseFloat(e.target.value);
-    confValue.textContent = `${val.toFixed(2)} (${Math.round(val * 100)}%)`;
+    thresholdValue.textContent = `${val.toFixed(2)} (${Math.round(val * 100)}%)`;
   });
-  confSlider.dispatchEvent(new Event("input"));
 
-  function appendLog(timeStr, message) {
-    const line = document.createElement("div");
-    line.className = "log-line";
-    line.innerHTML = `<span class="log-time">[${timeStr}]</span><span class="log-msg">${message}</span>`;
-    terminalBox.appendChild(line);
-    terminalBox.scrollTop = terminalBox.scrollHeight;
-  }
+  // Source Switcher (Presets vs Upload)
+  segPresetsBtn.addEventListener("click", () => {
+    segPresetsBtn.classList.add("active");
+    segUploadBtn.classList.remove("active");
+    presetContainer.style.display = "flex";
+    uploadContainer.style.display = "none";
+    document.getElementById("sourceBadge").textContent = "PRESET";
 
-  // Render clickable face chips for multi-person inspection
-  function renderFaceChips(faces, activeIdx) {
-    const container = document.getElementById("faceChipsContainer");
-    const wrapper = document.getElementById("multiFaceSelector");
-    const countSpan = document.getElementById("detectedPersonsCount");
-    container.innerHTML = "";
-
-    if (!faces || faces.length <= 1) {
-      wrapper.style.display = "none";
-      return;
+    if (activeUploadId) {
+      clearUpload();
     }
+  });
 
-    wrapper.style.display = "block";
-    countSpan.textContent = faces.length;
+  segUploadBtn.addEventListener("click", () => {
+    segUploadBtn.classList.add("active");
+    segPresetsBtn.classList.remove("active");
+    presetContainer.style.display = "none";
+    uploadContainer.style.display = "block";
+    document.getElementById("sourceBadge").textContent = "UPLOAD";
+  });
 
-    faces.forEach((f, i) => {
-      const chip = document.createElement("button");
-      chip.type = "button";
-      chip.className = "face-chip" + (f.face_index === activeIdx ? " active" : "");
-      chip.setAttribute("data-index", f.face_index);
-
-      let imgHtml = "";
-      if (f.crop_b64) {
-        imgHtml = `<img src="${f.crop_b64}" class="face-chip-img" alt="Person #${i+1}" />`;
-      }
-
-      const label = f.is_primary ? `Person #${i+1} (Primary)` : `Person #${i+1}`;
-      chip.innerHTML = `${imgHtml}<span>${label}</span>`;
-
-      chip.addEventListener("click", () => {
-        selectFace(f.face_index);
-      });
-
-      container.appendChild(chip);
-    });
-  }
-
-  // Select active inspected person
-  function selectFace(faceIdx) {
-    selectedFaceIdx = faceIdx;
-
-    // Update active class on chips
-    document.querySelectorAll(".face-chip").forEach(chip => {
-      const idx = parseInt(chip.getAttribute("data-index"), 10);
-      if (idx === faceIdx) {
-        chip.classList.add("active");
-      } else {
-        chip.classList.remove("active");
-      }
-    });
-
-    // Update Card 03 metrics
-    const f = currentDetectedFaces.find(x => x.face_index === faceIdx);
-    if (f) {
-      document.getElementById("valBbox").textContent = `[${f.bbox.join(", ")}]`;
-      document.getElementById("valConf").textContent = `${(f.confidence * 100).toFixed(1)}% (PASS)`;
-      document.getElementById("valSharpness").textContent = `${f.sharpness} (PASS)`;
-      if (f.embedding_sample && f.embedding_sample.length > 0) {
-        document.getElementById("vectorSample").textContent =
-          `[${f.embedding_sample.join(", ")}, ...] // 512-D ArcFace (Person #${faceIdx + 1})`;
-      }
-    }
-
-    // Update Person Tags across Card 4, 5, 7
-    const tagText = currentDetectedFaces.length > 1 ? `[Person #${faceIdx + 1}]` : "";
-    document.getElementById("card4PersonTag").textContent = tagText;
-    document.getElementById("card5PersonTag").textContent = tagText;
-    document.getElementById("card7PersonTag").textContent = tagText;
-
-    // If run results exist, update Card 4, 5, 7
-    if (runResultsData && runResultsData.faces_results && runResultsData.faces_results.length > 0) {
-      const profile = runResultsData.faces_results.find(p => p.face_index === faceIdx) || runResultsData.faces_results[0];
-      renderFaceResultCards(profile);
-    }
-  }
-
-  // Render Card 4, 5, 7 for an individual person profile
-  function renderFaceResultCards(profile) {
-    // 1. Matched Media (Card 4)
-    const matchedBox = document.getElementById("matchedImageBox");
-    if (profile.matched_image_b64) {
-      matchedBox.innerHTML = `<img src="${profile.matched_image_b64}" alt="Matched Online Post" />`;
-    } else {
-      matchedBox.innerHTML = `<span class="media-placeholder">No Online Match Cleared Threshold</span>`;
-    }
-
-    if (profile.best_match) {
-      document.getElementById("valDomain").textContent = `DOMAIN: ${profile.best_match.domain.toUpperCase()}`;
-      document.getElementById("valDomainText").textContent = profile.best_match.domain;
-      document.getElementById("valSim").textContent = `${profile.best_match.similarity.toFixed(4)} (MAX)`;
-      document.getElementById("valMargin").textContent = `+${profile.runner_up_margin.toFixed(4)}`;
-      const pageUrl = profile.best_match.page_url || "";
-      document.getElementById("valPageUrl").textContent = pageUrl.length > 40 ? pageUrl.substring(0, 38) + "..." : pageUrl;
-    } else {
-      document.getElementById("valDomain").textContent = "DOMAIN: —";
-      document.getElementById("valDomainText").textContent = "—";
-      document.getElementById("valSim").textContent = "—";
-      document.getElementById("valMargin").textContent = "—";
-      document.getElementById("valPageUrl").textContent = "—";
-    }
-
-    // 2. Leaderboard (Card 5)
-    const tbody = document.getElementById("leaderboardBody");
-    tbody.innerHTML = "";
-    if (profile.leaderboard && profile.leaderboard.length > 0) {
-      profile.leaderboard.forEach(row => {
-        const tr = document.createElement("tr");
-        if (row.rank === 1) tr.className = "top-match";
-        const tagClass = row.status === "MATCH" ? "match" : (row.status === "RUNNER" ? "runner" : "reject");
-        tr.innerHTML = `
-          <td>${row.rank}</td>
-          <td>${row.domain}</td>
-          <td>${row.title.substring(0, 32)}</td>
-          <td>${row.similarity.toFixed(4)}</td>
-          <td><span class="status-tag ${tagClass}">${row.status}</span></td>
-        `;
-        tbody.appendChild(tr);
-      });
-      document.getElementById("candCountText").textContent = `${profile.leaderboard.length} CANDIDATES`;
-    } else {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="5" class="muted" style="text-align: center; padding: 24px;">
-            ${profile.status_message || "No candidates found for this person"}
-          </td>
-        </tr>
-      `;
-      document.getElementById("candCountText").textContent = "0 CANDIDATES";
-    }
-
-    // 3. Attestation (Card 7)
-    if (profile.attestation) {
-      document.getElementById("valContentHash").textContent = profile.attestation.content_hash || "—";
-      document.getElementById("valRecordHash").textContent = profile.attestation.record_hash || "—";
-      document.getElementById("valTxHash").textContent = profile.attestation.tx_hash || "—";
-      document.getElementById("valSubmitter").textContent = `${profile.attestation.submitter} (Block #${profile.attestation.block_number})`;
-    } else {
-      document.getElementById("valContentHash").textContent = "NOT ATTESTED";
-      document.getElementById("valRecordHash").textContent = "NOT ATTESTED";
-      document.getElementById("valTxHash").textContent = "—";
-      document.getElementById("valSubmitter").textContent = "—";
-    }
-
-    // 4. Social Profiles (Card 4 Subpanel)
-    const socialBox = document.getElementById("socialProfilesBox");
-    const valName = document.getElementById("valIdentifiedName");
-    const valSocialCount = document.getElementById("valSocialCount");
-    const valBio = document.getElementById("valBioSummary");
-    const badgesContainer = document.getElementById("socialBadgesContainer");
-
-    badgesContainer.innerHTML = "";
-    if (profile.social_identity && profile.social_identity.profiles && profile.social_identity.profiles.length > 0) {
-      socialBox.style.display = "block";
-      valName.textContent = profile.social_identity.canonical_name || "Verified Subject";
-      valSocialCount.textContent = `${profile.social_identity.profiles.length} PROFILES`;
-      
-      if (profile.social_identity.bio_summary) {
-        valBio.textContent = profile.social_identity.bio_summary;
-        valBio.style.display = "block";
-      } else {
-        valBio.style.display = "none";
-      }
-
-      profile.social_identity.profiles.forEach(p => {
-        const a = document.createElement("a");
-        a.className = "social-badge";
-        a.href = p.url;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        a.title = `${p.platform_label}: ${p.url}`;
-        a.innerHTML = `<span class="social-badge-platform">${p.platform_label}</span><span class="social-badge-handle">${p.handle}</span>`;
-        badgesContainer.appendChild(a);
-      });
-    } else {
-      socialBox.style.display = "none";
-    }
-  }
-
-  // Update Probe Profile UI with Face Inspection Data
-  function updateProbeProfile(imgSrc, primaryFace, sample, facesCount, sourceName, allFaces) {
-    const box = document.getElementById("inputImageBox");
-    if (imgSrc) {
-      box.innerHTML = `<img src="${imgSrc}" alt="Probe Face" />`;
-    }
-
-    currentDetectedFaces = allFaces || (primaryFace ? [primaryFace] : []);
-    selectedFaceIdx = primaryFace ? primaryFace.face_index : 0;
-    renderFaceChips(currentDetectedFaces, selectedFaceIdx);
-
-    if (primaryFace) {
-      document.getElementById("valBbox").textContent = `[${primaryFace.bbox.join(", ")}]`;
-      document.getElementById("valConf").textContent = `${(primaryFace.confidence * 100).toFixed(1)}% (PASS)`;
-      document.getElementById("valSharpness").textContent = `${primaryFace.sharpness} (PASS)`;
-    } else {
-      document.getElementById("valBbox").textContent = "NO FACE DETECTED";
-      document.getElementById("valConf").textContent = "0.0%";
-      document.getElementById("valSharpness").textContent = "—";
-    }
-
-    if (sample && sample.length > 0) {
-      document.getElementById("vectorSample").textContent =
-        `[${sample.join(", ")}, ...] // 512 dimensions`;
-    }
-
-    if (sourceName) {
-      document.getElementById("probeSourceBadge").textContent = sourceName.toUpperCase();
-    }
-
-    // Reset Person tags & social profiles
-    const tagText = currentDetectedFaces.length > 1 ? `[Person #${selectedFaceIdx + 1}]` : "";
-    document.getElementById("card4PersonTag").textContent = tagText;
-    document.getElementById("card5PersonTag").textContent = tagText;
-    document.getElementById("card7PersonTag").textContent = tagText;
-    document.getElementById("socialProfilesBox").style.display = "none";
-  }
-
-  // Preset Selection
-  presetBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      presetBtns.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      selectedPreset = btn.getAttribute("data-file");
-
-      // Clear any custom upload
-      activeUploadId = null;
-      runResultsData = null;
-      uploadBox.classList.remove("active");
-      uploadText.textContent = "[ + SELECT OR DROP IMAGE ]";
-      uploadSub.textContent = "Supports JPG, PNG, WEBP (Up to 50MB)";
-      uploadActions.style.display = "none";
-      customFileInput.value = "";
-
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ action: "preview", preset: selectedPreset }));
-      }
+  // Presets Click Handler
+  document.querySelectorAll(".preset-card").forEach(card => {
+    card.addEventListener("click", () => {
+      document.querySelectorAll(".preset-card").forEach(c => c.classList.remove("active"));
+      card.classList.add("active");
+      selectedPreset = card.getAttribute("data-file");
+      clearUpload();
+      requestPreview(selectedPreset);
     });
   });
 
-  // Upload Box Click Handler
-  uploadBox.addEventListener("click", (e) => {
-    if (e.target === clearUploadBtn) return;
-    customFileInput.click();
+  // File Upload Handlers
+  uploadDropzone.addEventListener("click", () => fileInput.click());
+
+  uploadDropzone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    uploadDropzone.classList.add("dragover");
   });
 
-  // Clear Upload Handler
+  uploadDropzone.addEventListener("dragleave", () => {
+    uploadDropzone.classList.remove("dragover");
+  });
+
+  uploadDropzone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    uploadDropzone.classList.remove("dragover");
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFileUpload(e.dataTransfer.files[0]);
+    }
+  });
+
+  fileInput.addEventListener("change", (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleFileUpload(e.target.files[0]);
+    }
+  });
+
   clearUploadBtn.addEventListener("click", (e) => {
     e.stopPropagation();
+    clearUpload();
+    segPresetsBtn.click();
+    document.querySelector(".preset-card").click();
+  });
+
+  function clearUpload() {
     activeUploadId = null;
-    runResultsData = null;
-    uploadBox.classList.remove("active");
-    uploadText.textContent = "[ + SELECT OR DROP IMAGE ]";
-    uploadSub.textContent = "Supports JPG, PNG, WEBP (Up to 50MB)";
-    uploadActions.style.display = "none";
-    customFileInput.value = "";
+    document.getElementById("uploadLabel").textContent = "Drop probe image here";
+    clearUploadBtn.style.display = "none";
+    fileInput.value = "";
+  }
 
-    // Re-activate first preset
-    presetBtns[0].click();
-    appendLog(new Date().toLocaleTimeString(), "Cleared custom upload. Switched back to Jensen Huang preset.");
-  });
-
-  // Drag and Drop Handlers on Upload Box
-  uploadBox.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    uploadBox.classList.add("dragover");
-  });
-  uploadBox.addEventListener("dragleave", () => {
-    uploadBox.classList.remove("dragover");
-  });
-  uploadBox.addEventListener("drop", (e) => {
-    e.preventDefault();
-    uploadBox.classList.remove("dragover");
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFileSelected(files[0]);
-    }
-  });
-
-  // Window drag/drop prevention
-  window.addEventListener("dragover", (e) => e.preventDefault());
-  window.addEventListener("drop", (e) => {
-    e.preventDefault();
-    if (e.target !== uploadBox && !uploadBox.contains(e.target) && e.dataTransfer.files.length > 0) {
-      handleFileSelected(e.dataTransfer.files[0]);
-    }
-  });
-
-  // File Input Change
-  customFileInput.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      handleFileSelected(file);
-    }
-  });
-
-  // Send File to REST Endpoint /api/upload for Instant Analysis
-  async function handleFileSelected(file) {
-    const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
-    appendLog(new Date().toLocaleTimeString(), `Uploading & analyzing probe: ${file.name} (${sizeMb} MB)...`);
-
-    // 1. Immediately deactivate presets and lock execution button to prevent race conditions
-    selectedPreset = null;
-    activeUploadId = null;
-    runResultsData = null;
-    presetBtns.forEach(b => b.classList.remove("active"));
-
-    const runBtn = document.getElementById("runBtn");
-    runBtn.disabled = true;
-    runBtn.textContent = `UPLOADING (${sizeMb} MB)...`;
-
-    uploadBox.classList.remove("active");
-    uploadText.textContent = `UPLOADING (${sizeMb} MB)...`;
-    uploadSub.textContent = `${file.name} — Analyzing biometrics...`;
-    uploadActions.style.display = "none";
+  async function handleFileUpload(file) {
+    document.getElementById("uploadLabel").textContent = `Uploading ${file.name}...`;
+    appendLog(new Date().toLocaleTimeString(), `Uploading & analyzing probe: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)...`);
 
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append("file", file);
 
     try {
-      const resp = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const resp = await fetch("/api/upload", { method: "POST", body: formData });
       const data = await resp.json();
 
       if (!data.success) {
-        alert("Upload error: " + (data.error || "Failed to process image"));
-        uploadText.textContent = "[ + SELECT OR DROP IMAGE ]";
-        uploadSub.textContent = "Upload failed. Try another photo.";
-        runBtn.textContent = "SELECT OR UPLOAD FACE";
-        runBtn.disabled = true;
+        alert("Upload failed: " + data.error);
+        clearUpload();
         return;
       }
 
       activeUploadId = data.upload_id;
+      document.getElementById("uploadLabel").textContent = file.name;
+      clearUploadBtn.style.display = "inline-flex";
 
-      // Update UI to show Custom Upload is ACTIVE
-      uploadBox.classList.add("active");
-      uploadText.textContent = `[ ACTIVE: ${file.name.substring(0, 18)} ]`;
-      uploadSub.textContent = `${(file.size / 1024).toFixed(1)} KB • ${data.faces_count} face(s) found`;
-      uploadActions.style.display = "flex";
+      updateProbeProfile(
+        data.preview_b64,
+        data.primary_face,
+        data.embedding_sample,
+        data.faces_count,
+        "CUSTOM UPLOAD",
+        data.all_faces
+      );
 
-      // Re-enable run button now that upload is 100% complete
-      runBtn.disabled = false;
-      runBtn.textContent = "EXECUTE PIPELINE";
-
-      // Update Card 3 Biometrics Immediately with all faces
-      updateProbeProfile(data.preview_b64, data.primary_face, data.embedding_sample, data.faces_count, "CUSTOM PROBE", data.all_faces);
-
-      if (data.faces_count === 0) {
-        appendLog(new Date().toLocaleTimeString(), `WARNING: No faces detected in ${file.name}. Verification may fail.`);
-      } else {
-        appendLog(
-          new Date().toLocaleTimeString(),
-          `Detected ${data.faces_count} face(s)! Primary BBox: [${data.primary_face.bbox.join(", ")}], Confidence: ${(data.primary_face.confidence * 100).toFixed(1)}%, Sharpness: ${data.primary_face.sharpness}`
-        );
-      }
-
+      appendLog(new Date().toLocaleTimeString(), `Detected ${data.faces_count} face(s). Primary conf: ${data.primary_face ? (data.primary_face.confidence * 100).toFixed(1) + '%' : 'None'}`);
     } catch (err) {
       console.error(err);
-      alert("Failed to upload image: " + err.message);
-      uploadText.textContent = "[ + SELECT OR DROP IMAGE ]";
-      uploadSub.textContent = "Supports JPG, PNG, WEBP (Up to 50MB)";
-      runBtn.textContent = "SELECT OR UPLOAD FACE";
-      runBtn.disabled = true;
+      alert("Error uploading image: " + err.message);
+      clearUpload();
     }
   }
 
+  // Probe Profile UI Updates
+  function updateProbeProfile(imgSrc, primaryFace, sample, facesCount, sourceTag, allFaces) {
+    const vp = document.getElementById("probeViewport");
+    if (imgSrc) {
+      vp.innerHTML = `<img src="${imgSrc}" alt="Probe Target" />`;
+    }
+
+    currentDetectedFaces = allFaces || (primaryFace ? [primaryFace] : []);
+    selectedFaceIdx = primaryFace ? primaryFace.face_index : 0;
+    document.getElementById("facesCountBadge").textContent = `${facesCount || currentDetectedFaces.length} FACE(S)`;
+
+    renderPeopleChips(currentDetectedFaces, selectedFaceIdx);
+
+    if (primaryFace) {
+      document.getElementById("valBbox").textContent = `[${primaryFace.bbox.join(", ")}]`;
+      document.getElementById("valConf").textContent = `${(primaryFace.confidence * 100).toFixed(1)}%`;
+      document.getElementById("valSharpness").textContent = `${primaryFace.sharpness}`;
+    } else {
+      document.getElementById("valBbox").textContent = "NO FACE";
+      document.getElementById("valConf").textContent = "0.0%";
+      document.getElementById("valSharpness").textContent = "—";
+    }
+
+    // Reset results containers
+    document.getElementById("entityCard").style.display = "none";
+    document.getElementById("candidateGrid").innerHTML = `
+      <div class="mono" style="grid-column: 1 / -1; padding: 36px 0; text-align: center; color: var(--text-muted);">
+        Candidate imagery will appear here upon pipeline execution.
+      </div>
+    `;
+    document.getElementById("candidateTableBody").innerHTML = `
+      <tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Awaiting pipeline execution...</td></tr>
+    `;
+  }
+
+  // Multi-Person Subject Chips
+  function renderPeopleChips(faces, activeIdx) {
+    const strip = document.getElementById("peopleStrip");
+    const container = document.getElementById("peopleSelectorStrip");
+    strip.innerHTML = "";
+
+    if (!faces || faces.length <= 1) {
+      container.style.display = "none";
+      return;
+    }
+
+    container.style.display = "block";
+    document.getElementById("peopleCountSpan").textContent = faces.length;
+
+    faces.forEach((f, i) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "person-chip" + (f.face_index === activeIdx ? " active" : "");
+
+      let imgHtml = "";
+      if (f.crop_b64) {
+        imgHtml = `<img src="${f.crop_b64}" class="person-chip-crop" alt="Person #${i+1}" />`;
+      }
+      const label = f.is_primary ? `Person #${i+1} (Primary)` : `Person #${i+1}`;
+      chip.innerHTML = `${imgHtml}<span>${label}</span>`;
+
+      chip.addEventListener("click", () => {
+        selectPerson(f.face_index);
+      });
+
+      strip.appendChild(chip);
+    });
+  }
+
+  function selectPerson(faceIdx) {
+    selectedFaceIdx = faceIdx;
+
+    document.querySelectorAll(".person-chip").forEach(chip => {
+      chip.classList.toggle("active", chip.textContent.includes(`Person #${faceIdx + 1}`));
+    });
+
+    const f = currentDetectedFaces.find(x => x.face_index === faceIdx);
+    if (f) {
+      document.getElementById("valBbox").textContent = `[${f.bbox.join(", ")}]`;
+      document.getElementById("valConf").textContent = `${(f.confidence * 100).toFixed(1)}%`;
+      document.getElementById("valSharpness").textContent = `${f.sharpness}`;
+    }
+
+    if (runResultsData && runResultsData.faces_results) {
+      const profile = runResultsData.faces_results.find(p => p.face_index === faceIdx) || runResultsData.faces_results[0];
+      renderFaceResults(profile);
+    }
+  }
+
+  // Render Result Workspace for Selected Face
+  function renderFaceResults(profile) {
+    const tag = currentDetectedFaces.length > 1 ? `[Person #${profile.face_index + 1}]` : "";
+    document.getElementById("entityPersonTag").textContent = tag;
+    document.getElementById("galleryPersonTag").textContent = tag;
+
+    // 1. Entity & Social Profile
+    const entityCard = document.getElementById("entityCard");
+    const nameText = document.getElementById("entityNameText");
+    const bioText = document.getElementById("entityBioText");
+    const socialChips = document.getElementById("socialChipsRow");
+    const socialCount = document.getElementById("socialCountBadge");
+
+    socialChips.innerHTML = "";
+
+    if (profile.social_identity && profile.social_identity.profiles && profile.social_identity.profiles.length > 0) {
+      entityCard.style.display = "block";
+      nameText.textContent = profile.social_identity.canonical_name || "Verified Subject";
+      bioText.textContent = profile.social_identity.bio_summary || "";
+      bioText.style.display = profile.social_identity.bio_summary ? "block" : "none";
+      socialCount.textContent = `${profile.social_identity.profiles.length} PROFILES`;
+
+      profile.social_identity.profiles.forEach(p => {
+        const a = document.createElement("a");
+        a.className = "social-link-badge mono";
+        a.href = p.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.innerHTML = `<span class="platform-tag">${p.platform_label}</span><span>${p.handle}</span>`;
+        socialChips.appendChild(a);
+      });
+    } else {
+      entityCard.style.display = "none";
+    }
+
+    // 2. Candidate Gallery (Photos First Grid)
+    const grid = document.getElementById("candidateGrid");
+    const tbody = document.getElementById("candidateTableBody");
+    grid.innerHTML = "";
+    tbody.innerHTML = "";
+
+    const candidates = profile.leaderboard || [];
+    document.getElementById("galleryCountText").textContent = `${candidates.length} Candidate Web Images Evaluated`;
+
+    if (candidates.length > 0) {
+      candidates.forEach((c, idx) => {
+        const isWinner = (idx === 0 && c.status === "MATCH");
+        const statusClass = c.status === "MATCH" ? "match" : (c.status === "RUNNER" ? "runner" : "reject");
+
+        // Photo source: prioritize high-res matched image for rank 1
+        const imgSrc = (isWinner && profile.matched_image_b64) ? profile.matched_image_b64 : (c.image_url || "");
+
+        // Create Visual Card
+        const card = document.createElement("div");
+        card.className = "candidate-card" + (isWinner ? " winner" : "");
+        card.innerHTML = `
+          <div class="candidate-thumb-box">
+            <span class="candidate-rank-badge mono">#${c.rank}</span>
+            <span class="candidate-status-tag ${statusClass}">${c.status}</span>
+            <img src="${imgSrc}" alt="${c.title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\'><rect fill=\\'%23111\\' width=\\'100\\' height=\\'100\\'/><text fill=\\'%23555\\' x=\\'50%\\' y=\\'50%\\' text-anchor=\\'middle\\' font-family=\\'monospace\\' font-size=\\'10\\'>IMAGE PREVIEW</text></svg>';" />
+          </div>
+          <div class="candidate-details">
+            <div class="candidate-sim-row">
+              <span class="mono" style="font-size: 11px; color: var(--text-muted);">Biometric Similarity</span>
+              <span class="sim-score-text mono">${(c.similarity * 100).toFixed(2)}%</span>
+            </div>
+            <div class="sim-bar-bg">
+              <div class="sim-bar-fill" style="width: ${Math.min(100, Math.max(0, c.similarity * 100))}%;"></div>
+            </div>
+            <div class="candidate-source-title" title="${c.title}">${c.title}</div>
+            <div class="candidate-domain-row mono">
+              <span>${c.domain}</span>
+              <a href="${c.page_url}" target="_blank" rel="noopener noreferrer" class="candidate-domain-link">
+                <span>VISIT</span>
+                <svg class="nav-icon" style="width: 10px; height: 10px;" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              </a>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+
+        // Populate Table Row
+        const tr = document.createElement("tr");
+        if (isWinner) tr.className = "winner-row";
+        tr.innerHTML = `
+          <td>#${c.rank}</td>
+          <td>${c.domain}</td>
+          <td class="truncate" style="max-width: 280px;" title="${c.title}">${c.title}</td>
+          <td>${(c.similarity * 100).toFixed(2)}%</td>
+          <td><span class="candidate-status-tag ${statusClass}" style="position: static;">${c.status}</span></td>
+          <td><a href="${c.page_url}" target="_blank" rel="noopener noreferrer" class="candidate-domain-link">VIEW</a></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } else {
+      grid.innerHTML = `
+        <div class="mono" style="grid-column: 1 / -1; padding: 36px 0; text-align: center; color: var(--text-muted);">
+          No candidate images cleared the acceptance threshold.
+        </div>
+      `;
+      tbody.innerHTML = `
+        <tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">No candidate images cleared threshold.</td></tr>
+      `;
+    }
+
+    // 3. Attestation Record
+    if (profile.attestation) {
+      document.getElementById("valContentSha").textContent = profile.attestation.content_hash || "—";
+      document.getElementById("valRecordSha").textContent = profile.attestation.record_hash || "—";
+      document.getElementById("valTxHash").textContent = profile.attestation.tx_hash || "—";
+      document.getElementById("valBlockSubmitter").textContent = `Block #${profile.attestation.block_number} (${profile.attestation.submitter.substring(0, 10)}...)`;
+    } else {
+      document.getElementById("valContentSha").textContent = "NOT ATTESTED";
+      document.getElementById("valRecordSha").textContent = "NOT ATTESTED";
+      document.getElementById("valTxHash").textContent = "—";
+      document.getElementById("valBlockSubmitter").textContent = "—";
+    }
+
+    if (profile.canonical_record) {
+      document.getElementById("canonicalJsonBox").textContent = JSON.stringify(profile.canonical_record, null, 2);
+    } else {
+      document.getElementById("canonicalJsonBox").textContent = "// No canonical record generated for this face.";
+    }
+  }
+
+  // View Mode Switcher (Gallery vs Table)
+  const viewModeGridBtn = document.getElementById("viewModeGridBtn");
+  const viewModeTableBtn = document.getElementById("viewModeTableBtn");
+  const galleryContainer = document.getElementById("galleryContainer");
+
+  viewModeGridBtn.addEventListener("click", () => {
+    viewModeGridBtn.classList.add("active");
+    viewModeTableBtn.classList.remove("active");
+    galleryContainer.classList.remove("table-view-active");
+  });
+
+  viewModeTableBtn.addEventListener("click", () => {
+    viewModeTableBtn.classList.add("active");
+    viewModeGridBtn.classList.remove("active");
+    galleryContainer.classList.add("table-view-active");
+  });
+
+  // Drawer Tabs
+  document.querySelectorAll(".drawer-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".drawer-tab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+
+      const tabId = tab.getAttribute("data-tab");
+      document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+      document.getElementById(tabId).classList.add("active");
+    });
+  });
+
+  // Copy JSON Button
+  document.getElementById("copyRecordBtn").addEventListener("click", () => {
+    const text = document.getElementById("canonicalJsonBox").textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Canonical RFC-8785 JSON copied to clipboard!");
+    });
+  });
+
+  // Stepper Reset
   function resetStepper() {
     for (let i = 1; i <= 8; i++) {
-      const b = document.getElementById("badge" + i);
-      b.className = "step-badge pending";
-      b.textContent = "PENDING";
+      const bar = document.getElementById("bar" + i);
+      bar.className = "stepper-bar";
     }
+    document.getElementById("stepperStatusText").textContent = "Initializing pipeline...";
   }
 
-  function updateStep(stepNum, status, details, timeStr) {
-    const b = document.getElementById("badge" + stepNum);
-    if (!b) return;
+  function updateStep(stepNum, status, details) {
+    const bar = document.getElementById("bar" + stepNum);
+    if (!bar) return;
     if (status === "running") {
-      b.className = "step-badge running";
-      b.textContent = "RUNNING";
+      bar.className = "stepper-bar running";
+      document.getElementById("stepperStatusText").textContent = `Step ${stepNum}/8: ${details}`;
     } else if (status === "completed") {
-      b.className = "step-badge ok";
-      b.textContent = "OK";
+      bar.className = "stepper-bar done";
     } else if (status === "failed") {
-      b.className = "step-badge fail";
-      b.textContent = "FAIL";
+      bar.className = "stepper-bar fail";
+      document.getElementById("stepperStatusText").textContent = `Step ${stepNum}/8 FAILED: ${details}`;
     }
     if (details) {
-      appendLog(timeStr || new Date().toLocaleTimeString(), `Step ${stepNum}: ${details}`);
+      appendLog(new Date().toLocaleTimeString(), `[Step ${stepNum}/8] ${details}`);
     }
   }
 
+  function appendLog(timeStr, message) {
+    const line = `[${timeStr}] ${message}\n`;
+    terminalLogBox.textContent += line;
+    terminalLogBox.scrollTop = terminalLogBox.scrollHeight;
+  }
+
+  // WebSocket Connection
   function connectWs() {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
 
     ws.onopen = () => {
       if (!activeUploadId) {
-        ws.send(JSON.stringify({ action: "preview", preset: selectedPreset }));
+        requestPreview(selectedPreset);
       }
     };
 
@@ -1370,61 +1935,48 @@
           updateProbeProfile(msg.image_b64, msg.primary_face, msg.embedding_sample, msg.faces_count, "PRESET: " + msg.preset.split("_")[0], msg.all_faces);
         }
       } else if (msg.type === "step_update") {
-        updateStep(msg.step, msg.status, msg.details, msg.timestamp);
+        updateStep(msg.step, msg.status, msg.details);
       } else if (msg.type === "run_complete") {
-        clearInterval(timerInterval);
-        document.getElementById("runBtn").disabled = false;
-        document.getElementById("runBtn").textContent = "Execute Pipeline";
-        renderResults(msg);
+        runPipelineBtn.disabled = false;
+        runPipelineBtn.innerHTML = `
+          <svg class="nav-icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <span>EXECUTE IDENTIFICATION</span>
+        `;
+        handleRunComplete(msg);
       } else if (msg.type === "error") {
-        clearInterval(timerInterval);
-        document.getElementById("runBtn").disabled = false;
-        document.getElementById("runBtn").textContent = "Execute Pipeline";
-        appendLog(new Date().toLocaleTimeString(), `ERROR: ${msg.message}`);
+        runPipelineBtn.disabled = false;
         alert("Pipeline error: " + msg.message);
+        appendLog(new Date().toLocaleTimeString(), `ERROR: ${msg.message}`);
       }
-    };
-
-    ws.onclose = () => {
-      setTimeout(connectWs, 2000);
     };
   }
 
-  connectWs();
+  function requestPreview(preset) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ action: "preview", preset }));
+    }
+  }
 
   // Run Pipeline Execution
-  document.getElementById("runBtn").addEventListener("click", () => {
-    const runBtn = document.getElementById("runBtn");
-
+  runPipelineBtn.addEventListener("click", () => {
     if (!activeUploadId && !selectedPreset) {
-      alert("No face target selected. Please select a preset or upload an image before executing.");
+      alert("Please select a portrait preset or upload an image first.");
       return;
     }
 
     resetStepper();
-    runBtn.disabled = true;
-    runBtn.textContent = "Executing...";
+    runPipelineBtn.disabled = true;
+    runPipelineBtn.textContent = "EXECUTING PIPELINE...";
 
-    const tamper = document.getElementById("tamperToggle").checked;
-    const dryRun = document.getElementById("dryRunToggle").checked;
-    const engine = document.getElementById("engineSelect").value;
+    const similarityThreshold = parseFloat(thresholdSlider.value) || 0.80;
+    const tamper = tamperToggle.checked;
+    const engine = engineSelect.value;
 
-    startTime = Date.now();
-    timerInterval = setInterval(() => {
-      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-      document.getElementById("elapsedCounter").textContent = `${elapsed}s`;
-      document.getElementById("headerStatus").innerHTML = `STATE: <strong>RUNNING (${elapsed}s)</strong>`;
-    }, 100);
-
-    const banner = document.getElementById("verdictBanner");
-    banner.className = "verdict-banner";
-    document.getElementById("verdictTitle").textContent = "STATUS: PIPELINE RUNNING";
-    document.getElementById("verdictDesc").textContent = "Executing multi-tiered discovery, biometric verification, and attestation...";
-    document.getElementById("verdictBadge").textContent = "PROCESSING";
-
-    const similarityThreshold = parseFloat(confSlider.value) || 0.80;
-    const targetDesc = activeUploadId ? `Custom Upload [${activeUploadId}]` : `Preset [${selectedPreset}]`;
-    appendLog(new Date().toLocaleTimeString(), `--- Starting Run: Target=${targetDesc} (Confidence: ${similarityThreshold.toFixed(2)}, Tamper: ${tamper}, DryRun: ${dryRun}, Engine: ${engine}) ---`);
+    const banner = document.getElementById("verdictCard");
+    banner.className = "verdict-card";
+    document.getElementById("verdictTitleText").textContent = "INVESTIGATION IN PROGRESS...";
+    document.getElementById("verdictSubtitle").textContent = "Executing face detection, ArcFace embedding, web discovery, and on-chain attestation...";
+    document.getElementById("verdictMetricBadge").textContent = "RUNNING";
 
     const payload = {
       action: "run",
@@ -1432,117 +1984,114 @@
       preset: activeUploadId ? null : selectedPreset,
       similarity_threshold: similarityThreshold,
       tamper: tamper,
-      dry_run: dryRun,
+      dry_run: false,
       engine: engine,
     };
 
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify(payload));
-    } else {
-      alert("WebSocket connection not ready. Please refresh.");
-      runBtn.disabled = false;
+      appendLog(new Date().toLocaleTimeString(), `--- Initiating Run: Target=${activeUploadId || selectedPreset} (Threshold: ${similarityThreshold}, Tamper: ${tamper}) ---`);
     }
   });
 
-  function renderResults(data) {
-    document.getElementById("headerStatus").innerHTML = `STATE: <strong>COMPLETED (${data.elapsed_seconds}s)</strong>`;
-    currentRunId = data.run_id;
+  // Handle Run Complete
+  function handleRunComplete(data) {
     runResultsData = data;
+    currentRunId = data.run_id;
 
     if (currentRunId) {
-      downloadLedgerBtn.style.display = "inline-block";
-      downloadLedgerBtn.onclick = () => {
+      downloadLedgerTopBtn.style.display = "inline-flex";
+      downloadLedgerTopBtn.onclick = () => {
         window.location.href = `/api/ledger/${currentRunId}`;
       };
     }
 
-    // 1. Input Image
-    if (data.input_image_b64) {
-      const box = document.getElementById("inputImageBox");
-      box.innerHTML = `<img src="${data.input_image_b64}" alt="Input Face" />`;
+    const banner = document.getElementById("verdictCard");
+    const vTitle = document.getElementById("verdictTitleText");
+    const vSub = document.getElementById("verdictSubtitle");
+    const vBadge = document.getElementById("verdictMetricBadge");
+
+    const totalFaces = (data.faces_results || []).length;
+    const attestedCount = (data.faces_results || []).filter(p => p.attestation !== null).length;
+
+    if (data.tamper_mode_active) {
+      banner.className = "verdict-card tampered";
+      vTitle.textContent = "CRYPTOGRAPHIC TAMPER DETECTED";
+      vSub.textContent = "Mutated off-chain payload failed on-chain SHA-256 integrity validation.";
+      vBadge.textContent = "TAMPER DETECTED";
+    } else if (attestedCount === totalFaces && totalFaces > 0) {
+      banner.className = "verdict-card verified";
+      vTitle.textContent = totalFaces > 1 ? `VERIFIED — ${totalFaces} OF ${totalFaces} PERSONS IDENTIFIED & ATTESTED` : "VERIFIED — IMMUTABLE CRYPTOGRAPHIC MATCH";
+      vSub.textContent = `All detected persons verified on Ethereum Sepolia. Elapsed runtime: ${data.elapsed_seconds}s.`;
+      vBadge.textContent = "100% VERIFIED";
+    } else if (attestedCount > 0) {
+      banner.className = "verdict-card verified";
+      vTitle.textContent = `PARTIAL MATCH — ${attestedCount} OF ${totalFaces} ATTESTED`;
+      vSub.textContent = `${attestedCount} detected subject(s) cleared biometric threshold and attested.`;
+      vBadge.textContent = "PARTIAL VERIFIED";
+    } else {
+      banner.className = "verdict-card";
+      vTitle.textContent = "NO BIOMETRIC MATCH CLEARED THRESHOLD";
+      vSub.textContent = `Evaluated ${data.candidates_discovered || 0} discovered web candidates across search indexes.`;
+      vBadge.textContent = "NO MATCH";
     }
 
-    // 2. Handle Multi-Face or Single-Face Results
     if (data.faces_results && data.faces_results.length > 0) {
       currentDetectedFaces = data.faces_results;
       const targetFace = data.faces_results.find(p => p.face_index === selectedFaceIdx) || data.faces_results[0];
       selectedFaceIdx = targetFace.face_index;
-
-      renderFaceChips(data.faces_results, selectedFaceIdx);
-      selectFace(selectedFaceIdx);
-
-      // Final Verdict Banner
-      const banner = document.getElementById("verdictBanner");
-      const vTitle = document.getElementById("verdictTitle");
-      const vDesc = document.getElementById("verdictDesc");
-      const vBadge = document.getElementById("verdictBadge");
-
-      const totalFaces = data.faces_results.length;
-      const attestedCount = data.faces_results.filter(p => p.attestation !== null).length;
-
-      if (totalFaces > 1) {
-        if (attestedCount === totalFaces && !data.tamper_mode_active) {
-          banner.className = "verdict-banner verified";
-          vTitle.textContent = `STATUS: VERIFIED — ${totalFaces} OF ${totalFaces} PERSONS IDENTIFIED & ATTESTED ON-CHAIN`;
-          vDesc.textContent = `All detected people independently verified against immutable Sepolia records. Total runtime: ${data.elapsed_seconds}s.`;
-          vBadge.textContent = "ALL VERIFIED";
-        } else if (data.tamper_mode_active) {
-          banner.className = "verdict-banner tampered";
-          vTitle.textContent = "STATUS: TAMPER DETECTED — ON-CHAIN HASH MISMATCH";
-          vDesc.textContent = `Mutated payload failed validation against immutable Sepolia registry. Zero tampering permitted.`;
-          vBadge.textContent = "TAMPER DETECTED";
-        } else if (attestedCount > 0) {
-          banner.className = "verdict-banner verified";
-          vTitle.textContent = `STATUS: PARTIAL MATCH — ${attestedCount} OF ${totalFaces} PERSONS IDENTIFIED ON-CHAIN`;
-          vDesc.textContent = `${attestedCount} face(s) cleared threshold and attested to Sepolia. Total runtime: ${data.elapsed_seconds}s.`;
-          vBadge.textContent = "PARTIAL MATCH";
-        } else {
-          banner.className = "verdict-banner";
-          vTitle.textContent = `STATUS: NO MATCHES CLEARED THRESHOLD FOR ${totalFaces} PERSONS`;
-          vDesc.textContent = `Evaluated ${totalFaces} face(s) in ${data.elapsed_seconds}s.`;
-          vBadge.textContent = "NO MATCH";
-        }
-      } else {
-        if (data.re_verification_passed && !data.tamper_mode_active) {
-          banner.className = "verdict-banner verified";
-          vTitle.textContent = "STATUS: VERIFIED — ON-CHAIN CRYPTOGRAPHIC INTEGRITY MATCH";
-          vDesc.textContent = `Re-fetched media SHA-256 identical to immutable Sepolia record. Total runtime: ${data.elapsed_seconds}s.`;
-          vBadge.textContent = "VERIFIED";
-        } else if (data.tamper_mode_active) {
-          banner.className = "verdict-banner tampered";
-          vTitle.textContent = "STATUS: TAMPER DETECTED — ON-CHAIN HASH MISMATCH";
-          vDesc.textContent = `Mutated payload failed validation against immutable Sepolia registry. Zero tampering permitted.`;
-          vBadge.textContent = "TAMPER DETECTED";
-        } else {
-          banner.className = "verdict-banner";
-          vTitle.textContent = `STATUS: ${data.status_message.toUpperCase()}`;
-          vDesc.textContent = `Pipeline completed in ${data.elapsed_seconds}s.`;
-          vBadge.textContent = "COMPLETED";
-        }
-      }
-    } else {
-      // Fallback single-face rendering
-      if (data.primary_face) {
-        document.getElementById("valBbox").textContent = `[${data.primary_face.bbox.join(", ")}]`;
-        document.getElementById("valConf").textContent = `${(data.primary_face.confidence * 100).toFixed(1)}% (PASS)`;
-        document.getElementById("valSharpness").textContent = `${data.primary_face.sharpness} (PASS)`;
-      }
-      if (data.embedding_sample && data.embedding_sample.length > 0) {
-        document.getElementById("vectorSample").textContent =
-          `[${data.embedding_sample.join(", ")}, ...] // 512 dimensions`;
-      }
-      if (data.matched_image_b64) {
-        document.getElementById("matchedImageBox").innerHTML = `<img src="${data.matched_image_b64}" alt="Matched Online Post" />`;
-      }
-      const banner = document.getElementById("verdictBanner");
-      banner.className = data.re_verification_passed ? "verdict-banner verified" : "verdict-banner";
-      document.getElementById("verdictTitle").textContent = `STATUS: ${data.status_message.toUpperCase()}`;
-      document.getElementById("verdictDesc").textContent = `Pipeline completed in ${data.elapsed_seconds}s.`;
-      document.getElementById("verdictBadge").textContent = data.re_verification_passed ? "VERIFIED" : "COMPLETED";
+      renderPeopleChips(data.faces_results, selectedFaceIdx);
+      selectPerson(selectedFaceIdx);
     }
-
-    appendLog(new Date().toLocaleTimeString(), `Execution complete in ${data.elapsed_seconds}s. Run ID: ${data.run_id}`);
   }
+
+  // Fetch Historical Runs for Audit Ledger Screen
+  async function fetchLedgerRuns() {
+    const tbody = document.getElementById("ledgerRunsBody");
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Fetching runs...</td></tr>`;
+
+    try {
+      const res = await fetch("/api/runs");
+      const data = await res.json();
+      const runs = data.runs || [];
+      tbody.innerHTML = "";
+
+      if (runs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">No runs recorded yet.</td></tr>`;
+        return;
+      }
+
+      runs.forEach(r => {
+        const tr = document.createElement("tr");
+        const statusText = r.re_verification_passed ? "VERIFIED" : (r.tamper_mode ? "TAMPERED" : "UNCONFIRMED");
+        const statusClass = r.re_verification_passed ? "match" : (r.tamper_mode ? "reject" : "runner");
+
+        tr.innerHTML = `
+          <td class="mono font-bold">${r.run_id}</td>
+          <td class="mono" style="font-size: 11px;">${new Date(r.timestamp).toLocaleString()}</td>
+          <td>${r.identified_name}</td>
+          <td class="mono">${r.candidates_discovered}</td>
+          <td><span class="candidate-status-tag ${statusClass}" style="position: static;">${statusText}</span></td>
+          <td><a href="/api/ledger/${r.run_id}" class="btn-secondary mono" style="padding: 2px 8px; font-size: 10px;">JSON</a></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--status-danger-text);">Failed to load runs: ${e.message}</td></tr>`;
+    }
+  }
+
+  // Reset Button
+  resetAppBtn.addEventListener("click", () => {
+    clearUpload();
+    segPresetsBtn.click();
+    document.querySelector(".preset-card").click();
+    resetStepper();
+    document.getElementById("terminalLogBox").textContent = "[--:--:--] System initialized. Ready to execute pipeline.\n";
+  });
+
+  // Initialize
+  connectWs();
 </script>
 
 </body>

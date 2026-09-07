@@ -10,6 +10,7 @@ import json
 import logging
 import time
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -154,6 +155,45 @@ async def handle_get_ledger(request: web.Request) -> web.Response:
         content_type="application/json",
         headers={"Content-Disposition": f'attachment; filename="ledger_{run_id}.json"'},
     )
+
+
+async def handle_get_runs(request: web.Request) -> web.Response:
+    """Returns list of past pipeline execution runs for the audit ledger."""
+    runs = []
+    if RUNS_DIR.exists():
+        for run_path in sorted(RUNS_DIR.glob("run_*"), key=lambda p: p.stat().st_mtime, reverse=True)[:30]:
+            ev_file = run_path / "evidence_report.json"
+            ledger_file = run_path / "run_ledger.json"
+            data = {}
+            if ev_file.exists():
+                try:
+                    data = json.loads(ev_file.read_text(encoding="utf-8"))
+                except Exception:
+                    pass
+            elif ledger_file.exists():
+                try:
+                    data = json.loads(ledger_file.read_text(encoding="utf-8"))
+                except Exception:
+                    pass
+
+            faces = data.get("faces", [])
+            primary_name = None
+            if faces:
+                first_face = faces[0]
+                soc = first_face.get("social_identity") or {}
+                primary_name = soc.get("canonical_name")
+
+            runs.append({
+                "run_id": run_path.name,
+                "timestamp": data.get("timestamp", datetime.fromtimestamp(run_path.stat().st_mtime, tz=timezone.utc).isoformat()),
+                "faces_count": data.get("input_faces_count", len(faces) or 1),
+                "candidates_discovered": data.get("candidates_discovered", 0),
+                "re_verification_passed": data.get("re_verification", {}).get("passed", False),
+                "tamper_mode": data.get("re_verification", {}).get("tamper_mode", False),
+                "identified_name": primary_name or "Unknown Subject",
+                "top_domain": faces[0].get("source_domain") if faces else None,
+            })
+    return web.json_response({"runs": runs})
 
 
 async def handle_ws(request: web.Request) -> web.WebSocketResponse:
@@ -403,6 +443,7 @@ def create_app() -> web.Application:
     app = web.Application(client_max_size=50 * 1024 * 1024)
     app.router.add_get("/", handle_index)
     app.router.add_get("/api/examples", handle_get_examples)
+    app.router.add_get("/api/runs", handle_get_runs)
     app.router.add_post("/api/upload", handle_upload)
     app.router.add_get("/api/ledger/{run_id}", handle_get_ledger)
     app.router.add_get("/ws", handle_ws)
