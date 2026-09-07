@@ -3,15 +3,26 @@ Face detection and primary subject selection using InsightFace SCRFD.
 Supports landmark extraction, quality gating, and automatic primary face selection.
 """
 
+import contextlib
 from dataclasses import dataclass
+import io
+import logging
 from pathlib import Path
 from typing import List, Optional, Tuple, Union
+import warnings
 
 import cv2
-import numpy as np
 from insightface.app import FaceAnalysis
+import numpy as np
+import onnxruntime
+
+# Filter third-party deprecation warning originating inside insightface's use of scikit-image
+warnings.filterwarnings("ignore", category=FutureWarning, module="insightface")
+warnings.filterwarnings("ignore", message=".*estimate is deprecated.*")
 
 from src.face.quality import check_face_quality
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -37,9 +48,25 @@ class FaceDetector:
 
     _instance: Optional["FaceDetector"] = None
 
-    def __init__(self, model_name: str = "buffalo_l", ctx_id: int = -1, det_size: Tuple[int, int] = (640, 640)):
-        self.app = FaceAnalysis(name=model_name)
-        self.app.prepare(ctx_id=ctx_id, det_size=det_size)
+    def __init__(
+        self,
+        model_name: str = "buffalo_l",
+        ctx_id: int = -1,
+        det_size: Tuple[int, int] = (640, 640),
+        silent: bool = True,
+    ):
+        # Prevent ONNX Runtime UserWarning by only requesting providers that are actually available
+        available_providers = onnxruntime.get_available_providers()
+        providers = ["CUDAExecutionProvider", "CPUExecutionProvider"] if "CUDAExecutionProvider" in available_providers else ["CPUExecutionProvider"]
+
+        # Suppress InsightFace's hardcoded stdout print statements during model loading
+        if silent:
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.app = FaceAnalysis(name=model_name, providers=providers)
+                self.app.prepare(ctx_id=ctx_id, det_size=det_size)
+        else:
+            self.app = FaceAnalysis(name=model_name, providers=providers)
+            self.app.prepare(ctx_id=ctx_id, det_size=det_size)
 
     @classmethod
     def get_shared_instance(cls) -> "FaceDetector":

@@ -27,15 +27,16 @@ class SocialDiscoveryEngine:
         candidate_urls: List[str],
         candidate_htmls: Optional[List[str]] = None,
         candidate_excerpts: Optional[List[str]] = None,
-        name_hint: Optional[str] = None,
     ) -> Optional[PersonSocialIdentity]:
         """
-        Main entry point for resolving a person's social profiles from reverse search candidates.
+        Main entry point for resolving a person's social profiles strictly from reverse search candidates.
         """
-        # 1. Deduce most probable person entity name
-        resolved_name = name_hint
-        if not resolved_name or len(resolved_name.strip()) < 3:
-            resolved_name = extract_entity_name(candidate_titles, candidate_excerpts)
+        # 1. Deduce most probable person entity name strictly from candidate web results
+        resolved_name = extract_entity_name(
+            titles=candidate_titles,
+            candidate_urls=candidate_urls,
+            text_excerpts=candidate_excerpts,
+        )
 
         profiles_by_platform: Dict[SocialPlatform, SocialProfile] = {}
         bio_summary: Optional[str] = None

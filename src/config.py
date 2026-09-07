@@ -49,5 +49,7 @@ class PipelineConfig:
 
 
 def get_config() -> PipelineConfig:
-    """Returns singleton pipeline configuration instance."""
+    """Returns pipeline configuration instance, reloading .env if present."""
+    if env_path.exists():
+        load_dotenv(dotenv_path=env_path, override=True)
     return PipelineConfig()

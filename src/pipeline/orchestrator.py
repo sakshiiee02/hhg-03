@@ -211,14 +211,12 @@ class PipelineOrchestrator:
         # -------------------------------------------------------------
         # STEP 3: Dynamic Reverse Image Search
         # -------------------------------------------------------------
-        notify(3, "Web Discovery", "running", f"Initiating dynamic reverse-image search ({self.config.search_engine})...")
+        notify(3, "Web Discovery", "running", f"Initiating parallel visual search ({self.config.search_engine})...")
         candidates = await self.search_router.discover_candidates(image_path, max_candidates=35)
         if not candidates:
             reason = "No candidate URLs discovered by search engines."
             if self.config.search_engine == "serpapi" and not self.search_router.serpapi:
-                reason = "SERPAPI_API_KEY is not configured in .env. Please add your key or use Auto/Yandex."
-            elif self.config.search_engine == "google_lens":
-                reason = "Google Lens blocked automated upload (CAPTCHA rate-limit). Use Auto Router (Yandex) or configure SerpApi."
+                reason = "SERPAPI_API_KEY is not configured in .env. Please configure your key or select Parallel Auto / Yandex."
             notify(3, "Web Discovery", "failed", reason)
             return PipelineRunResult(
                 success=False,
@@ -408,9 +406,10 @@ class PipelineOrchestrator:
             # Discover social profiles for the verified person
             social_ident = None
             try:
-                cand_titles = [c.title for c in top_c if c.title]
-                cand_urls = [c.page_url for c in top_c if c.page_url]
+                cand_titles = [c.title for c in top_c if c.title] + [c.title for c in candidates if c.title]
+                cand_urls = [c.page_url for c in top_c if c.page_url] + [c.page_url for c in candidates if c.page_url]
                 cand_excerpts = [downloaded_by_id[c.candidate_id].text_excerpt for c in top_c if c.candidate_id in downloaded_by_id]
+                
                 social_ident = await self.social_engine.discover_socials(
                     candidate_titles=cand_titles,
                     candidate_urls=cand_urls,

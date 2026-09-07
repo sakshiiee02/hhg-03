@@ -1176,10 +1176,9 @@
             <div class="form-group">
               <div class="form-label">Search Discovery Engine</div>
               <select class="select-input mono" id="engineSelect">
-                <option value="auto">Auto Router (Yandex -> Lens -> SerpApi)</option>
+                <option value="auto">Parallel Auto (Yandex + SerpApi Multi-Engine)</option>
                 <option value="yandex">Yandex Images (Stealth Chromium)</option>
-                <option value="google_lens">Google Lens (Direct)</option>
-                <option value="serpapi">SerpApi Safety Net</option>
+                <option value="serpapi">SerpApi Multi-Engine (Lens + Bing + Google)</option>
               </select>
             </div>
 
@@ -1233,7 +1232,7 @@
           </div>
 
           <!-- 2. Identified Identity & Verified Social Accounts Card -->
-          <div class="entity-card" id="entityCard" style="display: none;">
+          <div class="entity-card" id="entityCard">
             <div class="entity-header">
               <div>
                 <div class="mono" style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
@@ -1443,9 +1442,9 @@ contract FaceVerificationRegistry {
           <div class="form-group">
             <div class="form-label">Search Router Engine Priorities</div>
             <div class="mono" style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
-              1. <strong>Yandex Images (Stealth Chromium)</strong>: Direct automated image upload with zero API keys and no rate limits.<br />
-              2. <strong>Google Lens (Direct Playwright)</strong>: Direct headless upload (fallback to SerpApi on CAPTCHA).<br />
-              3. <strong>SerpApi Safety Net</strong>: Commercial proxy API for Google Lens (requires SERPAPI_API_KEY in .env).
+              1. <strong>Parallel Multi-Engine (Auto)</strong>: Concurrently queries Yandex Images and SerpApi (Google Lens + Bing Visual + Google Reverse), interleaving results round-robin.<br />
+              2. <strong>Yandex Images (Stealth Chromium)</strong>: Direct automated image upload with zero API keys and no rate limits.<br />
+              3. <strong>SerpApi Multi-Engine</strong>: Commercial visual search suite (Google Lens, Bing Visual Search, Google Reverse Image; requires SERPAPI_API_KEY in .env).
             </div>
           </div>
 
@@ -1633,6 +1632,50 @@ contract FaceVerificationRegistry {
     }
   }
 
+  // Reset entire workspace to pristine standby state (clears all previous run data)
+  function resetInvestigationWorkspace() {
+    runResultsData = null;
+    currentRunId = null;
+    downloadLedgerTopBtn.style.display = "none";
+
+    // 1. Reset Verdict Banner
+    const banner = document.getElementById("verdictCard");
+    banner.className = "verdict-card";
+    document.getElementById("verdictTitleText").textContent = "STATUS: READY TO SCAN";
+    document.getElementById("verdictSubtitle").textContent = "Select a target portrait to begin facial intelligence discovery.";
+    const badge = document.getElementById("verdictMetricBadge");
+    badge.textContent = "STANDBY";
+    badge.style.color = "var(--text-secondary)";
+    badge.style.borderColor = "var(--border-focus)";
+
+    // 2. Reset Identified Subject & Social Profiles Card to Standby
+    renderSocialProfiles(null, false);
+
+    // 3. Reset Candidate Gallery
+    document.getElementById("candidateGrid").innerHTML = `
+      <div class="mono" style="grid-column: 1 / -1; padding: 36px 0; text-align: center; color: var(--text-muted);">
+        Candidate imagery will appear here upon pipeline execution.
+      </div>
+    `;
+    document.getElementById("candidateTableBody").innerHTML = `
+      <tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Awaiting pipeline execution...</td></tr>
+    `;
+    document.getElementById("galleryCountText").textContent = "0 Candidate Web Images Evaluated";
+    document.getElementById("entityPersonTag").textContent = "";
+    document.getElementById("galleryPersonTag").textContent = "";
+
+    // 4. Reset Cryptographic Attestation Drawer
+    document.getElementById("valContentSha").textContent = "—";
+    document.getElementById("valRecordSha").textContent = "—";
+    document.getElementById("valTxHash").textContent = "—";
+    document.getElementById("valBlockSubmitter").textContent = "—";
+    document.getElementById("canonicalJsonBox").textContent = "// Awaiting pipeline execution...";
+
+    // 5. Reset Micro-Stepper
+    resetStepper();
+    document.getElementById("stepperStatusText").textContent = "Ready to execute";
+  }
+
   // Probe Profile UI Updates
   function updateProbeProfile(imgSrc, primaryFace, sample, facesCount, sourceTag, allFaces) {
     const vp = document.getElementById("probeViewport");
@@ -1656,16 +1699,58 @@ contract FaceVerificationRegistry {
       document.getElementById("valSharpness").textContent = "—";
     }
 
-    // Reset results containers
-    document.getElementById("entityCard").style.display = "none";
-    document.getElementById("candidateGrid").innerHTML = `
-      <div class="mono" style="grid-column: 1 / -1; padding: 36px 0; text-align: center; color: var(--text-muted);">
-        Candidate imagery will appear here upon pipeline execution.
-      </div>
-    `;
-    document.getElementById("candidateTableBody").innerHTML = `
-      <tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Awaiting pipeline execution...</td></tr>
-    `;
+    // Completely wipe all previous run data whenever a new target image is loaded
+    resetInvestigationWorkspace();
+  }
+
+  // Render Social Profiles & Subject Identity strictly from live reverse-search results
+  function renderSocialProfiles(socialIdentity, isVerified = false) {
+    const entityCard = document.getElementById("entityCard");
+    const nameText = document.getElementById("entityNameText");
+    const bioText = document.getElementById("entityBioText");
+    const socialChips = document.getElementById("socialChipsRow");
+    const socialCount = document.getElementById("socialCountBadge");
+
+    entityCard.style.display = "block";
+    socialChips.innerHTML = "";
+
+    if (isVerified && socialIdentity && socialIdentity.profiles && socialIdentity.profiles.length > 0) {
+      // Authentic verified public profiles discovered live
+      nameText.textContent = socialIdentity.canonical_name || "Verified Subject";
+      bioText.textContent = socialIdentity.bio_summary || "Biometrically verified identity across public databases.";
+      bioText.style.display = "block";
+      socialCount.textContent = `${socialIdentity.profiles.length} VERIFIED PROFILES`;
+      socialCount.style.borderColor = "var(--accent-emerald)";
+      socialCount.style.color = "var(--accent-emerald)";
+
+      socialIdentity.profiles.forEach(p => {
+        const a = document.createElement("a");
+        a.className = "social-link-badge mono";
+        a.href = p.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.innerHTML = `<span class="platform-tag">${p.platform_label || p.platform || "WEB"}</span><span>${p.handle || p.display_name}</span>`;
+        socialChips.appendChild(a);
+      });
+    } else if (isVerified) {
+      // Pipeline completed, but 0 social profiles found
+      nameText.textContent = (socialIdentity && socialIdentity.canonical_name) ? socialIdentity.canonical_name : "Unidentified Subject";
+      bioText.textContent = (socialIdentity && socialIdentity.bio_summary) ? socialIdentity.bio_summary : "No public social media accounts discovered on public web indexes.";
+      bioText.style.display = "block";
+      socialCount.textContent = "0 PUBLIC PROFILES";
+      socialCount.style.borderColor = "var(--border-default)";
+      socialCount.style.color = "var(--text-muted)";
+      socialChips.innerHTML = `<span class="mono" style="font-size: 11px; color: var(--text-muted);">0 public social profiles discovered across web indexes for this target.</span>`;
+    } else {
+      // Standby / Pre-execution state
+      nameText.textContent = "Awaiting Investigation";
+      bioText.textContent = "Target identity and verified social media accounts will be resolved live from candidate web sources.";
+      bioText.style.display = "block";
+      socialCount.textContent = "STANDBY";
+      socialCount.style.borderColor = "var(--border-default)";
+      socialCount.style.color = "var(--text-muted)";
+      socialChips.innerHTML = `<span class="mono" style="font-size: 11px; color: var(--text-muted);">Awaiting pipeline execution — Identity will be discovered live from public web indexes.</span>`;
+    }
   }
 
   // Multi-Person Subject Chips
@@ -1729,33 +1814,7 @@ contract FaceVerificationRegistry {
     document.getElementById("galleryPersonTag").textContent = tag;
 
     // 1. Entity & Social Profile
-    const entityCard = document.getElementById("entityCard");
-    const nameText = document.getElementById("entityNameText");
-    const bioText = document.getElementById("entityBioText");
-    const socialChips = document.getElementById("socialChipsRow");
-    const socialCount = document.getElementById("socialCountBadge");
-
-    socialChips.innerHTML = "";
-
-    if (profile.social_identity && profile.social_identity.profiles && profile.social_identity.profiles.length > 0) {
-      entityCard.style.display = "block";
-      nameText.textContent = profile.social_identity.canonical_name || "Verified Subject";
-      bioText.textContent = profile.social_identity.bio_summary || "";
-      bioText.style.display = profile.social_identity.bio_summary ? "block" : "none";
-      socialCount.textContent = `${profile.social_identity.profiles.length} PROFILES`;
-
-      profile.social_identity.profiles.forEach(p => {
-        const a = document.createElement("a");
-        a.className = "social-link-badge mono";
-        a.href = p.url;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        a.innerHTML = `<span class="platform-tag">${p.platform_label}</span><span>${p.handle}</span>`;
-        socialChips.appendChild(a);
-      });
-    } else {
-      entityCard.style.display = "none";
-    }
+    renderSocialProfiles(profile.social_identity, true, "VERIFIED IDENTITY");
 
     // 2. Candidate Gallery (Photos First Grid)
     const grid = document.getElementById("candidateGrid");
@@ -2091,6 +2150,7 @@ contract FaceVerificationRegistry {
   });
 
   // Initialize
+  resetInvestigationWorkspace();
   connectWs();
 </script>
 

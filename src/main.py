@@ -247,9 +247,9 @@ def main():
     parser.add_argument(
         "--engine",
         type=str,
-        choices=["auto", "yandex", "google_lens", "serpapi"],
+        choices=["auto", "yandex", "serpapi"],
         default=None,
-        help="Override search engine provider (default: from .env or 'auto')",
+        help="Override search engine provider ('auto', 'yandex', or 'serpapi')",
     )
 
     args = parser.parse_args()

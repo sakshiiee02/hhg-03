@@ -53,19 +53,7 @@
    - Step 8 re-fetches media over the network and verifies hashes against the immutable on-chain record.
    - `--tamper` CLI mode deliberately mutates data off-chain to demonstrate cryptographic mismatch detection.
 
----
 
-## Development & Evaluation Documentation
-
-| Document | Purpose |
-| --- | --- |
-| **[HH_Goa_2026_Task3_Developer_Handoff.md](file:///d:/Projects/hhg-03/docs/HH_Goa_2026_Task3_Developer_Handoff.md)** | Master developer handoff specification updated with interview decisions. |
-| **[ARCHITECTURE.md](file:///d:/Projects/hhg-03/docs/ARCHITECTURE.md)** | In-depth technical architecture of biometrics, search routing, and blockchain. |
-| **[SETUP_GUIDE.md](file:///d:/Projects/hhg-03/docs/SETUP_GUIDE.md)** | Step-by-step developer environment setup and dependency installation. |
-| **[DEMO_SCRIPT.md](file:///d:/Projects/hhg-03/docs/DEMO_SCRIPT.md)** | Evaluator screen-recording script (00:00 – 01:20 timing breakdown). |
-| **[EVALUATION_GUIDE.md](file:///d:/Projects/hhg-03/docs/EVALUATION_GUIDE.md)** | Accuracy calibration, quality gating policy, and test matrices. |
-
----
 
 ## Quickstart
 

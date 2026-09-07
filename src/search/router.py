@@ -1,16 +1,18 @@
 """
-Search Router coordinating primary automated discovery with multi-engine fallback.
-Prioritizes Yandex Images (Playwright Stealth) -> Google Lens -> SerpApi Safety Net.
+Search Router coordinating multi-engine visual discovery.
+Runs Yandex Images (Playwright Stealth) and SerpApi Multi-Engine
+(Google Lens, Bing Visual Search, Google Reverse Image) in parallel,
+merging and deduplicating results via round-robin interleaving.
 """
 
+import asyncio
 import logging
 from pathlib import Path
 from typing import List, Optional
 
 from PIL import Image
 
-from src.search.base import CandidateResult
-from src.search.google_lens import GoogleLensSearchEngine
+from src.search.base import CandidateResult, normalize_url
 from src.search.serpapi import SerpApiSearchEngine
 from src.search.yandex import YandexSearchEngine
 
@@ -33,7 +35,11 @@ def _get_search_query_path(image_path: Path) -> Path:
 
 
 class SearchRouter:
-    """Coordinates reverse-image search discovery across multiple providers."""
+    """
+    Coordinates reverse-image search discovery across multiple visual engines.
+    Supports parallel execution across Yandex Images (Playwright Stealth) and
+    SerpApi multi-engine (Google Lens, Bing Visual Search, Google Reverse Image).
+    """
 
     def __init__(
         self,
@@ -43,8 +49,45 @@ class SearchRouter:
         self.primary_engine = primary_engine.lower()
         self.serpapi_key = serpapi_api_key
         self.yandex = YandexSearchEngine()
-        self.google_lens = GoogleLensSearchEngine()
         self.serpapi = SerpApiSearchEngine(serpapi_api_key) if serpapi_api_key else None
+
+    @staticmethod
+    def _interleave_and_deduplicate(
+        result_lists: List[List[CandidateResult]],
+        max_candidates: int,
+    ) -> List[CandidateResult]:
+        """
+        Interleaves multiple engine result sets in a round-robin sequence to ensure
+        balanced representation across providers, deduplicating by normalized page URL.
+        """
+        merged: List[CandidateResult] = []
+        seen_urls = set()
+        if not result_lists:
+            return []
+
+        max_len = max((len(l) for l in result_lists), default=0)
+        rank = 1
+
+        for i in range(max_len):
+            for l in result_lists:
+                if i < len(l):
+                    c = l[i]
+                    norm_url = normalize_url(c.page_url)
+                    if norm_url not in seen_urls:
+                        seen_urls.add(norm_url)
+                        merged.append(CandidateResult(
+                            rank=rank,
+                            page_url=norm_url,
+                            image_url=c.image_url,
+                            source_domain=c.source_domain,
+                            title=c.title,
+                            provider=c.provider,
+                        ))
+                        rank += 1
+                        if len(merged) >= max_candidates:
+                            return merged
+
+        return merged
 
     async def discover_candidates(
         self,
@@ -52,102 +95,82 @@ class SearchRouter:
         max_candidates: int = 35,
     ) -> List[CandidateResult]:
         """
-        Conducts genuine dynamic reverse search with automatic fallback routing.
+        Conducts reverse search across configured visual search engines.
+        In 'auto' mode, queries Yandex and SerpApi concurrently, merging results round-robin.
         """
-        candidates: List[CandidateResult] = []
-        active_provider = ""
         query_image = _get_search_query_path(image_path)
 
-        # A. Explicit Engine: SerpApi
+        # A. Explicit Engine: SerpApi Multi-Engine
         if self.primary_engine == "serpapi":
             if not self.serpapi:
                 logger.warning(
                     "SerpApi is selected as discovery engine, but SERPAPI_API_KEY is not configured in .env. "
-                    "To use SerpApi, sign up for a free key at https://serpapi.com/ and set SERPAPI_API_KEY in .env."
+                    "To use SerpApi, set SERPAPI_API_KEY in .env or switch to Auto / Yandex."
                 )
                 return []
-            logger.info("Executing SerpApi Google Lens discovery...")
+            logger.info("Executing SerpApi Multi-Engine discovery (Google Lens + Bing + Google Reverse)...")
             try:
                 candidates = await self.serpapi.search(query_image, max_results=max_candidates)
-                if candidates:
-                    logger.info(f"SerpApi discovered {len(candidates)} candidates.")
+                logger.info(f"SerpApi discovered {len(candidates)} candidates.")
+                return candidates
             except Exception as e:
                 logger.warning(f"SerpApi query failed: {e}")
-            return candidates
+                return []
 
-        # B. Explicit Engine: Google Lens (Playwright)
-        if self.primary_engine == "google_lens":
-            logger.info("Executing Google Lens discovery via Playwright...")
+        # B. Explicit Engine: Google Lens (via SerpApi with fallback)
+        if self.primary_engine in ("google_lens", "lens"):
+            if not self.serpapi:
+                logger.warning(
+                    "Google Lens now runs reliably via SerpApi, but SERPAPI_API_KEY is not set. "
+                    "Falling back to Yandex Images."
+                )
+                return await self.yandex.search(query_image, max_results=max_candidates)
             try:
-                candidates = await self.google_lens.search(query_image, max_results=max_candidates)
-                if not candidates:
-                    logger.warning(
-                        "Google Lens returned 0 results. Google actively blocks automated headless image uploads (CAPTCHA/sorry page). "
-                        "Use the Auto Router (Yandex) or configure SERPAPI_API_KEY for 100% reliable Google Lens discovery."
-                    )
+                return await self.serpapi.search(
+                    query_image,
+                    max_results=max_candidates,
+                    engines=["google_lens"],
+                )
             except Exception as e:
-                logger.warning(f"Google Lens discovery failed: {e}")
-            return candidates
+                logger.warning(f"SerpApi Google Lens query failed: {e}")
+                return []
 
         # C. Explicit Engine: Yandex Only
         if self.primary_engine == "yandex":
             logger.info("Executing Yandex Images discovery via Playwright...")
             try:
                 candidates = await self.yandex.search(query_image, max_results=max_candidates)
+                logger.info(f"Yandex discovered {len(candidates)} candidates.")
+                return candidates
             except Exception as e:
                 logger.warning(f"Yandex search failed: {e}")
-            return candidates
+                return []
 
-        # D. Auto Router: Multi-engine fallback (Yandex -> Google Lens -> SerpApi)
-        logger.info("Initiating dynamic reverse search on Yandex Images (Primary)...")
-        try:
-            candidates = await self.yandex.search(query_image, max_results=max_candidates)
-            if candidates:
-                active_provider = "Yandex Images"
-                logger.info(f"Yandex successfully discovered {len(candidates)} candidates.")
-        except Exception as e:
-            logger.warning(f"Yandex search failed ({e}). Proceeding to fallback...")
+        # D. Auto / Parallel Multi-Engine Discovery
+        # Runs Yandex and SerpApi concurrently when SerpApi is configured.
+        logger.info("Initiating parallel visual discovery across available search engines...")
+        engines_to_run = [
+            ("Yandex Images", self.yandex.search(query_image, max_results=max_candidates))
+        ]
 
-        # Fallback 1: Google Lens
-        if len(candidates) < 5:
-            logger.info("Attempting Google Lens discovery fallback...")
-            try:
-                lens_candidates = await self.google_lens.search(query_image, max_results=max_candidates)
-                if lens_candidates:
-                    active_provider = "Google Lens" if not candidates else f"{active_provider} + Google Lens"
-                    candidates.extend(lens_candidates)
-                    logger.info(f"Google Lens discovered {len(lens_candidates)} candidates.")
-            except Exception as e:
-                logger.warning(f"Google Lens fallback failed ({e}).")
+        if self.serpapi:
+            engines_to_run.append(
+                ("SerpApi Multi-Engine", self.serpapi.search(query_image, max_results=max_candidates))
+            )
+        else:
+            logger.info("SERPAPI_API_KEY not configured; running visual search on Yandex Images.")
 
-        # Fallback 2: SerpApi Safety Net
-        if len(candidates) < 5 and self.serpapi:
-            logger.info("Activating SerpApi safety net fallback...")
-            try:
-                serp_candidates = await self.serpapi.search(query_image, max_results=max_candidates)
-                if serp_candidates:
-                    active_provider = "SerpApi" if not candidates else f"{active_provider} + SerpApi"
-                    candidates.extend(serp_candidates)
-                    logger.info(f"SerpApi safety net discovered {len(serp_candidates)} candidates.")
-            except Exception as e:
-                logger.warning(f"SerpApi fallback failed ({e}).")
+        tasks = [task for _, task in engines_to_run]
+        raw_results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        # Deduplicate candidates across engines by normalized page_url
-        seen_urls = set()
-        deduped: List[CandidateResult] = []
-        rank = 1
+        engine_candidate_lists: List[List[CandidateResult]] = []
+        for (name, _), result in zip(engines_to_run, raw_results):
+            if isinstance(result, Exception):
+                logger.warning(f"Search provider '{name}' error: {result}")
+            elif isinstance(result, list) and result:
+                logger.info(f"Search provider '{name}' discovered {len(result)} candidate(s).")
+                engine_candidate_lists.append(result)
 
-        for c in candidates:
-            if c.page_url not in seen_urls:
-                seen_urls.add(c.page_url)
-                deduped.append(CandidateResult(
-                    rank=rank,
-                    page_url=c.page_url,
-                    image_url=c.image_url,
-                    source_domain=c.source_domain,
-                    title=c.title,
-                    provider=c.provider,
-                ))
-                rank += 1
-
-        return deduped[:max_candidates]
+        deduped = self._interleave_and_deduplicate(engine_candidate_lists, max_candidates=max_candidates)
+        logger.info(f"Multi-engine discovery complete. Total unique candidates: {len(deduped)}")
+        return deduped

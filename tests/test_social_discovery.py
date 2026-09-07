@@ -94,6 +94,17 @@ def test_extract_entity_name():
     assert name == "Jensen Huang"
 
 
+def test_extract_entity_name_with_noise_slugs():
+    """Verifies that image/event noise in URL slugs (like 'cropped', 'siggraph') is cleanly filtered."""
+    urls = [
+        "https://profitonline.cz/wp-content/uploads/2026/05/jensen-huang-cropped-1.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/c/c4/Jensen_Huang_SIGGRAPH_2023.jpg",
+    ]
+    titles = ["jensen-huang-cropped-1.jpg"]
+    name = extract_entity_name(titles=titles, candidate_urls=urls)
+    assert name == "Jensen Huang"
+
+
 @pytest.mark.asyncio
 async def test_social_discovery_engine_live():
     from src.social.engine import SocialDiscoveryEngine

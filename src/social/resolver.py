@@ -15,7 +15,7 @@ from src.social.models import PersonSocialIdentity, SocialPlatform, SocialProfil
 
 logger = logging.getLogger(__name__)
 
-# Noise tokens commonly found in web page titles and search snippets
+# Noise tokens commonly found in web page titles, slugs, and search snippets
 TITLE_NOISE_TERMS = [
     "wikipedia", "the free encyclopedia", "linkedin", "forbes", "bloomberg",
     "instagram", "twitter", "x.com", "facebook", "youtube", "crunchbase",
@@ -25,6 +25,27 @@ TITLE_NOISE_TERMS = [
     "who is", "ceo", "founder", "president", "director", "executive",
 ]
 
+SLUG_NOISE_WORDS = {
+    "image", "images", "photo", "photos", "portrait", "portraits", "author",
+    "autori", "thumb", "thumbnail", "thumbnails", "small", "medium", "large",
+    "upload", "uploads", "media", "cache", "avatar", "cropped", "crop", "hires",
+    "headshot", "cutout", "closeup", "pic", "picture", "pictures", "wallpaper",
+    "full", "official", "banner", "cover", "article", "news", "content", "wp",
+    "static", "assets", "gallery", "default", "profile", "icon", "vector",
+    "illustration", "png", "jpg", "jpeg", "webp", "gif", "svg", "scale", "hd",
+    "hq", "res", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+    "siggraph", "interview", "keynote", "summit", "conference", "meeting",
+    "speech", "talk", "stage", "press",
+}
+
+TITLE_TRAILING_NOISE = {
+    "cropped", "crop", "hires", "headshot", "portrait", "face", "photo", "image",
+    "pic", "picture", "square", "circle", "vector", "official", "ceo", "founder",
+    "president", "keynote", "speaker", "interview", "nvidia", "openai", "microsoft",
+    "meta", "google", "apple", "tesla", "amazon", "news", "law", "wallpaper",
+    "wikipedia", "commons", "wikimedia", "file", "jpg", "jpeg", "png", "webp",
+}
+
 CLEAN_DELIMITERS_REGEX = re.compile(r"[\-|–|—|:|•|\|]")
 
 
@@ -33,59 +54,98 @@ def clean_title_candidate(title: str) -> str:
     if not title:
         return ""
 
-    # 1. Clean noisy prefixes (e.g. "Who is ", "Meet ", "Photo of ")
-    clean_str = re.sub(r"^(who is|meet|photo of|portrait of|inside)\s+", "", title, flags=re.IGNORECASE).strip()
+    # 1. Strip parenthetical/bracketed qualifiers (e.g. "(cropped)", "[photo]", "(born 1963)")
+    clean_str = re.sub(r"\(.*?\)", " ", title)
+    clean_str = re.sub(r"\[.*?\]", " ", clean_str)
 
-    # 2. Split on common delimiters
+    # 2. Clean noisy prefixes (e.g. "Who is ", "Meet ", "Photo of ", "File:")
+    clean_str = re.sub(
+        r"^(file|image|photo|picture|who is|meet|photo of|portrait of|inside)\s*[:\-]?\s*",
+        "",
+        clean_str,
+        flags=re.IGNORECASE,
+    ).strip()
+
+    # 3. Split on common delimiters
     parts = CLEAN_DELIMITERS_REGEX.split(clean_str)
 
-    # 3. Look across parts for consecutive capitalized name tokens
+    # 4. Look across parts for consecutive capitalized name tokens
     name_pattern = re.compile(r"\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3})\b")
 
     for part in parts:
         cand = part.strip()
         lower_cand = cand.lower()
-        if any(noise in lower_cand for noise in ("wikipedia", "linkedin", "twitter", "instagram", "facebook")):
+        if any(noise in lower_cand for noise in ("wikipedia", "linkedin", "twitter", "instagram", "facebook", "youtube")):
             continue
 
         # Look for 2 to 4 capitalized words (e.g. "Jensen Huang", "Sam Altman")
         matches = name_pattern.findall(cand)
         for m in matches:
             words = m.split()
-            # Filter out non-name common phrases
-            if not any(w.lower() in ("net worth", "free encyclopedia", "breaking news", "united states") for w in words):
-                return m
+            # Trim trailing noise words (e.g. "Jensen Huang Cropped" -> "Jensen Huang")
+            if len(words) > 2 and words[-1].lower() in TITLE_TRAILING_NOISE:
+                words = words[:-1]
+            if 2 <= len(words) <= 3 and not any(w.lower() in ("net worth", "free encyclopedia", "breaking news", "united states") for w in words):
+                return " ".join(words)
 
         words = [w for w in cand.split() if w.isalpha()]
-        if 2 <= len(words) <= 4 and all(w[0].isupper() for w in words):
-            return cand
+        if len(words) > 2 and words[-1].lower() in TITLE_TRAILING_NOISE:
+            words = words[:-1]
+        if 2 <= len(words) <= 3 and all(w[0].isupper() for w in words):
+            return " ".join(words)
 
     return parts[0].strip() if parts else title.strip()
 
 
-def extract_entity_name(titles: List[str], text_excerpts: Optional[List[str]] = None) -> Optional[str]:
+def extract_entity_name(
+    titles: List[str],
+    candidate_urls: Optional[List[str]] = None,
+    text_excerpts: Optional[List[str]] = None,
+) -> Optional[str]:
     """
-    Extracts the most probable person/entity name from a collection of candidate titles.
+    Extracts the most probable person/entity name strictly from a collection of candidate
+    web page titles, candidate URL slugs, and text excerpts.
     Uses pattern cleaning and frequency voting.
     """
-    if not titles:
-        return None
-
     cleaned_names: List[str] = []
-    for t in titles:
+
+    # 1. Extract names from URL slugs (e.g. /sam-altman.jpg, /jensen-huang-cropped-1.jpg)
+    if candidate_urls:
+        for url in candidate_urls:
+            slugs = re.findall(r'([a-z]{3,20}(?:[-_][a-z0-9]{1,20})+)', url.lower())
+            for s in slugs:
+                parts = re.split(r'[-_]', s)
+                clean_parts = [p for p in parts if p.lower() not in SLUG_NOISE_WORDS and p.isalpha()]
+                if 2 <= len(clean_parts) <= 3:
+                    cand_name = " ".join(p.capitalize() for p in clean_parts)
+                    cleaned_names.append(cand_name)
+
+    # 2. Extract names from candidate titles
+    for t in (titles or []):
         cleaned = clean_title_candidate(t)
-        # Strip remaining non-alpha prefixes (e.g. "Who is ", "Photo of ")
-        cleaned = re.sub(r"^(who is|photo of|portrait of|image of|meet)\s+", "", cleaned, flags=re.IGNORECASE)
-        # Check word structure
         words = [w for w in cleaned.split() if w.isalpha()]
-        if 2 <= len(words) <= 4 and all(w[0].isupper() for w in words):
+        if len(words) > 2 and words[-1].lower() in TITLE_TRAILING_NOISE:
+            words = words[:-1]
+        if 2 <= len(words) <= 3 and all(w[0].isupper() for w in words):
             cleaned_names.append(" ".join(words))
 
+    # 3. Extract names from text excerpts
+    if text_excerpts:
+        name_pattern = re.compile(r"\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})\b")
+        for exc in text_excerpts:
+            if exc:
+                for m in name_pattern.findall(exc):
+                    words = m.split()
+                    if len(words) > 2 and words[-1].lower() in TITLE_TRAILING_NOISE:
+                        words = words[:-1]
+                    if 2 <= len(words) <= 3 and not any(w.lower() in ("face verification", "breaking news", "united states", "executive director") for w in words):
+                        cleaned_names.append(" ".join(words))
+
     if not cleaned_names:
-        # Fallback: check first title
-        fallback_words = [w for w in titles[0].split() if w.isalpha()]
-        if len(fallback_words) >= 2:
-            return f"{fallback_words[0]} {fallback_words[1]}".title()
+        if titles:
+            fallback_words = [w for w in titles[0].split() if w.isalpha()]
+            if len(fallback_words) >= 2:
+                return f"{fallback_words[0]} {fallback_words[1]}".title()
         return None
 
     # Count occurrences
@@ -108,6 +168,7 @@ class WikidataSocialResolver:
     async def resolve(self, person_name: str) -> Optional[PersonSocialIdentity]:
         """
         Looks up the person on Wikipedia/Wikidata and returns their structured social profiles.
+        Supports fallback query tokenization for multi-word queries (e.g. 'Jensen Huang Cropped' -> 'Jensen Huang').
         """
         if not person_name or len(person_name.strip()) < 3:
             return None
@@ -115,30 +176,43 @@ class WikidataSocialResolver:
         clean_name = person_name.strip()
         headers = {"User-Agent": self.USER_AGENT}
 
+        # Multi-stage query strategy: try full name, then first 2 tokens
+        query_attempts = [clean_name]
+        words = clean_name.split()
+        if len(words) > 2:
+            query_attempts.append(" ".join(words[:2]))
+
         try:
             async with aiohttp.ClientSession(headers=headers, timeout=self.timeout) as session:
-                # 1. Search Wikipedia for top matching article title
-                search_url = (
-                    "https://en.wikipedia.org/w/api.php?action=query&list=search"
-                    f"&srsearch={quote_plus(clean_name)}&utf8=&format=json"
-                )
-                async with session.get(search_url) as resp:
-                    if resp.status != 200:
-                        return None
-                    data = await resp.json()
-                    search_results = data.get("query", {}).get("search", [])
-                    if not search_results:
-                        return None
+                wiki_title = None
 
-                    top_page = search_results[0]
-                    wiki_title = top_page["title"]
+                for query in query_attempts:
+                    search_url = (
+                        "https://en.wikipedia.org/w/api.php?action=query&list=search"
+                        f"&srsearch={quote_plus(query)}&utf8=&format=json"
+                    )
+                    async with session.get(search_url) as resp:
+                        if resp.status != 200:
+                            continue
+                        data = await resp.json()
+                        search_results = data.get("query", {}).get("search", [])
+                        if not search_results:
+                            continue
 
-                    # Quick sanity check: Wikipedia title should share at least one significant word with person_name
-                    name_tokens = set(clean_name.lower().split())
-                    title_tokens = set(wiki_title.lower().split())
-                    if not name_tokens.intersection(title_tokens):
-                        logger.debug(f"Wikipedia top hit '{wiki_title}' does not match query '{clean_name}'.")
-                        return None
+                        # Check top 3 search hits for shared significant name tokens
+                        name_tokens = set(query.lower().split())
+                        for candidate_hit in search_results[:3]:
+                            hit_title = candidate_hit["title"]
+                            title_tokens = set(hit_title.lower().split())
+                            if name_tokens.intersection(title_tokens):
+                                wiki_title = hit_title
+                                break
+
+                    if wiki_title:
+                        break
+
+                if not wiki_title:
+                    return None
 
                 # 2. Retrieve Wikidata entity ID (Q-number) and page summary
                 page_info_url = (
