@@ -212,8 +212,55 @@ class PipelineOrchestrator:
         # -------------------------------------------------------------
         # STEP 3: Dynamic Reverse Image Search
         # -------------------------------------------------------------
-        notify(3, "Web Discovery", "running", f"Initiating parallel visual search ({self.config.search_engine})...")
-        candidates = await self.search_router.discover_candidates(image_path, max_candidates=35)
+        notify(3, "Web Discovery", "running", f"Initiating visual search ({self.config.search_engine})...")
+
+        candidates_by_face: Dict[int, List[CandidateResult]] = {}
+        all_discovered_candidates: List[CandidateResult] = []
+        candidate_ids_seen = set()
+
+        if len(faces) > 1:
+            notify(3, "Web Discovery", "running", f"Detected {len(faces)} subjects: generating individual face crops for visual search...")
+
+            # Sort faces so primary_face is searched first
+            sorted_faces = sorted(faces, key=lambda f: 0 if f.face_index == primary_face.face_index else 1)
+            search_sem = asyncio.Semaphore(2)
+
+            async def search_single_face_crop(face_obj: DetectedFace):
+                async with search_sem:
+                    crop_dest = ledger.run_dir / f"probe_crop_face_{face_obj.face_index}.jpg"
+                    saved = self.detector.save_face_crop(image_path, face_obj.bbox, crop_dest, padding_ratio=0.35)
+                    query_img = crop_dest if saved else image_path
+                    try:
+                        cands = await self.search_router.discover_candidates(query_img, max_candidates=20)
+                        logger.info(f"Discovered {len(cands)} candidates for Face #{face_obj.face_index} via crop search.")
+                        return face_obj.face_index, cands
+                    except Exception as err:
+                        logger.warning(f"Discovery failed for face #{face_obj.face_index}: {err}")
+                        return face_obj.face_index, []
+
+            tasks = [search_single_face_crop(f) for f in sorted_faces]
+            face_search_results = await asyncio.gather(*tasks)
+
+            for f_idx, res in face_search_results:
+                candidates_by_face[f_idx] = res
+                for c in res:
+                    c_key = (c.image_url or "", c.page_url)
+                    if c_key not in candidate_ids_seen:
+                        candidate_ids_seen.add(c_key)
+                        all_discovered_candidates.append(c)
+
+            candidates = all_discovered_candidates
+
+            # Fallback to full probe image if face crops yielded no results
+            if not candidates:
+                logger.info("Individual face crops returned 0 candidates; searching full probe image as fallback...")
+                candidates = await self.search_router.discover_candidates(image_path, max_candidates=35)
+                for f in faces:
+                    candidates_by_face[f.face_index] = candidates
+        else:
+            candidates = await self.search_router.discover_candidates(image_path, max_candidates=35)
+            candidates_by_face[primary_face.face_index] = candidates
+
         if not candidates:
             reason = "No candidate URLs discovered by search engines."
             if self.config.search_engine == "serpapi" and not self.search_router.serpapi:
@@ -278,9 +325,9 @@ class PipelineOrchestrator:
                 per_face_verifications[f.face_index].append(res)
 
             # 3. Confident Early Stop Heuristic:
-            # If at least 3 candidates evaluated, and primary face found an unequivocal match (>= 0.92)
-            # with clear margin (>= 0.15) or ultra-high match (>= 0.96), stop streaming early!
-            if len(downloaded) >= 3:
+            # Single face: early-stop if primary face achieves confident score (>= 0.96 or >= 0.92 with margin >= 0.15)
+            # Multi-face: only early-stop if all subjects have found a strong candidate (>= 0.90)
+            if len(faces) == 1 and len(downloaded) >= 3:
                 pri_scores = sorted([r.best_similarity for r in per_face_verifications[primary_face.face_index]], reverse=True)
                 top_score = pri_scores[0]
                 runner_score = pri_scores[1] if len(pri_scores) > 1 else 0.0
@@ -291,6 +338,15 @@ class PipelineOrchestrator:
                         f"Confident early-stop triggered: Top score {top_score:.4f}, Margin {score_margin:.4f} "
                         f"after {len(downloaded)} candidates."
                     )
+                    early_stopped = True
+                    break
+            elif len(faces) > 1 and len(downloaded) >= len(faces) * 3:
+                all_confident = all(
+                    any(r.best_similarity >= 0.90 for r in per_face_verifications[f.face_index])
+                    for f in faces
+                )
+                if all_confident:
+                    logger.info(f"Confident early-stop triggered for all {len(faces)} faces.")
                     early_stopped = True
                     break
 
@@ -426,8 +482,9 @@ class PipelineOrchestrator:
             # Discover social profiles for the verified person
             social_ident = None
             try:
-                cand_titles = [c.title for c in top_c if c.title] + [c.title for c in candidates if c.title]
-                cand_urls = [c.page_url for c in top_c if c.page_url] + [c.page_url for c in candidates if c.page_url]
+                face_cands = candidates_by_face.get(f.face_index, candidates)
+                cand_titles = [c.title for c in top_c if c.title] + [c.title for c in face_cands if c.title]
+                cand_urls = [c.page_url for c in top_c if c.page_url] + [c.page_url for c in face_cands if c.page_url]
                 cand_excerpts = [downloaded_by_id[c.candidate_id].text_excerpt for c in top_c if c.candidate_id in downloaded_by_id]
                 
                 social_ident = await self.social_engine.discover_socials(
@@ -441,7 +498,7 @@ class PipelineOrchestrator:
                         6,
                         "Social Discovery",
                         "running",
-                        f"Discovered {len(social_ident.profiles)} profile(s) for {social_ident.canonical_name}: {social_str}",
+                        f"Discovered {len(social_ident.profiles)} profile(s) for Face #{f.face_index} ({social_ident.canonical_name}): {social_str}",
                     )
             except Exception as e:
                 logger.warning(f"Social discovery error for face #{f.face_index}: {e}")

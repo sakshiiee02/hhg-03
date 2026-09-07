@@ -46,37 +46,82 @@ def test_quality_gate_blur_and_resolution():
     assert "smaller than minimum" in reason
 
 
-def test_detector_on_jensen_huang():
-    image_path = Path("examples/jensen_huang_portrait.jpg")
+def test_detector_on_sam_altman():
+    image_path = Path("examples/sam_altman_portrait.jpg")
+    if not image_path.exists():
+        pytest.skip("Example image not present")
+
+    detector = FaceDetector.get_shared_instance()
+    faces = detector.detect(image_path)
+    assert len(faces) == 1
+
+    primary = detector.select_primary_face(faces)
+    assert primary.confidence >= 0.80
+    assert primary.passes_quality is True
+    assert len(primary.embedding) == 512
+    assert pytest.approx(np.linalg.norm(primary.embedding), 1e-4) == 1.0
+
+
+def test_detector_on_multiple_faces_group(tmp_path):
+    image_path = Path("examples/multiple_faces_group.jpg")
+    if not image_path.exists():
+        pytest.skip("Example image not present")
+
+    detector = FaceDetector.get_shared_instance()
+    faces = detector.detect(image_path)
+    assert len(faces) == 6
+
+    # Verify that each detected face can be cropped and saved to disk for individual reverse search
+    for f in faces:
+        dest_crop = tmp_path / f"crop_face_{f.face_index}.jpg"
+        saved = detector.save_face_crop(image_path, f.bbox, dest_crop, padding_ratio=0.35)
+        assert saved is True
+        assert dest_crop.exists()
+        assert dest_crop.stat().st_size > 1000  # valid image file
+        # Verify saved crop can be loaded and has valid dimensions
+        crop_img = cv2.imread(str(dest_crop))
+        assert crop_img is not None
+        assert crop_img.shape[0] >= 200
+        assert crop_img.shape[1] >= 150
+
+
+def test_detector_on_low_quality_blur_face():
+    image_path = Path("examples/low_quality_blur_face.jpg")
     if not image_path.exists():
         pytest.skip("Example image not present")
 
     detector = FaceDetector.get_shared_instance()
     faces = detector.detect(image_path)
     assert len(faces) >= 1
-
+    # Quality filter must reject high blur
     primary = detector.select_primary_face(faces)
-    assert primary.confidence >= 0.80
-    assert primary.passes_quality is True
-    assert len(primary.embedding) == 512
-    # Verify unit norm
-    assert pytest.approx(np.linalg.norm(primary.embedding), 1e-4) == 1.0
+    assert primary.passes_quality is False
+    assert "sharpness" in primary.quality_reason.lower() or "blur" in primary.quality_reason.lower()
+
+
+def test_detector_on_no_face_landscape():
+    image_path = Path("examples/no_face_landscape.jpg")
+    if not image_path.exists():
+        pytest.skip("Example image not present")
+
+    detector = FaceDetector.get_shared_instance()
+    faces = detector.detect(image_path)
+    assert len(faces) == 0
 
 
 def test_cross_person_matching_discrimination():
-    """Verify that Jensen Huang and negative control exhibit low similarity (< 0.60)."""
-    p_jensen = Path("examples/jensen_huang_portrait.jpg")
-    p_negative = Path("examples/negative_control.jpg")
-    if not p_jensen.exists() or not p_negative.exists():
+    """Verify that Sam Altman and an impostor face exhibit low similarity (< 0.60)."""
+    p_sam = Path("examples/sam_altman_portrait.jpg")
+    p_multi = Path("examples/multiple_faces_group.jpg")
+    if not p_sam.exists() or not p_multi.exists():
         pytest.skip("Example images not present")
 
     detector = FaceDetector.get_shared_instance()
-    faces_j = detector.detect(p_jensen)
-    faces_n = detector.detect(p_negative)
+    faces_sam = detector.detect(p_sam)
+    faces_multi = detector.detect(p_multi)
 
-    emb_jensen = detector.select_primary_face(faces_j).embedding
-    emb_negative = detector.select_primary_face(faces_n).embedding
+    emb_sam = detector.select_primary_face(faces_sam).embedding
+    emb_impostor = detector.select_primary_face(faces_multi).embedding
 
-    similarity = compute_cosine_similarity(emb_jensen, emb_negative)
-    # Impostor pairs should be significantly below 0.60
+    similarity = compute_cosine_similarity(emb_sam, emb_impostor)
     assert similarity < 0.60, f"Impostor pair similarity unexpectedly high: {similarity:.4f}"

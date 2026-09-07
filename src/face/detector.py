@@ -205,3 +205,25 @@ class FaceDetector:
             return None
         b64 = base64.b64encode(buf.tobytes()).decode("utf-8")
         return f"data:image/jpeg;base64,{b64}"
+
+    def save_face_crop(
+        self,
+        image_input: Union[str, Path, np.ndarray],
+        bbox: Tuple[int, int, int, int],
+        dest_path: Union[str, Path],
+        padding_ratio: float = 0.35,
+        min_size: int = 250,
+    ) -> bool:
+        """Crops a detected face, upscaling if necessary for visual reverse search, and saves to disk."""
+        crop = self.crop_face(image_input, bbox, padding_ratio=padding_ratio)
+        if crop is None or crop.size == 0:
+            return False
+        ch, cw = crop.shape[:2]
+        if min(ch, cw) < min_size:
+            scale = min_size / float(min(ch, cw))
+            new_w = int(round(cw * scale))
+            new_h = int(round(ch * scale))
+            crop = cv2.resize(crop, (new_w, new_h), interpolation=cv2.INTER_LANCZOS4)
+        dest = Path(dest_path)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        return bool(cv2.imwrite(str(dest), crop, [cv2.IMWRITE_JPEG_QUALITY, 95]))

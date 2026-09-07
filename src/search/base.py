@@ -26,6 +26,10 @@ class CandidateResult:
     title: Optional[str]
     provider: str
 
+    @property
+    def candidate_id(self) -> str:
+        return f"cand_{self.rank}_{self.source_domain}"
+
 
 def extract_domain(url: str) -> str:
     """Extracts a normalized domain name from a URL."""

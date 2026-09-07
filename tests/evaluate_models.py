@@ -24,59 +24,57 @@ def run_benchmark():
 
     detector = FaceDetector.get_shared_instance()
 
-    p_jensen = Path("examples/jensen_huang_portrait.jpg")
     p_sam = Path("examples/sam_altman_portrait.jpg")
-    p_negative = Path("examples/negative_control.jpg")
+    p_multi = Path("examples/multiple_faces_group.jpg")
 
-    if not (p_jensen.exists() and p_sam.exists() and p_negative.exists()):
+    if not (p_sam.exists() and p_multi.exists()):
         console.print("[red]Error: Example images missing in examples/.[/red]")
         return
 
     # Extract target embeddings
-    faces_jensen = detector.detect(p_jensen)
     faces_sam = detector.detect(p_sam)
-    faces_negative = detector.detect(p_negative)
+    faces_multi = detector.detect(p_multi)
 
-    emb_jensen = detector.select_primary_face(faces_jensen).embedding
     emb_sam = detector.select_primary_face(faces_sam).embedding
-    emb_negative = detector.select_primary_face(faces_negative).embedding
+    emb_multi_0 = faces_multi[0].embedding
+    emb_multi_1 = faces_multi[1].embedding if len(faces_multi) > 1 else emb_multi_0
 
     # -------------------------------------------------------------
     # 1. Genuine Pairs (Identity Sanity & Cross-Pose/Lighting)
     # -------------------------------------------------------------
     genuine_scores = []
     # Exact match sanity check
-    genuine_scores.append(("Jensen (Identical)", compute_cosine_similarity(emb_jensen, emb_jensen)))
     genuine_scores.append(("Sam Altman (Identical)", compute_cosine_similarity(emb_sam, emb_sam)))
+    genuine_scores.append(("Multi-Person Face 0 (Identical)", compute_cosine_similarity(emb_multi_0, emb_multi_0)))
 
     # Synthetic variations (brightness, horizontal flip, slight crop)
-    img_j = cv2.imread(str(p_jensen))
-    flipped_j = cv2.flip(img_j, 1)
-    bright_j = cv2.convertScaleAbs(img_j, alpha=1.1, beta=15)
+    img_sam = cv2.imread(str(p_sam))
+    flipped_sam = cv2.flip(img_sam, 1)
+    bright_sam = cv2.convertScaleAbs(img_sam, alpha=1.1, beta=15)
 
-    faces_flipped = detector.detect(flipped_j)
+    faces_flipped = detector.detect(flipped_sam)
     if faces_flipped:
-        genuine_scores.append(("Jensen (Horizontal Flip)", compute_cosine_similarity(emb_jensen, faces_flipped[0].embedding)))
+        genuine_scores.append(("Sam Altman (Horizontal Flip)", compute_cosine_similarity(emb_sam, faces_flipped[0].embedding)))
 
-    faces_bright = detector.detect(bright_j)
+    faces_bright = detector.detect(bright_sam)
     if faces_bright:
-        genuine_scores.append(("Jensen (+15 Brightness)", compute_cosine_similarity(emb_jensen, faces_bright[0].embedding)))
+        genuine_scores.append(("Sam Altman (+15 Brightness)", compute_cosine_similarity(emb_sam, faces_bright[0].embedding)))
 
     # -------------------------------------------------------------
     # 2. Impostor / Negative Pairs
     # -------------------------------------------------------------
     impostor_scores = []
-    impostor_scores.append(("Jensen vs Sam Altman", compute_cosine_similarity(emb_jensen, emb_sam)))
-    impostor_scores.append(("Jensen vs Negative Control", compute_cosine_similarity(emb_jensen, emb_negative)))
-    impostor_scores.append(("Sam Altman vs Negative Control", compute_cosine_similarity(emb_sam, emb_negative)))
+    impostor_scores.append(("Sam Altman vs Multi-Face Person 0", compute_cosine_similarity(emb_sam, emb_multi_0)))
+    impostor_scores.append(("Sam Altman vs Multi-Face Person 1", compute_cosine_similarity(emb_sam, emb_multi_1)))
+    impostor_scores.append(("Multi-Face Person 0 vs Person 1", compute_cosine_similarity(emb_multi_0, emb_multi_1)))
 
     # -------------------------------------------------------------
     # 3. Quality Gate Tests
     # -------------------------------------------------------------
-    blurred = cv2.GaussianBlur(img_j, (45, 45), 0)
+    blurred = cv2.GaussianBlur(img_sam, (45, 45), 0)
     passes_blur, blur_reason, blur_val = check_face_quality([0, 0, 100, 100], blurred)
 
-    tiny_crop = cv2.resize(img_j, (30, 30))
+    tiny_crop = cv2.resize(img_sam, (30, 30))
     passes_res, res_reason, _ = check_face_quality([0, 0, 25, 25], tiny_crop, min_size=40)
 
     # -------------------------------------------------------------

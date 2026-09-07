@@ -273,7 +273,7 @@ def main():
         "-i",
         type=str,
         default=None,
-        help="Path to the input face portrait image (e.g. examples/jensen_huang_portrait.jpg)",
+        help="Path to the input face portrait image (e.g. examples/sam_altman_portrait.jpg)",
     )
     parser.add_argument(
         "--reverify",

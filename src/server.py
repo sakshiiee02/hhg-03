@@ -261,7 +261,7 @@ async def handle_ws(request: web.Request) -> web.WebSocketResponse:
                         })
 
                 elif action == "preview":
-                    preset = data.get("preset", "jensen_huang_portrait.jpg")
+                    preset = data.get("preset", "sam_altman_portrait.jpg")
                     image_path = EXAMPLES_DIR / preset
                     if image_path.exists():
                         detector = FaceDetector.get_shared_instance()
@@ -337,6 +337,31 @@ async def handle_ws(request: web.Request) -> web.WebSocketResponse:
                         await ws.send_json({
                             "type": "error",
                             "message": "No probe target specified. Please select a preset or upload an image before running.",
+                        })
+                        continue
+
+                    detector = FaceDetector.get_shared_instance()
+                    check_faces = detector.detect(image_path)
+                    if not check_faces:
+                        await ws.send_json({
+                            "type": "run_complete",
+                            "success": False,
+                            "status_message": "REJECTED: No human face detected in probe image. Pipeline execution halted.",
+                            "elapsed_seconds": 0.0,
+                            "run_id": "rejected_no_face",
+                            "input_image_b64": file_to_base64(image_path),
+                            "matched_image_b64": None,
+                            "primary_face": None,
+                            "embedding_sample": [],
+                            "candidates_discovered": 0,
+                            "candidates_downloaded": 0,
+                            "runner_up_margin": 0.0,
+                            "leaderboard": [],
+                            "attestation": None,
+                            "social_identity": None,
+                            "re_verification_passed": False,
+                            "tamper_mode_active": False,
+                            "faces_results": [],
                         })
                         continue
 

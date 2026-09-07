@@ -77,10 +77,10 @@ Copy-Item .env.example .env
 ### 3. Execute the Pipeline (Command Line)
 ```powershell
 # Standard happy path execution
-python -m src.main --image examples/jensen_huang_portrait.jpg
+python -m src.main --image examples/sam_altman_portrait.jpg
 
 # Cryptographic tamper demonstration
-python -m src.main --image examples/jensen_huang_portrait.jpg --tamper
+python -m src.main --image examples/sam_altman_portrait.jpg --tamper
 ```
 
 ### 4. Launch the Interactive GUI (Monochrome Bento Grid)
@@ -95,7 +95,7 @@ Options:
 - `--no-browser`: Disable automatic browser window opening.
 
 Access the dashboard in your browser at `http://127.0.0.1:8000`. Features:
-- **Card 01 (Config)**: Preset selector (Jensen Huang, Sam Altman, Linus Torvalds) + Custom image file upload.
+- **Card 01 (Config)**: 4 standardized preset categories (Famous Person - Sam Altman, Multi-Person Group, Low Quality Blur Face, No Face Image [Rejected]) + Custom upload.
 - **Card 02 (Stepper)**: Real-time 8-step execution progression badges.
 - **Card 03 (Probe Profile)**: Instant image preview, SCRFD bounding box, Laplacian blur score, and 512-D ArcFace vector sample.
 - **Card 04 (Matched Media)**: Discovered online web image, top cosine similarity, and runner-up margin.
