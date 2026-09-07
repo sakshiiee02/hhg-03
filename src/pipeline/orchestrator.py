@@ -27,6 +27,7 @@ from src.face.matcher import CandidateVerificationResult, FaceMatcher, MatchVerd
 from src.pipeline.evidence import EvidenceLedger
 from src.search.base import CandidateResult
 from src.search.router import SearchRouter
+from src.social import PersonSocialIdentity, SocialDiscoveryEngine
 from src.web.downloader import CandidateDownloader, DownloadedCandidate
 
 logger = logging.getLogger(__name__)
@@ -50,6 +51,7 @@ class FaceVerificationProfile:
     content_hash: str = ""
     record_hash: str = ""
     attestation: Optional[AttestationReceipt] = None
+    social_identity: Optional[PersonSocialIdentity] = None
     re_verification_passed: bool = False
     status_message: str = "PENDING"
 
@@ -100,6 +102,7 @@ class PipelineOrchestrator:
             contract_address=self.config.sepolia_contract_address or None,
             force_simulated=self.config.force_simulated_blockchain,
         )
+        self.social_engine = SocialDiscoveryEngine()
 
     async def execute(
         self,
@@ -401,6 +404,32 @@ class PipelineOrchestrator:
                 continue
 
             winning_cand = downloaded_by_id[best_m.candidate_id]
+
+            # Discover social profiles for the verified person
+            social_ident = None
+            try:
+                cand_titles = [c.title for c in top_c if c.title]
+                cand_urls = [c.page_url for c in top_c if c.page_url]
+                cand_excerpts = [downloaded_by_id[c.candidate_id].text_excerpt for c in top_c if c.candidate_id in downloaded_by_id]
+                social_ident = await self.social_engine.discover_socials(
+                    candidate_titles=cand_titles,
+                    candidate_urls=cand_urls,
+                    candidate_excerpts=cand_excerpts,
+                )
+                if social_ident and social_ident.profiles:
+                    social_str = ", ".join(f"{p.display_name} ({p.handle})" for p in social_ident.profiles[:3])
+                    notify(
+                        6,
+                        "Social Discovery",
+                        "running",
+                        f"Discovered {len(social_ident.profiles)} profile(s) for {social_ident.canonical_name}: {social_str}",
+                    )
+            except Exception as e:
+                logger.warning(f"Social discovery error for face #{f.face_index}: {e}")
+
+            ident_name = social_ident.canonical_name if social_ident else None
+            soc_dict = {p.platform.value: p.url for p in social_ident.profiles} if (social_ident and social_ident.profiles) else None
+
             canonical_rec = build_canonical_record(
                 canonical_url=winning_cand.canonical_url,
                 source_domain=winning_cand.source_domain,
@@ -408,6 +437,8 @@ class PipelineOrchestrator:
                 image_sha256=winning_cand.image_sha256,
                 discovered_at=discovery_ts,
                 text_excerpt=f"Face #{f.face_index} verification: {winning_cand.text_excerpt}",
+                identified_name=ident_name,
+                social_profiles=soc_dict,
             )
             rec_sha = hash_canonical_record(canonical_rec)
             cnt_sha = winning_cand.image_sha256
@@ -440,6 +471,8 @@ class PipelineOrchestrator:
                 image_sha256=re_comp_img_hash,
                 discovered_at=discovery_ts,
                 text_excerpt=f"Face #{f.face_index} verification: {winning_cand.text_excerpt}",
+                identified_name=ident_name,
+                social_profiles=soc_dict,
             )
             re_comp_rec_hash = hash_canonical_record(rebuilt_canon)
 
@@ -471,6 +504,7 @@ class PipelineOrchestrator:
                 content_hash=cnt_sha,
                 record_hash=rec_sha,
                 attestation=receipt,
+                social_identity=social_ident,
                 re_verification_passed=re_passed,
                 status_message="VERIFIED" if re_passed else ("TAMPER_DETECTED" if tamper and is_prim else "FAILED"),
             ))
@@ -529,6 +563,7 @@ class PipelineOrchestrator:
                     "record_hash": p.record_hash,
                     "tx_hash": p.attestation.tx_hash if p.attestation else None,
                     "re_verification_passed": p.re_verification_passed,
+                    "social_identity": p.social_identity.to_dict() if p.social_identity else None,
                 }
                 for p in faces_profiles
             ],

@@ -528,6 +528,38 @@
       border-color: #222222;
     }
 
+    /* Social Media Profile Badges */
+    .social-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #141414;
+      border: 1px solid #2a2a2a;
+      color: #e0e0e0;
+      padding: 5px 8px;
+      font-size: 11px;
+      text-decoration: none;
+      font-family: inherit;
+    }
+    .social-badge:hover {
+      background-color: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+    }
+    .social-badge-platform {
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 9px;
+      color: #777777;
+      letter-spacing: 0.05em;
+    }
+    .social-badge:hover .social-badge-platform {
+      color: #222222;
+    }
+    .social-badge-handle {
+      font-weight: 600;
+    }
+
     /* Terminal Log Box */
     .terminal-box {
       background-color: #080808;
@@ -792,6 +824,20 @@
           <td class="value" id="valPageUrl" style="font-size: 11px;">—</td>
         </tr>
       </table>
+
+      <!-- Discovered Social Profiles Subpanel -->
+      <div id="socialProfilesBox" style="display: none; margin-top: 14px; border-top: 1px solid #222222; padding-top: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span class="mono bold" style="font-size: 10px; color: #ffffff; text-transform: uppercase; letter-spacing: 0.06em;">
+            IDENTIFIED: <span id="valIdentifiedName" style="color: #ffffff;">—</span>
+          </span>
+          <span class="mono" id="valSocialCount" style="font-size: 9px; color: #888888; text-transform: uppercase;">0 PROFILES</span>
+        </div>
+        <div id="valBioSummary" class="mono" style="font-size: 10px; color: #888888; margin-bottom: 10px; line-height: 1.4; display: none;"></div>
+        <div id="socialBadgesContainer" style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
     </div>
 
     <!-- Card 5: Verification Leaderboard (Span 8) -->
@@ -1055,6 +1101,40 @@
       document.getElementById("valTxHash").textContent = "—";
       document.getElementById("valSubmitter").textContent = "—";
     }
+
+    // 4. Social Profiles (Card 4 Subpanel)
+    const socialBox = document.getElementById("socialProfilesBox");
+    const valName = document.getElementById("valIdentifiedName");
+    const valSocialCount = document.getElementById("valSocialCount");
+    const valBio = document.getElementById("valBioSummary");
+    const badgesContainer = document.getElementById("socialBadgesContainer");
+
+    badgesContainer.innerHTML = "";
+    if (profile.social_identity && profile.social_identity.profiles && profile.social_identity.profiles.length > 0) {
+      socialBox.style.display = "block";
+      valName.textContent = profile.social_identity.canonical_name || "Verified Subject";
+      valSocialCount.textContent = `${profile.social_identity.profiles.length} PROFILES`;
+      
+      if (profile.social_identity.bio_summary) {
+        valBio.textContent = profile.social_identity.bio_summary;
+        valBio.style.display = "block";
+      } else {
+        valBio.style.display = "none";
+      }
+
+      profile.social_identity.profiles.forEach(p => {
+        const a = document.createElement("a");
+        a.className = "social-badge";
+        a.href = p.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.title = `${p.platform_label}: ${p.url}`;
+        a.innerHTML = `<span class="social-badge-platform">${p.platform_label}</span><span class="social-badge-handle">${p.handle}</span>`;
+        badgesContainer.appendChild(a);
+      });
+    } else {
+      socialBox.style.display = "none";
+    }
   }
 
   // Update Probe Profile UI with Face Inspection Data
@@ -1087,11 +1167,12 @@
       document.getElementById("probeSourceBadge").textContent = sourceName.toUpperCase();
     }
 
-    // Reset Person tags
+    // Reset Person tags & social profiles
     const tagText = currentDetectedFaces.length > 1 ? `[Person #${selectedFaceIdx + 1}]` : "";
     document.getElementById("card4PersonTag").textContent = tagText;
     document.getElementById("card5PersonTag").textContent = tagText;
     document.getElementById("card7PersonTag").textContent = tagText;
+    document.getElementById("socialProfilesBox").style.display = "none";
   }
 
   // Preset Selection

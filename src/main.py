@@ -94,6 +94,46 @@ def render_leaderboard(result: PipelineRunResult):
     console.print()
 
 
+def render_social_profiles_panel(result: PipelineRunResult):
+    profiles_found = False
+    for p in result.faces_results:
+        if p.social_identity and p.social_identity.profiles:
+            profiles_found = True
+            break
+    if not profiles_found:
+        return
+
+    for p in result.faces_results:
+        if not p.social_identity or not p.social_identity.profiles:
+            continue
+
+        ident = p.social_identity
+        suffix = f" (Face #{p.face_index})" if len(result.faces_results) > 1 else ""
+        table = Table(
+            title=f"[bold cyan]Discovered Social Profiles: {ident.canonical_name}{suffix}[/bold cyan]",
+            box=box.ROUNDED,
+            show_header=True,
+            header_style="bold magenta",
+        )
+        table.add_column("Platform", style="bold white", width=16)
+        table.add_column("Handle / Identifier", style="cyan", width=26)
+        table.add_column("Source", style="dim white", width=16)
+        table.add_column("Verified URL", style="underline blue")
+
+        for prof in ident.profiles:
+            table.add_row(
+                prof.display_name,
+                prof.handle,
+                prof.source.upper(),
+                prof.url,
+            )
+
+        console.print(table)
+        if ident.bio_summary:
+            console.print(f"[dim italic]Summary: {ident.bio_summary}[/dim italic]")
+        console.print()
+
+
 def render_attestation_panel(result: PipelineRunResult):
     att = result.attestation
     if not att:
@@ -270,6 +310,7 @@ def main():
     console.print()
     if not args.dry_run and result.best_match:
         render_leaderboard(result)
+        render_social_profiles_panel(result)
         render_attestation_panel(result)
 
     render_final_status(result)

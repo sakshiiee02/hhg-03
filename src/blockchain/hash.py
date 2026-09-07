@@ -7,7 +7,7 @@ and conversions to/from Solidity bytes32 types.
 import hashlib
 import json
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 
 def hash_bytes(data: bytes) -> str:
@@ -29,12 +29,14 @@ def build_canonical_record(
     image_sha256: str,
     discovered_at: str,
     text_excerpt: str = "",
+    identified_name: Optional[str] = None,
+    social_profiles: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Any]:
     """
     Constructs a standardized, immutable metadata dictionary for discovered post evidence.
     Fields are deterministic and non-volatile to ensure reproducible re-verification.
     """
-    return {
+    record = {
         "canonical_url": canonical_url.strip(),
         "discovered_at": discovered_at.strip(),
         "image_sha256": image_sha256.lower().replace("0x", ""),
@@ -42,6 +44,11 @@ def build_canonical_record(
         "text_excerpt": text_excerpt.strip(),
         "title": title.strip(),
     }
+    if identified_name:
+        record["identified_name"] = identified_name.strip()
+    if social_profiles:
+        record["social_profiles"] = {k.strip(): v.strip() for k, v in sorted(social_profiles.items())}
+    return record
 
 
 def canonicalize_json(record: Dict[str, Any]) -> str:

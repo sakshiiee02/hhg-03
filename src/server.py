@@ -363,6 +363,7 @@ async def handle_ws(request: web.Request) -> web.WebSocketResponse:
                             "runner_up_margin": round(p.runner_up_margin, 4),
                             "leaderboard": p_leaderboard,
                             "attestation": p_attestation,
+                            "social_identity": p.social_identity.to_dict() if p.social_identity else None,
                             "re_verification_passed": p.re_verification_passed,
                             "status_message": p.status_message,
                         })
@@ -382,6 +383,7 @@ async def handle_ws(request: web.Request) -> web.WebSocketResponse:
                         "runner_up_margin": round(result.runner_up_margin, 4),
                         "leaderboard": leaderboard_data,
                         "attestation": attestation_data,
+                        "social_identity": faces_results_data[0].get("social_identity") if faces_results_data else None,
                         "re_verification_passed": result.re_verification_passed,
                         "tamper_mode_active": result.tamper_mode_active,
                         "faces_results": faces_results_data,
