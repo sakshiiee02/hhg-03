@@ -123,3 +123,113 @@ async def test_social_discovery_engine_live():
     # Should find X or LinkedIn from Wikidata
     assert any(p in (SocialPlatform.X_TWITTER, SocialPlatform.LINKEDIN) for p in platforms)
 
+
+def test_threads_and_bluesky_extraction():
+    prof_th = extract_social_from_url("https://threads.net/@sama")
+    assert prof_th is not None
+    assert prof_th.platform == SocialPlatform.THREADS
+    assert prof_th.handle == "@sama"
+    assert prof_th.url == "https://threads.net/@sama"
+
+    prof_bs = extract_social_from_url("https://bsky.app/profile/sama.bsky.social")
+    assert prof_bs is not None
+    assert prof_bs.platform == SocialPlatform.BLUESKY
+    assert prof_bs.handle == "@sama.bsky.social"
+    assert prof_bs.url == "https://bsky.app/profile/sama.bsky.social"
+
+
+@pytest.mark.asyncio
+async def test_verifier_publisher_rejection():
+    from src.social.verifier import SocialProfileVerifier
+
+    verifier = SocialProfileVerifier()
+    canonical_name = "Sam Altman"
+
+    # Publisher profiles should be rejected immediately
+    for pub_url, handle in [
+        ("https://x.com/TechCrunch", "@TechCrunch"),
+        ("https://x.com/Forbes", "@Forbes"),
+        ("https://x.com/TheVerge", "@TheVerge"),
+        ("https://youtube.com/@Bloomberg", "@Bloomberg"),
+    ]:
+        prof = SocialProfile(platform=SocialPlatform.X_TWITTER, handle=handle, url=pub_url, source="candidate_dom")
+        is_verified, _, reason = await verifier.verify_profile(prof, canonical_name)
+        assert not is_verified, f"Expected {pub_url} to be rejected, but passed with reason: {reason}"
+        assert "publisher" in reason.lower()
+
+
+@pytest.mark.asyncio
+async def test_verifier_handle_matching():
+    from src.social.verifier import SocialProfileVerifier
+
+    verifier = SocialProfileVerifier()
+
+    # Sam Altman matching handles
+    prof_sama = SocialProfile(platform=SocialPlatform.X_TWITTER, handle="@sama", url="https://x.com/sama", source="candidate_dom")
+    is_verified, _, reason = await verifier.verify_profile(prof_sama, "Sam Altman")
+    assert is_verified
+    assert any(k in reason for k in ("firstname", "handle", "metadata"))
+
+    prof_li = SocialProfile(platform=SocialPlatform.LINKEDIN, handle="in/samaltman", url="https://linkedin.com/in/samaltman", source="candidate_dom")
+    is_verified, _, reason = await verifier.verify_profile(prof_li, "Sam Altman")
+    assert is_verified
+    assert any(k in reason for k in ("handle", "metadata", "firstname"))
+
+    # Direct Tier 3 slug verification when HTTP is not used or fails
+    name_info = verifier._normalize_name_tokens("Sam Altman")
+    assert verifier.verify_handle_slug("samaltman", name_info)[0] is True
+    assert verifier.verify_handle_slug("in/samaltman", name_info)[0] is True
+    assert verifier.verify_handle_slug("@sama", name_info)[0] is True
+    assert verifier.verify_handle_slug("saltman", name_info)[0] is True
+    assert verifier.verify_handle_slug("@TechCrunch", name_info)[0] is False
+    assert verifier.verify_handle_slug("@random_user_99", name_info)[0] is False
+
+    # Jensen Huang matching handles
+    prof_jh = SocialProfile(platform=SocialPlatform.LINKEDIN, handle="in/jensenhuang", url="https://linkedin.com/in/jensenhuang", source="candidate_dom")
+    is_verified, _, _ = await verifier.verify_profile(prof_jh, "Jensen Huang")
+    assert is_verified
+
+    # Unrelated person handle should be rejected
+    prof_unrelated = SocialProfile(platform=SocialPlatform.X_TWITTER, handle="@random_user_99", url="https://x.com/random_user_99", source="candidate_dom")
+    is_verified, _, reason = await verifier.verify_profile(prof_unrelated, "Sam Altman")
+    assert not is_verified
+
+
+@pytest.mark.asyncio
+async def test_verifier_metadata_text_matching():
+    from src.social.verifier import SocialProfileVerifier
+
+    verifier = SocialProfileVerifier()
+    name_info = verifier._normalize_name_tokens("Sam Altman")
+
+    # Positive matches
+    assert verifier.match_metadata_text("Sam Altman (@sama) / X", name_info)[0] is True
+    assert verifier.match_metadata_text("Sam Altman - Co-Founder & CEO - OpenAI | LinkedIn", name_info)[0] is True
+    assert verifier.match_metadata_text("Official profile of Sam Altman. Thoughts on AI and tech.", name_info)[0] is True
+
+    # Negative matches
+    assert verifier.match_metadata_text("TechCrunch (@TechCrunch) / X", name_info)[0] is False
+    assert verifier.match_metadata_text("John Doe - Software Engineer | LinkedIn", name_info)[0] is False
+
+
+@pytest.mark.asyncio
+async def test_verifier_end_to_end_filtering():
+    from src.social.verifier import SocialProfileVerifier
+
+    verifier = SocialProfileVerifier()
+    candidates = [
+        SocialProfile(platform=SocialPlatform.X_TWITTER, handle="@sama", url="https://x.com/sama", source="candidate_dom"),
+        SocialProfile(platform=SocialPlatform.X_TWITTER, handle="@TechCrunch", url="https://x.com/TechCrunch", source="candidate_dom"),
+        SocialProfile(platform=SocialPlatform.X_TWITTER, handle="@unrelated_guy", url="https://x.com/unrelated_guy", source="candidate_dom"),
+        SocialProfile(platform=SocialPlatform.LINKEDIN, handle="in/samaltman", url="https://linkedin.com/in/samaltman", source="candidate_dom"),
+    ]
+
+    verified = await verifier.verify_profiles(candidates, canonical_name="Sam Altman")
+    urls = [p.url for p in verified]
+
+    assert "https://x.com/sama" in urls
+    assert "https://linkedin.com/in/samaltman" in urls
+    assert "https://x.com/TechCrunch" not in urls
+    assert "https://x.com/unrelated_guy" not in urls
+
+

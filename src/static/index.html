@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aegis | Enterprise Facial Intelligence & Cryptographic Attestation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
 
   <style>
     :root {
@@ -370,7 +373,8 @@
       gap: 6px;
     }
 
-    .upload-dropzone:hover, .upload-dropzone.dragover {
+    .upload-dropzone:hover,
+    .upload-dropzone.dragover {
       border-color: var(--accent-white);
       background-color: var(--bg-surface-elevated);
     }
@@ -589,8 +593,13 @@
       text-transform: uppercase;
     }
 
-    .verdict-card.verified .verdict-title { color: var(--status-success-text); }
-    .verdict-card.tampered .verdict-title { color: var(--status-danger-text); }
+    .verdict-card.verified .verdict-title {
+      color: var(--status-success-text);
+    }
+
+    .verdict-card.tampered .verdict-title {
+      color: var(--status-danger-text);
+    }
 
     .verdict-subtitle {
       font-size: 12px;
@@ -768,11 +777,13 @@
       color: #000000;
       border-color: #ffffff;
     }
+
     .candidate-status-tag.runner {
       background-color: #000000;
       color: #fcd34d;
       border-color: #d97706;
     }
+
     .candidate-status-tag.reject {
       background-color: #000000;
       color: #9ca3af;
@@ -851,8 +862,13 @@
       overflow-x: auto;
     }
 
-    .table-view-active .candidate-grid { display: none; }
-    .table-view-active .data-table-container { display: block; }
+    .table-view-active .candidate-grid {
+      display: none;
+    }
+
+    .table-view-active .data-table-container {
+      display: block;
+    }
 
     table.saas-table {
       width: 100%;
@@ -1002,900 +1018,978 @@
       background-color: var(--border-subtle);
     }
 
-    .stepper-bar.done { background-color: #10b981; }
-    .stepper-bar.running { background-color: #ffffff; }
-    .stepper-bar.fail { background-color: #ef4444; }
+    .stepper-bar.done {
+      background-color: #10b981;
+    }
+
+    .stepper-bar.running {
+      background-color: #ffffff;
+    }
+
+    .stepper-bar.fail {
+      background-color: #ef4444;
+    }
   </style>
 </head>
+
 <body>
 
-<div class="app-layout">
+  <div class="app-layout">
 
-  <!-- 1. LEFT SIDEBAR NAVIGATION -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="brand-icon">A</div>
-      <div>
-        <div class="brand-title">Aegis Biometrics</div>
-        <div class="brand-sub mono">Task 3 | HH Goa 2026</div>
-      </div>
-    </div>
-
-    <nav class="sidebar-nav">
-      <button type="button" class="nav-item active" data-screen="studioScreen">
-        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <span>Investigation Studio</span>
-      </button>
-      <button type="button" class="nav-item" data-screen="ledgerScreen">
-        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-        <span>Audit Ledger & Runs</span>
-      </button>
-      <button type="button" class="nav-item" data-screen="registryScreen">
-        <svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-        <span>On-Chain Registry</span>
-      </button>
-      <button type="button" class="nav-item" data-screen="settingsScreen">
-        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-        <span>Engine Settings</span>
-      </button>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div class="status-indicator">
-        <span class="status-dot"></span>
-        <span class="mono">Sepolia EVM Ready</span>
-      </div>
-      <div class="mono" style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">
-        InsightFace SCRFD / ArcFace
-      </div>
-    </div>
-  </aside>
-
-  <!-- 2. MAIN APPLICATION WORKSPACE -->
-  <main class="main-container">
-
-    <!-- Top Application Bar -->
-    <header class="top-bar">
-      <div class="breadcrumbs mono">
-        <span>Investigation Studio</span>
-        <span>/</span>
-        <span class="current" id="activeBreadcrumb">Live Probe Scanner</span>
-      </div>
-
-      <div class="top-actions">
-        <div class="network-badge mono">
-          <span class="network-dot"></span>
-          <span>ETH SEPOLIA</span>
+    <!-- 1. LEFT SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon">A</div>
+        <div>
+          <div class="brand-title">Aegis Biometrics</div>
+          <div class="brand-sub mono">Task 3 | HH Goa 2026</div>
         </div>
-        <button type="button" class="btn-secondary mono" id="downloadLedgerTopBtn" style="display: none;">
-          <svg class="nav-icon" style="width: 13px; height: 13px;" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          <span>EXPORT LEDGER</span>
-        </button>
-        <button type="button" class="btn-secondary mono" id="resetAppBtn">
-          <span>RESET</span>
-        </button>
       </div>
-    </header>
 
-    <!-- SCREEN 1: INVESTIGATION STUDIO -->
-    <div class="screen-view active" id="studioScreen">
-      <div class="studio-layout">
+      <nav class="sidebar-nav">
+        <button type="button" class="nav-item active" data-screen="studioScreen">
+          <svg class="nav-icon" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span>Investigation Studio</span>
+        </button>
+        <button type="button" class="nav-item" data-screen="ledgerScreen">
+          <svg class="nav-icon" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span>Audit Ledger & Runs</span>
+        </button>
+        <button type="button" class="nav-item" data-screen="registryScreen">
+          <svg class="nav-icon" viewBox="0 0 24 24">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+          <span>On-Chain Registry</span>
+        </button>
+        <button type="button" class="nav-item" data-screen="settingsScreen">
+          <svg class="nav-icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+            </path>
+          </svg>
+          <span>Engine Settings</span>
+        </button>
+      </nav>
 
-        <!-- Left Inspector & Control Pane -->
-        <div class="studio-left-pane">
+      <div class="sidebar-footer">
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span class="mono">Sepolia EVM Ready</span>
+        </div>
+        <div class="mono" style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">
+          InsightFace SCRFD / ArcFace
+        </div>
+      </div>
+    </aside>
 
-          <!-- Target Source Switcher -->
-          <div class="pane-section">
-            <div class="section-title">
-              <span>Target Probe Source</span>
-              <span class="mono" id="sourceBadge">PRESET</span>
+    <!-- 2. MAIN APPLICATION WORKSPACE -->
+    <main class="main-container">
+
+      <!-- Top Application Bar -->
+      <header class="top-bar">
+        <div class="breadcrumbs mono">
+          <span>Investigation Studio</span>
+          <span>/</span>
+          <span class="current" id="activeBreadcrumb">Live Probe Scanner</span>
+        </div>
+
+        <div class="top-actions">
+          <div class="network-badge mono">
+            <span class="network-dot"></span>
+            <span>ETH SEPOLIA</span>
+          </div>
+          <button type="button" class="btn-secondary mono" id="downloadLedgerTopBtn" style="display: none;">
+            <svg class="nav-icon" style="width: 13px; height: 13px;" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>EXPORT LEDGER</span>
+          </button>
+          <button type="button" class="btn-secondary mono" id="resetAppBtn">
+            <span>RESET</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- SCREEN 1: INVESTIGATION STUDIO -->
+      <div class="screen-view active" id="studioScreen">
+        <div class="studio-layout">
+
+          <!-- Left Inspector & Control Pane -->
+          <div class="studio-left-pane">
+
+            <!-- Target Source Switcher -->
+            <div class="pane-section">
+              <div class="section-title">
+                <span>Target Probe Source</span>
+                <span class="mono" id="sourceBadge">PRESET</span>
+              </div>
+
+              <div class="segmented-control">
+                <button type="button" class="seg-btn active" id="segPresetsBtn">PRESET LIBRARY</button>
+                <button type="button" class="seg-btn" id="segUploadBtn">CUSTOM UPLOAD</button>
+              </div>
+
+              <!-- Presets Tab Container (4 Specific Categories) -->
+              <div id="presetContainer" class="presets-list">
+                <div class="preset-card active" data-file="sam_altman_portrait.jpg">
+                  <div class="preset-info">
+                    <div class="preset-name">1 · Sam Altman</div>
+                    <div class="preset-role mono">Famous Person (CEO, OpenAI)</div>
+                  </div>
+                </div>
+                <div class="preset-card" data-file="multiple_faces_group.jpg">
+                  <div class="preset-info">
+                    <div class="preset-name">2 · Multi-Person Group</div>
+                    <div class="preset-role mono">Multiple Faces</div>
+                  </div>
+                </div>
+                <div class="preset-card" data-file="low_quality_blur_face.jpg">
+                  <div class="preset-info">
+                    <div class="preset-name">3 · Low Quality Blur Face</div>
+                    <div class="preset-role mono">High Blur (Quality Filter Gate)</div>
+                  </div>
+                </div>
+                <div class="preset-card" data-file="no_face_landscape.jpg">
+                  <div class="preset-info">
+                    <div class="preset-name">4 · No Face Image</div>
+                    <div class="preset-role mono">Non-Human (Reject Pipeline)</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Upload Tab Container -->
+              <div id="uploadContainer" style="display: none;">
+                <div class="upload-dropzone" id="uploadDropzone">
+                  <svg class="upload-icon" viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <div style="font-weight: 600; font-size: 12px;" id="uploadLabel">Drop probe image here</div>
+                  <div class="mono" style="font-size: 10px; color: var(--text-muted);">JPG, PNG, WEBP (Up to 50MB)</div>
+                  <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" style="display: none;" />
+                </div>
+                <button type="button" class="btn-secondary" id="clearUploadBtn"
+                  style="display: none; width: 100%; margin-top: 8px; justify-content: center;">
+                  CLEAR UPLOAD
+                </button>
+              </div>
             </div>
 
-            <div class="segmented-control">
-              <button type="button" class="seg-btn active" id="segPresetsBtn">PRESET LIBRARY</button>
-              <button type="button" class="seg-btn" id="segUploadBtn">CUSTOM UPLOAD</button>
+            <!-- Probe Image & Multi-Subject Selector -->
+            <div class="pane-section">
+              <div class="section-title">
+                <span>Probe Analysis</span>
+                <span class="mono" id="facesCountBadge">1 FACE</span>
+              </div>
+
+              <div class="probe-viewport" id="probeViewport">
+                <span class="mono" style="color: var(--text-muted);">Awaiting probe image...</span>
+              </div>
+
+              <!-- Multi-Person Selector Strip -->
+              <div id="peopleSelectorStrip" style="display: none;">
+                <div class="form-label">Detected Subjects (<span id="peopleCountSpan">1</span>)</div>
+                <div class="people-strip" id="peopleStrip"></div>
+              </div>
+
+              <!-- Biometric Telemetry -->
+              <div class="telemetry-grid mono">
+                <div class="telemetry-cell">
+                  <div class="telemetry-label">Bounding Box</div>
+                  <div class="telemetry-value" id="valBbox">—</div>
+                </div>
+                <div class="telemetry-cell">
+                  <div class="telemetry-label">Confidence</div>
+                  <div class="telemetry-value" id="valConf">—</div>
+                </div>
+                <div class="telemetry-cell">
+                  <div class="telemetry-label">Sharpness</div>
+                  <div class="telemetry-value" id="valSharpness">—</div>
+                </div>
+                <div class="telemetry-cell">
+                  <div class="telemetry-label">Embedding</div>
+                  <div class="telemetry-value">512-D L2</div>
+                </div>
+              </div>
             </div>
 
-            <!-- Presets Tab Container (4 Specific Categories) -->
-            <div id="presetContainer" class="presets-list">
-              <div class="preset-card active" data-file="sam_altman_portrait.jpg">
-                <div class="preset-info">
-                  <div class="preset-name">1 · Sam Altman</div>
-                  <div class="preset-role mono">Famous Person (CEO, OpenAI)</div>
-                </div>
+            <!-- Pipeline Execution Controls (Scrollable Config) -->
+            <div class="pane-section">
+              <div class="section-title">
+                <span>Execution Controls</span>
+                <span class="mono">CONFIG</span>
               </div>
-              <div class="preset-card" data-file="multiple_faces_group.jpg">
-                <div class="preset-info">
-                  <div class="preset-name">2 · Multi-Person Group</div>
-                  <div class="preset-role mono">Multiple Faces (6 People)</div>
+
+              <div class="form-group">
+                <div class="form-label">
+                  <span>Confidence Threshold</span>
+                  <span class="mono" id="thresholdValue">0.80 (80%)</span>
                 </div>
+                <input type="range" class="slider-range" id="thresholdSlider" min="0.50" max="0.95" step="0.01"
+                  value="0.80" />
               </div>
-              <div class="preset-card" data-file="low_quality_blur_face.jpg">
-                <div class="preset-info">
-                  <div class="preset-name">3 · Low Quality Blur Face</div>
-                  <div class="preset-role mono">High Blur (Quality Filter Gate)</div>
-                </div>
+
+              <div class="form-group">
+                <div class="form-label">Search Discovery Engine</div>
+                <select class="select-input mono" id="engineSelect">
+                  <option value="auto">Parallel Auto (Yandex + SerpApi Multi-Engine)</option>
+                  <option value="yandex">Yandex Images (Stealth Chromium)</option>
+                  <option value="serpapi">SerpApi Multi-Engine (Lens + Bing + Google)</option>
+                </select>
               </div>
-              <div class="preset-card" data-file="no_face_landscape.jpg">
-                <div class="preset-info">
-                  <div class="preset-name">4 · No Face Image</div>
-                  <div class="preset-role mono">Non-Human (Reject Pipeline)</div>
+
+              <div class="form-group">
+                <div class="toggle-row">
+                  <div>
+                    <div style="font-weight: 600; font-size: 11px;">Simulate Attack (Tamper)</div>
+                    <div class="mono" style="font-size: 10px; color: var(--text-muted);">Mutate off-chain payload</div>
+                  </div>
+                  <input type="checkbox" id="tamperToggle" />
                 </div>
               </div>
             </div>
 
-            <!-- Upload Tab Container -->
-            <div id="uploadContainer" style="display: none;">
-              <div class="upload-dropzone" id="uploadDropzone">
-                <svg class="upload-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                <div style="font-weight: 600; font-size: 12px;" id="uploadLabel">Drop probe image here</div>
-                <div class="mono" style="font-size: 10px; color: var(--text-muted);">JPG, PNG, WEBP (Up to 50MB)</div>
-                <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" style="display: none;" />
-              </div>
-              <button type="button" class="btn-secondary" id="clearUploadBtn" style="display: none; width: 100%; margin-top: 8px; justify-content: center;">
-                CLEAR UPLOAD
+            <!-- Sticky Execution Action Bar (Always visible without scrolling) -->
+            <div class="pane-sticky-action">
+              <button type="button" class="btn-execute" id="runPipelineBtn">
+                <svg class="nav-icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <span id="runBtnLabel">EXECUTE IDENTIFICATION</span>
               </button>
+
+              <!-- 8-Step Stepper Progress Bar -->
+              <div class="stepper-progress" id="stepperBars">
+                <div class="stepper-bar" id="bar1"></div>
+                <div class="stepper-bar" id="bar2"></div>
+                <div class="stepper-bar" id="bar3"></div>
+                <div class="stepper-bar" id="bar4"></div>
+                <div class="stepper-bar" id="bar5"></div>
+                <div class="stepper-bar" id="bar6"></div>
+                <div class="stepper-bar" id="bar7"></div>
+                <div class="stepper-bar" id="bar8"></div>
+              </div>
+              <div class="mono" id="stepperStatusText"
+                style="font-size: 10px; color: var(--text-muted); margin-top: 6px; text-align: center;">
+                Ready to execute
+              </div>
             </div>
+
           </div>
 
-          <!-- Probe Image & Multi-Subject Selector -->
-          <div class="pane-section">
-            <div class="section-title">
-              <span>Probe Analysis</span>
-              <span class="mono" id="facesCountBadge">1 FACE</span>
-            </div>
+          <!-- Right Investigation & Evidence Workspace -->
+          <div class="studio-main-workspace">
 
-            <div class="probe-viewport" id="probeViewport">
-              <span class="mono" style="color: var(--text-muted);">Awaiting probe image...</span>
-            </div>
-
-            <!-- Multi-Person Selector Strip -->
-            <div id="peopleSelectorStrip" style="display: none;">
-              <div class="form-label">Detected Subjects (<span id="peopleCountSpan">1</span>)</div>
-              <div class="people-strip" id="peopleStrip"></div>
-            </div>
-
-            <!-- Biometric Telemetry -->
-            <div class="telemetry-grid mono">
-              <div class="telemetry-cell">
-                <div class="telemetry-label">Bounding Box</div>
-                <div class="telemetry-value" id="valBbox">—</div>
+            <!-- 1. Executive Verdict & Cryptographic Summary Banner -->
+            <div class="verdict-card" id="verdictCard">
+              <div>
+                <div class="verdict-title" id="verdictTitleText">STATUS: READY TO SCAN</div>
+                <div class="verdict-subtitle mono" id="verdictSubtitle">
+                  Select a preset portrait or upload a target face to begin facial intelligence discovery.
+                </div>
               </div>
-              <div class="telemetry-cell">
-                <div class="telemetry-label">Confidence</div>
-                <div class="telemetry-value" id="valConf">—</div>
-              </div>
-              <div class="telemetry-cell">
-                <div class="telemetry-label">Sharpness</div>
-                <div class="telemetry-value" id="valSharpness">—</div>
-              </div>
-              <div class="telemetry-cell">
-                <div class="telemetry-label">Embedding</div>
-                <div class="telemetry-value">512-D L2</div>
+              <div class="mono" id="verdictMetricBadge"
+                style="font-size: 12px; font-weight: 700; padding: 6px 12px; border: 1px solid var(--border-focus); background: var(--bg-surface-elevated);">
+                STANDBY
               </div>
             </div>
-          </div>
 
-          <!-- Pipeline Execution Controls (Scrollable Config) -->
-          <div class="pane-section">
-            <div class="section-title">
-              <span>Execution Controls</span>
-              <span class="mono">CONFIG</span>
-            </div>
-
-            <div class="form-group">
-              <div class="form-label">
-                <span>Confidence Threshold</span>
-                <span class="mono" id="thresholdValue">0.80 (80%)</span>
-              </div>
-              <input type="range" class="slider-range" id="thresholdSlider" min="0.50" max="0.95" step="0.01" value="0.80" />
-            </div>
-
-            <div class="form-group">
-              <div class="form-label">Search Discovery Engine</div>
-              <select class="select-input mono" id="engineSelect">
-                <option value="auto">Parallel Auto (Yandex + SerpApi Multi-Engine)</option>
-                <option value="yandex">Yandex Images (Stealth Chromium)</option>
-                <option value="serpapi">SerpApi Multi-Engine (Lens + Bing + Google)</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <div class="toggle-row">
+            <!-- 2. Identified Identity & Verified Social Accounts Card -->
+            <div class="entity-card" id="entityCard">
+              <div class="entity-header">
                 <div>
-                  <div style="font-weight: 600; font-size: 11px;">Simulate Attack (Tamper)</div>
-                  <div class="mono" style="font-size: 10px; color: var(--text-muted);">Mutate off-chain payload</div>
+                  <div class="mono"
+                    style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+                    IDENTIFIED SUBJECT <span id="entityPersonTag"></span>
+                  </div>
+                  <div class="entity-name" id="entityNameText">—</div>
                 </div>
-                <input type="checkbox" id="tamperToggle" />
-              </div>
-            </div>
-          </div>
-
-          <!-- Sticky Execution Action Bar (Always visible without scrolling) -->
-          <div class="pane-sticky-action">
-            <button type="button" class="btn-execute" id="runPipelineBtn">
-              <svg class="nav-icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-              <span id="runBtnLabel">EXECUTE IDENTIFICATION</span>
-            </button>
-
-            <!-- 8-Step Stepper Progress Bar -->
-            <div class="stepper-progress" id="stepperBars">
-              <div class="stepper-bar" id="bar1"></div>
-              <div class="stepper-bar" id="bar2"></div>
-              <div class="stepper-bar" id="bar3"></div>
-              <div class="stepper-bar" id="bar4"></div>
-              <div class="stepper-bar" id="bar5"></div>
-              <div class="stepper-bar" id="bar6"></div>
-              <div class="stepper-bar" id="bar7"></div>
-              <div class="stepper-bar" id="bar8"></div>
-            </div>
-            <div class="mono" id="stepperStatusText" style="font-size: 10px; color: var(--text-muted); margin-top: 6px; text-align: center;">
-              Ready to execute
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Right Investigation & Evidence Workspace -->
-        <div class="studio-main-workspace">
-
-          <!-- 1. Executive Verdict & Cryptographic Summary Banner -->
-          <div class="verdict-card" id="verdictCard">
-            <div>
-              <div class="verdict-title" id="verdictTitleText">STATUS: READY TO SCAN</div>
-              <div class="verdict-subtitle mono" id="verdictSubtitle">
-                Select a preset portrait or upload a target face to begin facial intelligence discovery.
-              </div>
-            </div>
-            <div class="mono" id="verdictMetricBadge" style="font-size: 12px; font-weight: 700; padding: 6px 12px; border: 1px solid var(--border-focus); background: var(--bg-surface-elevated);">
-              STANDBY
-            </div>
-          </div>
-
-          <!-- 2. Identified Identity & Verified Social Accounts Card -->
-          <div class="entity-card" id="entityCard">
-            <div class="entity-header">
-              <div>
-                <div class="mono" style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
-                  IDENTIFIED SUBJECT <span id="entityPersonTag"></span>
-                </div>
-                <div class="entity-name" id="entityNameText">—</div>
-              </div>
-              <div class="mono" id="socialCountBadge" style="font-size: 11px; padding: 4px 8px; background-color: var(--bg-surface-elevated); border: 1px solid var(--border-default);">
-                0 PROFILES
-              </div>
-            </div>
-
-            <div class="entity-bio mono" id="entityBioText"></div>
-
-            <div class="social-chips-row" id="socialChipsRow">
-              <!-- Dynamically populated social badges -->
-            </div>
-          </div>
-
-          <!-- 3. Candidate Verification Gallery (Photos First) -->
-          <div class="gallery-container" id="galleryContainer">
-            <div class="gallery-header">
-              <div>
-                <div style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
-                  Discovered Candidate Imagery <span id="galleryPersonTag" class="mono" style="color: var(--text-muted);"></span>
-                </div>
-                <div class="mono" style="font-size: 11px; color: var(--text-muted); margin-top: 2px;" id="galleryCountText">
-                  Photos-First Biometric Evaluation
+                <div class="mono" id="socialCountBadge"
+                  style="font-size: 11px; padding: 4px 8px; background-color: var(--bg-surface-elevated); border: 1px solid var(--border-default);">
+                  0 PROFILES
                 </div>
               </div>
 
-              <div class="view-mode-toggle mono">
-                <button type="button" class="view-mode-btn active" id="viewModeGridBtn">
-                  <svg class="nav-icon" style="width: 12px; height: 12px;" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                  <span>GALLERY</span>
-                </button>
-                <button type="button" class="view-mode-btn" id="viewModeTableBtn">
-                  <svg class="nav-icon" style="width: 12px; height: 12px;" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                  <span>TABLE</span>
-                </button>
+              <div class="entity-bio mono" id="entityBioText"></div>
+
+              <div class="social-chips-row" id="socialChipsRow">
+                <!-- Dynamically populated social badges -->
               </div>
             </div>
 
-            <!-- View A: Photos-First Grid Cards -->
-            <div class="candidate-grid" id="candidateGrid">
-              <div class="mono" style="grid-column: 1 / -1; padding: 36px 0; text-align: center; color: var(--text-muted);">
-                Candidate imagery will appear here upon pipeline execution.
-              </div>
-            </div>
-
-            <!-- View B: Compact Data Table -->
-            <div class="data-table-container" id="dataTableContainer">
-              <table class="saas-table mono">
-                <thead>
-                  <tr>
-                    <th>Rank</th>
-                    <th>Source Domain</th>
-                    <th>Page Title</th>
-                    <th>Cosine Similarity</th>
-                    <th>Classification</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody id="candidateTableBody">
-                  <tr>
-                    <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">
-                      Awaiting pipeline execution...
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- 4. Cryptographic Attestation & Execution Drawer -->
-          <div class="drawer-card">
-            <div class="drawer-nav">
-              <button type="button" class="drawer-tab active" data-tab="tabAttestation">On-Chain Attestation Record</button>
-              <button type="button" class="drawer-tab" data-tab="tabLogs">Execution Console Log</button>
-            </div>
-
-            <div class="drawer-content">
-              <!-- Tab 1: Attestation Hashes & Record -->
-              <div class="tab-pane active" id="tabAttestation">
-                <div class="telemetry-grid mono" style="margin-bottom: 12px;">
-                  <div class="telemetry-cell">
-                    <div class="telemetry-label">Content SHA-256 (Image)</div>
-                    <div class="telemetry-value truncate" id="valContentSha">—</div>
+            <!-- 3. Candidate Verification Gallery (Photos First) -->
+            <div class="gallery-container" id="galleryContainer">
+              <div class="gallery-header">
+                <div>
+                  <div style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
+                    Discovered Candidate Imagery <span id="galleryPersonTag" class="mono"
+                      style="color: var(--text-muted);"></span>
                   </div>
-                  <div class="telemetry-cell">
-                    <div class="telemetry-label">Canonical Record SHA-256</div>
-                    <div class="telemetry-value truncate" id="valRecordSha">—</div>
-                  </div>
-                  <div class="telemetry-cell">
-                    <div class="telemetry-label">Ethereum Sepolia Tx</div>
-                    <div class="telemetry-value truncate" id="valTxHash">—</div>
-                  </div>
-                  <div class="telemetry-cell">
-                    <div class="telemetry-label">Submitter / Block</div>
-                    <div class="telemetry-value truncate" id="valBlockSubmitter">—</div>
+                  <div class="mono" style="font-size: 11px; color: var(--text-muted); margin-top: 2px;"
+                    id="galleryCountText">
+                    Photos-First Biometric Evaluation
                   </div>
                 </div>
 
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; flex-wrap: wrap;">
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <button type="button" class="btn-secondary mono" id="reverifyBtn" style="padding: 4px 10px; font-size: 11px; font-weight: 600;">
-                      <svg class="nav-icon" style="width: 12px; height: 12px;" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                      <span>RE-VERIFY ON-CHAIN INTEGRITY</span>
-                    </button>
-                    <span class="mono" id="reverifyResultChip" style="font-size: 11px; display: none; padding: 2px 8px; border-radius: 4px;"></span>
-                  </div>
-                  <div class="form-label" style="margin-bottom: 0;">
-                    <span>Canonical RFC-8785 JSON</span>
-                    <button type="button" class="btn-secondary mono" id="copyRecordBtn" style="padding: 2px 6px; font-size: 10px;">COPY JSON</button>
-                  </div>
+                <div class="view-mode-toggle mono">
+                  <button type="button" class="view-mode-btn active" id="viewModeGridBtn">
+                    <svg class="nav-icon" style="width: 12px; height: 12px;" viewBox="0 0 24 24">
+                      <rect x="3" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="14" width="7" height="7"></rect>
+                      <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>GALLERY</span>
+                  </button>
+                  <button type="button" class="view-mode-btn" id="viewModeTableBtn">
+                    <svg class="nav-icon" style="width: 12px; height: 12px;" viewBox="0 0 24 24">
+                      <line x1="8" y1="6" x2="21" y2="6"></line>
+                      <line x1="8" y1="12" x2="21" y2="12"></line>
+                      <line x1="8" y1="18" x2="21" y2="18"></line>
+                      <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                      <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                      <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
+                    <span>TABLE</span>
+                  </button>
                 </div>
-                <div class="code-preview-box mono" id="canonicalJsonBox">// Canonical cryptographic record will appear here...</div>
               </div>
 
-              <!-- Tab 2: Execution Logs Stream -->
-              <div class="tab-pane" id="tabLogs">
-                <div class="code-preview-box mono" id="terminalLogBox" style="height: 200px;">[--:--:--] System initialized. Ready to execute pipeline.</div>
+              <!-- View A: Photos-First Grid Cards -->
+              <div class="candidate-grid" id="candidateGrid">
+                <div class="mono"
+                  style="grid-column: 1 / -1; padding: 36px 0; text-align: center; color: var(--text-muted);">
+                  Candidate imagery will appear here upon pipeline execution.
+                </div>
+              </div>
+
+              <!-- View B: Compact Data Table -->
+              <div class="data-table-container" id="dataTableContainer">
+                <table class="saas-table mono">
+                  <thead>
+                    <tr>
+                      <th>Rank</th>
+                      <th>Source Domain</th>
+                      <th>Page Title</th>
+                      <th>Cosine Similarity</th>
+                      <th>Classification</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="candidateTableBody">
+                    <tr>
+                      <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">
+                        Awaiting pipeline execution...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
+
+            <!-- 4. Cryptographic Attestation & Execution Drawer -->
+            <div class="drawer-card">
+              <div class="drawer-nav">
+                <button type="button" class="drawer-tab active" data-tab="tabAttestation">On-Chain Attestation
+                  Record</button>
+                <button type="button" class="drawer-tab" data-tab="tabLogs">Execution Console Log</button>
+              </div>
+
+              <div class="drawer-content">
+                <!-- Tab 1: Attestation Hashes & Record -->
+                <div class="tab-pane active" id="tabAttestation">
+                  <div class="telemetry-grid mono" style="margin-bottom: 12px;">
+                    <div class="telemetry-cell">
+                      <div class="telemetry-label">Content SHA-256 (Image)</div>
+                      <div class="telemetry-value truncate" id="valContentSha">—</div>
+                    </div>
+                    <div class="telemetry-cell">
+                      <div class="telemetry-label">Canonical Record SHA-256</div>
+                      <div class="telemetry-value truncate" id="valRecordSha">—</div>
+                    </div>
+                    <div class="telemetry-cell">
+                      <div class="telemetry-label">Ethereum Sepolia Tx</div>
+                      <div class="telemetry-value truncate" id="valTxHash">—</div>
+                    </div>
+                    <div class="telemetry-cell">
+                      <div class="telemetry-label">Submitter / Block</div>
+                      <div class="telemetry-value truncate" id="valBlockSubmitter">—</div>
+                    </div>
+                  </div>
+
+                  <div
+                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <button type="button" class="btn-secondary mono" id="reverifyBtn"
+                        style="padding: 4px 10px; font-size: 11px; font-weight: 600;">
+                        <svg class="nav-icon" style="width: 12px; height: 12px;" viewBox="0 0 24 24">
+                          <polyline points="23 4 23 10 17 10"></polyline>
+                          <polyline points="1 20 1 14 7 14"></polyline>
+                          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                        <span>RE-VERIFY ON-CHAIN INTEGRITY</span>
+                      </button>
+                      <span class="mono" id="reverifyResultChip"
+                        style="font-size: 11px; display: none; padding: 2px 8px; border-radius: 4px;"></span>
+                    </div>
+                    <div class="form-label" style="margin-bottom: 0;">
+                      <span>Canonical RFC-8785 JSON</span>
+                      <button type="button" class="btn-secondary mono" id="copyRecordBtn"
+                        style="padding: 2px 6px; font-size: 10px;">COPY JSON</button>
+                    </div>
+                  </div>
+                  <div class="code-preview-box mono" id="canonicalJsonBox">// Canonical cryptographic record will appear
+                    here...</div>
+                </div>
+
+                <!-- Tab 2: Execution Logs Stream -->
+                <div class="tab-pane" id="tabLogs">
+                  <div class="code-preview-box mono" id="terminalLogBox" style="height: 200px;">[--:--:--] System
+                    initialized. Ready to execute pipeline.</div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
         </div>
-
       </div>
-    </div>
 
-    <!-- SCREEN 2: AUDIT LEDGER & HISTORY -->
-    <div class="screen-view" id="ledgerScreen">
-      <div class="screen-inner-container">
-        <div class="screen-header-block">
-          <div class="screen-heading">Historical Audit Ledger</div>
-          <div class="screen-desc mono">Permanent cryptographic run records saved to the immutable evidence store.</div>
-        </div>
-
-        <table class="saas-table mono" id="ledgerRunsTable">
-          <thead>
-            <tr>
-              <th>Run Identifier</th>
-              <th>Timestamp</th>
-              <th>Identified Person</th>
-              <th>Candidates</th>
-              <th>Integrity Verdict</th>
-              <th>Export</th>
-            </tr>
-          </thead>
-          <tbody id="ledgerRunsBody">
-            <tr>
-              <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">
-                Loading audit ledger records...
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- SCREEN 3: ON-CHAIN REGISTRY -->
-    <div class="screen-view" id="registryScreen">
-      <div class="screen-inner-container">
-        <div class="screen-header-block">
-          <div class="screen-heading">Ethereum Sepolia Smart Contract Registry</div>
-          <div class="screen-desc mono">Decentralized, tamper-evident attestation storage for biometric verification hashes.</div>
-        </div>
-
-        <div class="telemetry-grid mono" style="margin-bottom: 20px;">
-          <div class="telemetry-cell">
-            <div class="telemetry-label">Contract Standard</div>
-            <div class="telemetry-value">FaceVerificationRegistry.sol</div>
-          </div>
-          <div class="telemetry-cell">
-            <div class="telemetry-label">Network</div>
-            <div class="telemetry-value">Ethereum Sepolia (Chain ID 11155111)</div>
-          </div>
-          <div class="telemetry-cell">
-            <div class="telemetry-label">Registry Method</div>
-            <div class="telemetry-value">attest(bytes32 contentHash, bytes32 recordHash)</div>
-          </div>
-          <div class="telemetry-cell">
-            <div class="telemetry-label">EVM Mode</div>
-            <div class="telemetry-value">Active (Simulated EVM Zero-Failure Demo)</div>
-          </div>
-        </div>
-
-        <div class="form-label">Smart Contract Interface (ABI Summary)</div>
-        <div class="code-preview-box mono" style="height: 240px;">// SPDX-License-Identifier: MIT
-contract FaceVerificationRegistry {
-    struct Attestation {
-        bytes32 contentHash;
-        bytes32 recordHash;
-        uint256 timestamp;
-        address submitter;
-    }
-
-    event Attested(bytes32 indexed contentHash, bytes32 indexed recordHash, uint256 timestamp, address indexed submitter);
-
-    function attest(bytes32 _contentHash, bytes32 _recordHash) external returns (bytes32);
-    function getRecord(bytes32 _recordHash) external view returns (bytes32, bytes32, uint256, address);
-}</div>
-      </div>
-    </div>
-
-    <!-- SCREEN 4: ENGINE SETTINGS -->
-    <div class="screen-view" id="settingsScreen">
-      <div class="screen-inner-container">
-        <div class="screen-header-block">
-          <div class="screen-heading">Engine & Subsystem Configuration</div>
-          <div class="screen-desc mono">Control reverse-image search routers, biometric thresholds, and concurrency.</div>
-        </div>
-
-        <div class="entity-card">
-          <div class="form-group">
-            <div class="form-label">Search Router Engine Priorities</div>
-            <div class="mono" style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
-              1. <strong>Parallel Multi-Engine (Auto)</strong>: Concurrently queries Yandex Images and SerpApi (Google Lens + Bing Visual + Google Reverse), interleaving results round-robin.<br />
-              2. <strong>Yandex Images (Stealth Chromium)</strong>: Direct automated image upload with zero API keys and no rate limits.<br />
-              3. <strong>SerpApi Multi-Engine</strong>: Commercial visual search suite (Google Lens, Bing Visual Search, Google Reverse Image; requires SERPAPI_API_KEY in .env).
+      <!-- SCREEN 2: AUDIT LEDGER & HISTORY -->
+      <div class="screen-view" id="ledgerScreen">
+        <div class="screen-inner-container">
+          <div class="screen-header-block">
+            <div class="screen-heading">Historical Audit Ledger</div>
+            <div class="screen-desc mono">Permanent cryptographic run records saved to the immutable evidence store.
             </div>
           </div>
 
-          <div class="form-group" style="margin-top: 16px;">
-            <div class="form-label">Biometric Model Specifications</div>
-            <div class="mono" style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
-              • <strong>Detector</strong>: InsightFace SCRFD 10G (Single-shot Scale-aware Face Detector)<br />
-              • <strong>Embedder</strong>: ArcFace ResNet-50 (w600k_r50.onnx) 512-Dimensional L2-Normalized Vectors<br />
-              • <strong>Quality Gating</strong>: Laplacian Variance Blur Filter (&ge; 40.0) + Bounding Box Resolution (&ge; 40x40px)
+          <table class="saas-table mono" id="ledgerRunsTable">
+            <thead>
+              <tr>
+                <th>Run Identifier</th>
+                <th>Timestamp</th>
+                <th>Identified Person</th>
+                <th>Candidates</th>
+                <th>Integrity Verdict</th>
+                <th>Export</th>
+              </tr>
+            </thead>
+            <tbody id="ledgerRunsBody">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">
+                  Loading audit ledger records...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SCREEN 3: ON-CHAIN REGISTRY -->
+      <div class="screen-view" id="registryScreen">
+        <div class="screen-inner-container">
+          <div class="screen-header-block">
+            <div class="screen-heading">Ethereum Sepolia Smart Contract Registry</div>
+            <div class="screen-desc mono">Decentralized, tamper-evident attestation storage for biometric verification
+              hashes.</div>
+          </div>
+
+          <div class="telemetry-grid mono" style="margin-bottom: 20px;">
+            <div class="telemetry-cell">
+              <div class="telemetry-label">Contract Standard</div>
+              <div class="telemetry-value">FaceVerificationRegistry.sol</div>
+            </div>
+            <div class="telemetry-cell">
+              <div class="telemetry-label">Network</div>
+              <div class="telemetry-value">Ethereum Sepolia (Chain ID 11155111)</div>
+            </div>
+            <div class="telemetry-cell">
+              <div class="telemetry-label">Registry Method</div>
+              <div class="telemetry-value">attest(bytes32 contentHash, bytes32 recordHash)</div>
+            </div>
+            <div class="telemetry-cell">
+              <div class="telemetry-label">EVM Mode</div>
+              <div class="telemetry-value">Active (Simulated EVM Zero-Failure Demo)</div>
+            </div>
+          </div>
+
+          <div class="form-label">Smart Contract Interface (ABI Summary)</div>
+          <div class="code-preview-box mono" style="height: 240px;">// SPDX-License-Identifier: MIT
+            contract FaceVerificationRegistry {
+            struct Attestation {
+            bytes32 contentHash;
+            bytes32 recordHash;
+            uint256 timestamp;
+            address submitter;
+            }
+
+            event Attested(bytes32 indexed contentHash, bytes32 indexed recordHash, uint256 timestamp, address indexed
+            submitter);
+
+            function attest(bytes32 _contentHash, bytes32 _recordHash) external returns (bytes32);
+            function getRecord(bytes32 _recordHash) external view returns (bytes32, bytes32, uint256, address);
+            }</div>
+        </div>
+      </div>
+
+      <!-- SCREEN 4: ENGINE SETTINGS -->
+      <div class="screen-view" id="settingsScreen">
+        <div class="screen-inner-container">
+          <div class="screen-header-block">
+            <div class="screen-heading">Engine & Subsystem Configuration</div>
+            <div class="screen-desc mono">Control reverse-image search routers, biometric thresholds, and concurrency.
+            </div>
+          </div>
+
+          <div class="entity-card">
+            <div class="form-group">
+              <div class="form-label">Search Router Engine Priorities</div>
+              <div class="mono" style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+                1. <strong>Parallel Multi-Engine (Auto)</strong>: Concurrently queries Yandex Images and SerpApi (Google
+                Lens + Bing Visual + Google Reverse), interleaving results round-robin.<br />
+                2. <strong>Yandex Images (Stealth Chromium)</strong>: Direct automated image upload with zero API keys
+                and no rate limits.<br />
+                3. <strong>SerpApi Multi-Engine</strong>: Commercial visual search suite (Google Lens, Bing Visual
+                Search, Google Reverse Image; requires SERPAPI_API_KEY in .env).
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 16px;">
+              <div class="form-label">Biometric Model Specifications</div>
+              <div class="mono" style="font-size: 12px; color: var(--text-secondary); line-height: 1.6;">
+                • <strong>Detector</strong>: InsightFace SCRFD 10G (Single-shot Scale-aware Face Detector)<br />
+                • <strong>Embedder</strong>: ArcFace ResNet-50 (w600k_r50.onnx) 512-Dimensional L2-Normalized
+                Vectors<br />
+                • <strong>Quality Gating</strong>: Laplacian Variance Blur Filter (&ge; 40.0) + Bounding Box Resolution
+                (&ge; 40x40px)
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-  </main>
-</div>
+    </main>
+  </div>
 
-<script>
-  // Global State
-  let currentScreen = "studioScreen";
-  let activeUploadId = null;
-  let selectedPreset = "sam_altman_portrait.jpg";
-  let currentDetectedFaces = [];
-  let selectedFaceIdx = 0;
-  let runResultsData = null;
-  let ws = null;
-  let currentRunId = null;
+  <script>
+    // Global State
+    let currentScreen = "studioScreen";
+    let activeUploadId = null;
+    let selectedPreset = "sam_altman_portrait.jpg";
+    let currentDetectedFaces = [];
+    let selectedFaceIdx = 0;
+    let runResultsData = null;
+    let ws = null;
+    let currentRunId = null;
 
-  // DOM References
-  const segPresetsBtn = document.getElementById("segPresetsBtn");
-  const segUploadBtn = document.getElementById("segUploadBtn");
-  const presetContainer = document.getElementById("presetContainer");
-  const uploadContainer = document.getElementById("uploadContainer");
-  const uploadDropzone = document.getElementById("uploadDropzone");
-  const fileInput = document.getElementById("fileInput");
-  const clearUploadBtn = document.getElementById("clearUploadBtn");
-  const thresholdSlider = document.getElementById("thresholdSlider");
-  const thresholdValue = document.getElementById("thresholdValue");
-  const engineSelect = document.getElementById("engineSelect");
-  const tamperToggle = document.getElementById("tamperToggle");
-  const runPipelineBtn = document.getElementById("runPipelineBtn");
-  const downloadLedgerTopBtn = document.getElementById("downloadLedgerTopBtn");
-  const resetAppBtn = document.getElementById("resetAppBtn");
-  const terminalLogBox = document.getElementById("terminalLogBox");
+    // DOM References
+    const segPresetsBtn = document.getElementById("segPresetsBtn");
+    const segUploadBtn = document.getElementById("segUploadBtn");
+    const presetContainer = document.getElementById("presetContainer");
+    const uploadContainer = document.getElementById("uploadContainer");
+    const uploadDropzone = document.getElementById("uploadDropzone");
+    const fileInput = document.getElementById("fileInput");
+    const clearUploadBtn = document.getElementById("clearUploadBtn");
+    const thresholdSlider = document.getElementById("thresholdSlider");
+    const thresholdValue = document.getElementById("thresholdValue");
+    const engineSelect = document.getElementById("engineSelect");
+    const tamperToggle = document.getElementById("tamperToggle");
+    const runPipelineBtn = document.getElementById("runPipelineBtn");
+    const downloadLedgerTopBtn = document.getElementById("downloadLedgerTopBtn");
+    const resetAppBtn = document.getElementById("resetAppBtn");
+    const terminalLogBox = document.getElementById("terminalLogBox");
 
-  // Sidebar Navigation
-  document.querySelectorAll(".nav-item").forEach(item => {
-    item.addEventListener("click", () => {
-      document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-      item.classList.add("active");
+    // Sidebar Navigation
+    document.querySelectorAll(".nav-item").forEach(item => {
+      item.addEventListener("click", () => {
+        document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+        item.classList.add("active");
 
-      const screenId = item.getAttribute("data-screen");
-      document.querySelectorAll(".screen-view").forEach(s => s.classList.remove("active"));
-      document.getElementById(screenId).classList.add("active");
-      currentScreen = screenId;
+        const screenId = item.getAttribute("data-screen");
+        document.querySelectorAll(".screen-view").forEach(s => s.classList.remove("active"));
+        document.getElementById(screenId).classList.add("active");
+        currentScreen = screenId;
 
-      const breadcrumbMap = {
-        studioScreen: "Live Probe Scanner",
-        ledgerScreen: "Historical Audit Ledger",
-        registryScreen: "Ethereum Sepolia Smart Contract",
-        settingsScreen: "Engine Settings & Telemetry",
-      };
-      document.getElementById("activeBreadcrumb").textContent = breadcrumbMap[screenId] || "Dashboard";
+        const breadcrumbMap = {
+          studioScreen: "Live Probe Scanner",
+          ledgerScreen: "Historical Audit Ledger",
+          registryScreen: "Ethereum Sepolia Smart Contract",
+          settingsScreen: "Engine Settings & Telemetry",
+        };
+        document.getElementById("activeBreadcrumb").textContent = breadcrumbMap[screenId] || "Dashboard";
 
-      if (screenId === "ledgerScreen") {
-        fetchLedgerRuns();
-      }
+        if (screenId === "ledgerScreen") {
+          fetchLedgerRuns();
+        }
+      });
     });
-  });
 
-  // Slider Input
-  thresholdSlider.addEventListener("input", (e) => {
-    const val = parseFloat(e.target.value);
-    thresholdValue.textContent = `${val.toFixed(2)} (${Math.round(val * 100)}%)`;
-  });
-
-  // Source Switcher (Presets vs Upload)
-  segPresetsBtn.addEventListener("click", () => {
-    segPresetsBtn.classList.add("active");
-    segUploadBtn.classList.remove("active");
-    presetContainer.style.display = "flex";
-    uploadContainer.style.display = "none";
-    document.getElementById("sourceBadge").textContent = "PRESET";
-
-    if (activeUploadId) {
-      clearUpload();
-    }
-  });
-
-  segUploadBtn.addEventListener("click", () => {
-    segUploadBtn.classList.add("active");
-    segPresetsBtn.classList.remove("active");
-    presetContainer.style.display = "none";
-    uploadContainer.style.display = "block";
-    document.getElementById("sourceBadge").textContent = "UPLOAD";
-  });
-
-  // Presets Click Handler
-  document.querySelectorAll(".preset-card").forEach(card => {
-    card.addEventListener("click", () => {
-      document.querySelectorAll(".preset-card").forEach(c => c.classList.remove("active"));
-      card.classList.add("active");
-      selectedPreset = card.getAttribute("data-file");
-      clearUpload();
-      requestPreview(selectedPreset);
+    // Slider Input
+    thresholdSlider.addEventListener("input", (e) => {
+      const val = parseFloat(e.target.value);
+      thresholdValue.textContent = `${val.toFixed(2)} (${Math.round(val * 100)}%)`;
     });
-  });
 
-  // File Upload Handlers
-  uploadDropzone.addEventListener("click", () => fileInput.click());
+    // Source Switcher (Presets vs Upload)
+    segPresetsBtn.addEventListener("click", () => {
+      segPresetsBtn.classList.add("active");
+      segUploadBtn.classList.remove("active");
+      presetContainer.style.display = "flex";
+      uploadContainer.style.display = "none";
+      document.getElementById("sourceBadge").textContent = "PRESET";
 
-  uploadDropzone.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    uploadDropzone.classList.add("dragover");
-  });
-
-  uploadDropzone.addEventListener("dragleave", () => {
-    uploadDropzone.classList.remove("dragover");
-  });
-
-  uploadDropzone.addEventListener("drop", (e) => {
-    e.preventDefault();
-    uploadDropzone.classList.remove("dragover");
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFileUpload(e.dataTransfer.files[0]);
-    }
-  });
-
-  fileInput.addEventListener("change", (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      handleFileUpload(e.target.files[0]);
-    }
-  });
-
-  clearUploadBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    clearUpload();
-    segPresetsBtn.click();
-    document.querySelector(".preset-card").click();
-  });
-
-  function clearUpload() {
-    activeUploadId = null;
-    document.getElementById("uploadLabel").textContent = "Drop probe image here";
-    clearUploadBtn.style.display = "none";
-    fileInput.value = "";
-  }
-
-  async function handleFileUpload(file) {
-    document.getElementById("uploadLabel").textContent = `Uploading ${file.name}...`;
-    appendLog(new Date().toLocaleTimeString(), `Uploading & analyzing probe: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)...`);
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const resp = await fetch("/api/upload", { method: "POST", body: formData });
-      const data = await resp.json();
-
-      if (!data.success) {
-        alert("Upload failed: " + data.error);
+      if (activeUploadId) {
         clearUpload();
-        return;
       }
+    });
 
-      activeUploadId = data.upload_id;
-      document.getElementById("uploadLabel").textContent = file.name;
-      clearUploadBtn.style.display = "inline-flex";
+    segUploadBtn.addEventListener("click", () => {
+      segUploadBtn.classList.add("active");
+      segPresetsBtn.classList.remove("active");
+      presetContainer.style.display = "none";
+      uploadContainer.style.display = "block";
+      document.getElementById("sourceBadge").textContent = "UPLOAD";
+    });
 
-      updateProbeProfile(
-        data.preview_b64,
-        data.primary_face,
-        data.embedding_sample,
-        data.faces_count,
-        "CUSTOM UPLOAD",
-        data.all_faces
-      );
+    // Presets Click Handler
+    document.querySelectorAll(".preset-card").forEach(card => {
+      card.addEventListener("click", () => {
+        document.querySelectorAll(".preset-card").forEach(c => c.classList.remove("active"));
+        card.classList.add("active");
+        selectedPreset = card.getAttribute("data-file");
+        clearUpload();
+        requestPreview(selectedPreset);
+      });
+    });
 
-      appendLog(new Date().toLocaleTimeString(), `Detected ${data.faces_count} face(s). Primary conf: ${data.primary_face ? (data.primary_face.confidence * 100).toFixed(1) + '%' : 'None'}`);
-    } catch (err) {
-      console.error(err);
-      alert("Error uploading image: " + err.message);
+    // File Upload Handlers
+    uploadDropzone.addEventListener("click", () => fileInput.click());
+
+    uploadDropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      uploadDropzone.classList.add("dragover");
+    });
+
+    uploadDropzone.addEventListener("dragleave", () => {
+      uploadDropzone.classList.remove("dragover");
+    });
+
+    uploadDropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      uploadDropzone.classList.remove("dragover");
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleFileUpload(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        handleFileUpload(e.target.files[0]);
+      }
+    });
+
+    clearUploadBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
       clearUpload();
+      segPresetsBtn.click();
+      document.querySelector(".preset-card").click();
+    });
+
+    function clearUpload() {
+      activeUploadId = null;
+      document.getElementById("uploadLabel").textContent = "Drop probe image here";
+      clearUploadBtn.style.display = "none";
+      fileInput.value = "";
     }
-  }
 
-  // Reset entire workspace to pristine standby state (clears all previous run data)
-  function resetInvestigationWorkspace() {
-    runResultsData = null;
-    currentRunId = null;
-    downloadLedgerTopBtn.style.display = "none";
+    async function handleFileUpload(file) {
+      document.getElementById("uploadLabel").textContent = `Uploading ${file.name}...`;
+      appendLog(new Date().toLocaleTimeString(), `Uploading & analyzing probe: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)...`);
 
-    // 1. Reset Verdict Banner
-    const banner = document.getElementById("verdictCard");
-    banner.className = "verdict-card";
-    document.getElementById("verdictTitleText").textContent = "STATUS: READY TO SCAN";
-    document.getElementById("verdictSubtitle").textContent = "Select a target portrait to begin facial intelligence discovery.";
-    const badge = document.getElementById("verdictMetricBadge");
-    badge.textContent = "STANDBY";
-    badge.style.color = "var(--text-secondary)";
-    badge.style.borderColor = "var(--border-focus)";
+      const formData = new FormData();
+      formData.append("file", file);
 
-    // 2. Reset Identified Subject & Social Profiles Card to Standby
-    renderSocialProfiles(null, false);
+      try {
+        const resp = await fetch("/api/upload", { method: "POST", body: formData });
+        const data = await resp.json();
 
-    // 3. Reset Candidate Gallery
-    document.getElementById("candidateGrid").innerHTML = `
+        if (!data.success) {
+          alert("Upload failed: " + data.error);
+          clearUpload();
+          return;
+        }
+
+        activeUploadId = data.upload_id;
+        document.getElementById("uploadLabel").textContent = file.name;
+        clearUploadBtn.style.display = "inline-flex";
+
+        updateProbeProfile(
+          data.preview_b64,
+          data.primary_face,
+          data.embedding_sample,
+          data.faces_count,
+          "CUSTOM UPLOAD",
+          data.all_faces
+        );
+
+        appendLog(new Date().toLocaleTimeString(), `Detected ${data.faces_count} face(s). Primary conf: ${data.primary_face ? (data.primary_face.confidence * 100).toFixed(1) + '%' : 'None'}`);
+      } catch (err) {
+        console.error(err);
+        alert("Error uploading image: " + err.message);
+        clearUpload();
+      }
+    }
+
+    // Reset entire workspace to pristine standby state (clears all previous run data)
+    function resetInvestigationWorkspace() {
+      runResultsData = null;
+      currentRunId = null;
+      downloadLedgerTopBtn.style.display = "none";
+
+      // 1. Reset Verdict Banner
+      const banner = document.getElementById("verdictCard");
+      banner.className = "verdict-card";
+      document.getElementById("verdictTitleText").textContent = "STATUS: READY TO SCAN";
+      document.getElementById("verdictSubtitle").textContent = "Select a target portrait to begin facial intelligence discovery.";
+      const badge = document.getElementById("verdictMetricBadge");
+      badge.textContent = "STANDBY";
+      badge.style.color = "var(--text-secondary)";
+      badge.style.borderColor = "var(--border-focus)";
+
+      // 2. Reset Identified Subject & Social Profiles Card to Standby
+      renderSocialProfiles(null, false);
+
+      // 3. Reset Candidate Gallery
+      document.getElementById("candidateGrid").innerHTML = `
       <div class="mono" style="grid-column: 1 / -1; padding: 36px 0; text-align: center; color: var(--text-muted);">
         Candidate imagery will appear here upon pipeline execution.
       </div>
     `;
-    document.getElementById("candidateTableBody").innerHTML = `
+      document.getElementById("candidateTableBody").innerHTML = `
       <tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Awaiting pipeline execution...</td></tr>
     `;
-    document.getElementById("galleryCountText").textContent = "0 Candidate Web Images Evaluated";
-    document.getElementById("entityPersonTag").textContent = "";
-    document.getElementById("galleryPersonTag").textContent = "";
+      document.getElementById("galleryCountText").textContent = "0 Candidate Web Images Evaluated";
+      document.getElementById("entityPersonTag").textContent = "";
+      document.getElementById("galleryPersonTag").textContent = "";
 
-    // 4. Reset Cryptographic Attestation Drawer
-    document.getElementById("valContentSha").textContent = "—";
-    document.getElementById("valRecordSha").textContent = "—";
-    document.getElementById("valTxHash").textContent = "—";
-    document.getElementById("valBlockSubmitter").textContent = "—";
-    document.getElementById("canonicalJsonBox").textContent = "// Awaiting pipeline execution...";
-    if (document.getElementById("reverifyResultChip")) {
-      document.getElementById("reverifyResultChip").style.display = "none";
+      // 4. Reset Cryptographic Attestation Drawer
+      document.getElementById("valContentSha").textContent = "—";
+      document.getElementById("valRecordSha").textContent = "—";
+      document.getElementById("valTxHash").textContent = "—";
+      document.getElementById("valBlockSubmitter").textContent = "—";
+      document.getElementById("canonicalJsonBox").textContent = "// Awaiting pipeline execution...";
+      if (document.getElementById("reverifyResultChip")) {
+        document.getElementById("reverifyResultChip").style.display = "none";
+      }
+
+      // 5. Reset Micro-Stepper
+      resetStepper();
+      document.getElementById("stepperStatusText").textContent = "Ready to execute";
     }
 
-    // 5. Reset Micro-Stepper
-    resetStepper();
-    document.getElementById("stepperStatusText").textContent = "Ready to execute";
-  }
+    // Probe Profile UI Updates
+    function updateProbeProfile(imgSrc, primaryFace, sample, facesCount, sourceTag, allFaces) {
+      const vp = document.getElementById("probeViewport");
+      if (imgSrc) {
+        vp.innerHTML = `<img src="${imgSrc}" alt="Probe Target" />`;
+      }
 
-  // Probe Profile UI Updates
-  function updateProbeProfile(imgSrc, primaryFace, sample, facesCount, sourceTag, allFaces) {
-    const vp = document.getElementById("probeViewport");
-    if (imgSrc) {
-      vp.innerHTML = `<img src="${imgSrc}" alt="Probe Target" />`;
-    }
+      currentDetectedFaces = allFaces || (primaryFace ? [primaryFace] : []);
+      selectedFaceIdx = primaryFace ? primaryFace.face_index : 0;
+      const facesBadge = document.getElementById("facesCountBadge");
+      const sharpnessEl = document.getElementById("valSharpness");
+      const runBtn = document.getElementById("runPipelineBtn");
+      const runLabel = document.getElementById("runBtnLabel");
 
-    currentDetectedFaces = allFaces || (primaryFace ? [primaryFace] : []);
-    selectedFaceIdx = primaryFace ? primaryFace.face_index : 0;
-    const facesBadge = document.getElementById("facesCountBadge");
-    const sharpnessEl = document.getElementById("valSharpness");
-    const runBtn = document.getElementById("runPipelineBtn");
-    const runLabel = document.getElementById("runBtnLabel");
+      renderPeopleChips(currentDetectedFaces, selectedFaceIdx);
 
-    renderPeopleChips(currentDetectedFaces, selectedFaceIdx);
+      if (primaryFace && (facesCount === undefined || facesCount > 0)) {
+        facesBadge.textContent = `${facesCount || currentDetectedFaces.length} FACE(S)`;
+        facesBadge.style.borderColor = "var(--border-default)";
+        facesBadge.style.color = "var(--text-secondary)";
 
-    if (primaryFace && (facesCount === undefined || facesCount > 0)) {
-      facesBadge.textContent = `${facesCount || currentDetectedFaces.length} FACE(S)`;
-      facesBadge.style.borderColor = "var(--border-default)";
-      facesBadge.style.color = "var(--text-secondary)";
+        document.getElementById("valBbox").textContent = `[${primaryFace.bbox.join(", ")}]`;
+        document.getElementById("valConf").textContent = `${(primaryFace.confidence * 100).toFixed(1)}%`;
 
-      document.getElementById("valBbox").textContent = `[${primaryFace.bbox.join(", ")}]`;
-      document.getElementById("valConf").textContent = `${(primaryFace.confidence * 100).toFixed(1)}%`;
-      
-      if (primaryFace.sharpness < 35.0) {
-        sharpnessEl.textContent = `${primaryFace.sharpness} (LOW QUALITY BLUR)`;
-        sharpnessEl.style.color = "var(--status-danger-text)";
+        if (primaryFace.sharpness < 35.0) {
+          sharpnessEl.textContent = `${primaryFace.sharpness} (LOW QUALITY BLUR)`;
+          sharpnessEl.style.color = "var(--status-danger-text)";
+        } else {
+          sharpnessEl.textContent = `${primaryFace.sharpness}`;
+          sharpnessEl.style.color = "var(--text-primary)";
+        }
+
+        runBtn.disabled = false;
+        if (runLabel) runLabel.textContent = "EXECUTE IDENTIFICATION";
       } else {
-        sharpnessEl.textContent = `${primaryFace.sharpness}`;
-        sharpnessEl.style.color = "var(--text-primary)";
+        facesBadge.textContent = "0 FACES (REJECTED)";
+        facesBadge.style.borderColor = "var(--status-danger-border)";
+        facesBadge.style.color = "var(--status-danger-text)";
+
+        document.getElementById("valBbox").textContent = "NO FACE DETECTED";
+        document.getElementById("valConf").textContent = "0.0% (REJECTED)";
+        sharpnessEl.textContent = "N/A";
+        sharpnessEl.style.color = "var(--text-muted)";
+
+        // Disable pipeline execution button
+        runBtn.disabled = true;
+        if (runLabel) runLabel.textContent = "REJECTED: NO FACE DETECTED";
       }
 
-      runBtn.disabled = false;
-      if (runLabel) runLabel.textContent = "EXECUTE IDENTIFICATION";
-    } else {
-      facesBadge.textContent = "0 FACES (REJECTED)";
-      facesBadge.style.borderColor = "var(--status-danger-border)";
-      facesBadge.style.color = "var(--status-danger-text)";
-
-      document.getElementById("valBbox").textContent = "NO FACE DETECTED";
-      document.getElementById("valConf").textContent = "0.0% (REJECTED)";
-      sharpnessEl.textContent = "N/A";
-      sharpnessEl.style.color = "var(--text-muted)";
-
-      // Disable pipeline execution button
-      runBtn.disabled = true;
-      if (runLabel) runLabel.textContent = "REJECTED: NO FACE DETECTED";
+      // Completely wipe all previous run data whenever a new target image is loaded
+      resetInvestigationWorkspace();
     }
 
-    // Completely wipe all previous run data whenever a new target image is loaded
-    resetInvestigationWorkspace();
-  }
+    // Render Social Profiles & Subject Identity strictly from live reverse-search results
+    function renderSocialProfiles(socialIdentity, isVerified = false) {
+      const entityCard = document.getElementById("entityCard");
+      const nameText = document.getElementById("entityNameText");
+      const bioText = document.getElementById("entityBioText");
+      const socialChips = document.getElementById("socialChipsRow");
+      const socialCount = document.getElementById("socialCountBadge");
 
-  // Render Social Profiles & Subject Identity strictly from live reverse-search results
-  function renderSocialProfiles(socialIdentity, isVerified = false) {
-    const entityCard = document.getElementById("entityCard");
-    const nameText = document.getElementById("entityNameText");
-    const bioText = document.getElementById("entityBioText");
-    const socialChips = document.getElementById("socialChipsRow");
-    const socialCount = document.getElementById("socialCountBadge");
+      entityCard.style.display = "block";
+      socialChips.innerHTML = "";
 
-    entityCard.style.display = "block";
-    socialChips.innerHTML = "";
+      if (isVerified && socialIdentity && socialIdentity.profiles && socialIdentity.profiles.length > 0) {
+        // Authentic verified public profiles discovered live
+        nameText.textContent = socialIdentity.canonical_name || "Verified Subject";
+        bioText.textContent = socialIdentity.bio_summary || "Biometrically verified identity across public databases.";
+        bioText.style.display = "block";
+        socialCount.textContent = `${socialIdentity.profiles.length} VERIFIED PROFILES`;
+        socialCount.style.borderColor = "var(--accent-emerald)";
+        socialCount.style.color = "var(--accent-emerald)";
 
-    if (isVerified && socialIdentity && socialIdentity.profiles && socialIdentity.profiles.length > 0) {
-      // Authentic verified public profiles discovered live
-      nameText.textContent = socialIdentity.canonical_name || "Verified Subject";
-      bioText.textContent = socialIdentity.bio_summary || "Biometrically verified identity across public databases.";
-      bioText.style.display = "block";
-      socialCount.textContent = `${socialIdentity.profiles.length} VERIFIED PROFILES`;
-      socialCount.style.borderColor = "var(--accent-emerald)";
-      socialCount.style.color = "var(--accent-emerald)";
-
-      socialIdentity.profiles.forEach(p => {
-        const a = document.createElement("a");
-        a.className = "social-link-badge mono";
-        a.href = p.url;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        a.innerHTML = `<span class="platform-tag">${p.platform_label || p.platform || "WEB"}</span><span>${p.handle || p.display_name}</span>`;
-        socialChips.appendChild(a);
-      });
-    } else if (isVerified) {
-      // Pipeline completed, but 0 social profiles found
-      nameText.textContent = (socialIdentity && socialIdentity.canonical_name) ? socialIdentity.canonical_name : "Unidentified Subject";
-      bioText.textContent = (socialIdentity && socialIdentity.bio_summary) ? socialIdentity.bio_summary : "No public social media accounts discovered on public web indexes.";
-      bioText.style.display = "block";
-      socialCount.textContent = "0 PUBLIC PROFILES";
-      socialCount.style.borderColor = "var(--border-default)";
-      socialCount.style.color = "var(--text-muted)";
-      socialChips.innerHTML = `<span class="mono" style="font-size: 11px; color: var(--text-muted);">0 public social profiles discovered across web indexes for this target.</span>`;
-    } else {
-      // Standby / Pre-execution state
-      nameText.textContent = "Awaiting Investigation";
-      bioText.textContent = "Target identity and verified social media accounts will be resolved live from candidate web sources.";
-      bioText.style.display = "block";
-      socialCount.textContent = "STANDBY";
-      socialCount.style.borderColor = "var(--border-default)";
-      socialCount.style.color = "var(--text-muted)";
-      socialChips.innerHTML = `<span class="mono" style="font-size: 11px; color: var(--text-muted);">Awaiting pipeline execution — Identity will be discovered live from public web indexes.</span>`;
-    }
-  }
-
-  // Multi-Person Subject Chips
-  function renderPeopleChips(faces, activeIdx) {
-    const strip = document.getElementById("peopleStrip");
-    const container = document.getElementById("peopleSelectorStrip");
-    strip.innerHTML = "";
-
-    if (!faces || faces.length <= 1) {
-      container.style.display = "none";
-      return;
-    }
-
-    container.style.display = "block";
-    document.getElementById("peopleCountSpan").textContent = faces.length;
-
-    faces.forEach((f, i) => {
-      const chip = document.createElement("button");
-      chip.type = "button";
-      chip.className = "person-chip" + (f.face_index === activeIdx ? " active" : "");
-
-      let imgHtml = "";
-      if (f.crop_b64) {
-        imgHtml = `<img src="${f.crop_b64}" class="person-chip-crop" alt="Person #${i+1}" />`;
+        socialIdentity.profiles.forEach(p => {
+          const a = document.createElement("a");
+          a.className = "social-link-badge mono";
+          a.href = p.url;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.innerHTML = `<span class="platform-tag">${p.platform_label || p.platform || "WEB"}</span><span>${p.handle || p.display_name}</span>`;
+          socialChips.appendChild(a);
+        });
+      } else if (isVerified) {
+        // Pipeline completed, but 0 social profiles verified
+        const cName = (socialIdentity && socialIdentity.canonical_name) ? socialIdentity.canonical_name : "Unidentified Subject";
+        nameText.textContent = cName;
+        bioText.textContent = (socialIdentity && socialIdentity.bio_summary) ? socialIdentity.bio_summary : "Identity deduced, but no verified personal social accounts confirmed.";
+        bioText.style.display = "block";
+        socialCount.textContent = "0 VERIFIED PROFILES";
+        socialCount.style.borderColor = "var(--border-default)";
+        socialCount.style.color = "var(--text-muted)";
+        socialChips.innerHTML = `<span class="mono" style="font-size: 11px; color: var(--text-muted);">No direct social profiles matching "${cName}" verified.</span>`;
+      } else {
+        // Standby / Pre-execution state
+        nameText.textContent = "Awaiting Investigation";
+        bioText.textContent = "Target identity and verified social media accounts will be resolved live from candidate web sources.";
+        bioText.style.display = "block";
+        socialCount.textContent = "STANDBY";
+        socialCount.style.borderColor = "var(--border-default)";
+        socialCount.style.color = "var(--text-muted)";
+        socialChips.innerHTML = `<span class="mono" style="font-size: 11px; color: var(--text-muted);">Awaiting pipeline execution — Identity will be discovered live from public web indexes.</span>`;
       }
-      const label = f.is_primary ? `Person #${i+1} (Primary)` : `Person #${i+1}`;
-      chip.innerHTML = `${imgHtml}<span>${label}</span>`;
+    }
 
-      chip.addEventListener("click", () => {
-        selectPerson(f.face_index);
+    // Multi-Person Subject Chips
+    function renderPeopleChips(faces, activeIdx) {
+      const strip = document.getElementById("peopleStrip");
+      const container = document.getElementById("peopleSelectorStrip");
+      strip.innerHTML = "";
+
+      if (!faces || faces.length <= 1) {
+        container.style.display = "none";
+        return;
+      }
+
+      container.style.display = "block";
+      document.getElementById("peopleCountSpan").textContent = faces.length;
+
+      faces.forEach((f, i) => {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "person-chip" + (f.face_index === activeIdx ? " active" : "");
+
+        let imgHtml = "";
+        if (f.crop_b64) {
+          imgHtml = `<img src="${f.crop_b64}" class="person-chip-crop" alt="Person #${i + 1}" />`;
+        }
+        const label = f.is_primary ? `Person #${i + 1} (Primary)` : `Person #${i + 1}`;
+        chip.innerHTML = `${imgHtml}<span>${label}</span>`;
+
+        chip.addEventListener("click", () => {
+          selectPerson(f.face_index);
+        });
+
+        strip.appendChild(chip);
+      });
+    }
+
+    function selectPerson(faceIdx) {
+      selectedFaceIdx = faceIdx;
+
+      document.querySelectorAll(".person-chip").forEach(chip => {
+        chip.classList.toggle("active", chip.textContent.includes(`Person #${faceIdx + 1}`));
       });
 
-      strip.appendChild(chip);
-    });
-  }
+      const f = currentDetectedFaces.find(x => x.face_index === faceIdx);
+      if (f) {
+        document.getElementById("valBbox").textContent = `[${f.bbox.join(", ")}]`;
+        document.getElementById("valConf").textContent = `${(f.confidence * 100).toFixed(1)}%`;
+        document.getElementById("valSharpness").textContent = `${f.sharpness}`;
+      }
 
-  function selectPerson(faceIdx) {
-    selectedFaceIdx = faceIdx;
-
-    document.querySelectorAll(".person-chip").forEach(chip => {
-      chip.classList.toggle("active", chip.textContent.includes(`Person #${faceIdx + 1}`));
-    });
-
-    const f = currentDetectedFaces.find(x => x.face_index === faceIdx);
-    if (f) {
-      document.getElementById("valBbox").textContent = `[${f.bbox.join(", ")}]`;
-      document.getElementById("valConf").textContent = `${(f.confidence * 100).toFixed(1)}%`;
-      document.getElementById("valSharpness").textContent = `${f.sharpness}`;
+      if (runResultsData && runResultsData.faces_results) {
+        const profile = runResultsData.faces_results.find(p => p.face_index === faceIdx) || runResultsData.faces_results[0];
+        renderFaceResults(profile);
+      }
     }
 
-    if (runResultsData && runResultsData.faces_results) {
-      const profile = runResultsData.faces_results.find(p => p.face_index === faceIdx) || runResultsData.faces_results[0];
-      renderFaceResults(profile);
-    }
-  }
+    // Render Result Workspace for Selected Face
+    function renderFaceResults(profile) {
+      const tag = currentDetectedFaces.length > 1 ? `[Person #${profile.face_index + 1}]` : "";
+      document.getElementById("entityPersonTag").textContent = tag;
+      document.getElementById("galleryPersonTag").textContent = tag;
 
-  // Render Result Workspace for Selected Face
-  function renderFaceResults(profile) {
-    const tag = currentDetectedFaces.length > 1 ? `[Person #${profile.face_index + 1}]` : "";
-    document.getElementById("entityPersonTag").textContent = tag;
-    document.getElementById("galleryPersonTag").textContent = tag;
+      // 1. Entity & Social Profile
+      renderSocialProfiles(profile.social_identity, true, "VERIFIED IDENTITY");
 
-    // 1. Entity & Social Profile
-    renderSocialProfiles(profile.social_identity, true, "VERIFIED IDENTITY");
+      // 2. Candidate Gallery (Photos First Grid)
+      const grid = document.getElementById("candidateGrid");
+      const tbody = document.getElementById("candidateTableBody");
+      grid.innerHTML = "";
+      tbody.innerHTML = "";
 
-    // 2. Candidate Gallery (Photos First Grid)
-    const grid = document.getElementById("candidateGrid");
-    const tbody = document.getElementById("candidateTableBody");
-    grid.innerHTML = "";
-    tbody.innerHTML = "";
+      const candidates = profile.leaderboard || [];
+      document.getElementById("galleryCountText").textContent = `${candidates.length} Candidate Web Images Evaluated`;
 
-    const candidates = profile.leaderboard || [];
-    document.getElementById("galleryCountText").textContent = `${candidates.length} Candidate Web Images Evaluated`;
+      if (candidates.length > 0) {
+        candidates.forEach((c, idx) => {
+          const isWinner = (idx === 0 && c.status === "MATCH");
+          const statusClass = c.status === "MATCH" ? "match" : (c.status === "RUNNER" ? "runner" : "reject");
 
-    if (candidates.length > 0) {
-      candidates.forEach((c, idx) => {
-        const isWinner = (idx === 0 && c.status === "MATCH");
-        const statusClass = c.status === "MATCH" ? "match" : (c.status === "RUNNER" ? "runner" : "reject");
+          // Photo source: prioritize high-res matched image for rank 1
+          const imgSrc = (isWinner && profile.matched_image_b64) ? profile.matched_image_b64 : (c.image_url || "");
 
-        // Photo source: prioritize high-res matched image for rank 1
-        const imgSrc = (isWinner && profile.matched_image_b64) ? profile.matched_image_b64 : (c.image_url || "");
-
-        // Create Visual Card
-        const card = document.createElement("div");
-        card.className = "candidate-card" + (isWinner ? " winner" : "");
-        card.innerHTML = `
+          // Create Visual Card
+          const card = document.createElement("div");
+          card.className = "candidate-card" + (isWinner ? " winner" : "");
+          card.innerHTML = `
           <div class="candidate-thumb-box">
             <span class="candidate-rank-badge mono">#${c.rank}</span>
             <span class="candidate-status-tag ${statusClass}">${c.status}</span>
@@ -1919,12 +2013,12 @@ contract FaceVerificationRegistry {
             </div>
           </div>
         `;
-        grid.appendChild(card);
+          grid.appendChild(card);
 
-        // Populate Table Row
-        const tr = document.createElement("tr");
-        if (isWinner) tr.className = "winner-row";
-        tr.innerHTML = `
+          // Populate Table Row
+          const tr = document.createElement("tr");
+          if (isWinner) tr.className = "winner-row";
+          tr.innerHTML = `
           <td>#${c.rank}</td>
           <td>${c.domain}</td>
           <td class="truncate" style="max-width: 280px;" title="${c.title}">${c.title}</td>
@@ -1932,337 +2026,337 @@ contract FaceVerificationRegistry {
           <td><span class="candidate-status-tag ${statusClass}" style="position: static;">${c.status}</span></td>
           <td><a href="${c.page_url}" target="_blank" rel="noopener noreferrer" class="candidate-domain-link">VIEW</a></td>
         `;
-        tbody.appendChild(tr);
-      });
-    } else {
-      grid.innerHTML = `
+          tbody.appendChild(tr);
+        });
+      } else {
+        grid.innerHTML = `
         <div class="mono" style="grid-column: 1 / -1; padding: 36px 0; text-align: center; color: var(--text-muted);">
           No candidate images cleared the acceptance threshold.
         </div>
       `;
-      tbody.innerHTML = `
+        tbody.innerHTML = `
         <tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">No candidate images cleared threshold.</td></tr>
       `;
+      }
+
+      // 3. Attestation Record
+      if (profile.attestation) {
+        document.getElementById("valContentSha").textContent = profile.attestation.content_hash || "—";
+        document.getElementById("valRecordSha").textContent = profile.attestation.record_hash || "—";
+        document.getElementById("valTxHash").textContent = profile.attestation.tx_hash || "—";
+        document.getElementById("valBlockSubmitter").textContent = `Block #${profile.attestation.block_number} (${profile.attestation.submitter.substring(0, 10)}...)`;
+      } else {
+        document.getElementById("valContentSha").textContent = "NOT ATTESTED";
+        document.getElementById("valRecordSha").textContent = "NOT ATTESTED";
+        document.getElementById("valTxHash").textContent = "—";
+        document.getElementById("valBlockSubmitter").textContent = "—";
+      }
+
+      if (profile.canonical_record) {
+        document.getElementById("canonicalJsonBox").textContent = JSON.stringify(profile.canonical_record, null, 2);
+      } else {
+        document.getElementById("canonicalJsonBox").textContent = "// No canonical record generated for this face.";
+      }
     }
 
-    // 3. Attestation Record
-    if (profile.attestation) {
-      document.getElementById("valContentSha").textContent = profile.attestation.content_hash || "—";
-      document.getElementById("valRecordSha").textContent = profile.attestation.record_hash || "—";
-      document.getElementById("valTxHash").textContent = profile.attestation.tx_hash || "—";
-      document.getElementById("valBlockSubmitter").textContent = `Block #${profile.attestation.block_number} (${profile.attestation.submitter.substring(0, 10)}...)`;
-    } else {
-      document.getElementById("valContentSha").textContent = "NOT ATTESTED";
-      document.getElementById("valRecordSha").textContent = "NOT ATTESTED";
-      document.getElementById("valTxHash").textContent = "—";
-      document.getElementById("valBlockSubmitter").textContent = "—";
-    }
+    // View Mode Switcher (Gallery vs Table)
+    const viewModeGridBtn = document.getElementById("viewModeGridBtn");
+    const viewModeTableBtn = document.getElementById("viewModeTableBtn");
+    const galleryContainer = document.getElementById("galleryContainer");
 
-    if (profile.canonical_record) {
-      document.getElementById("canonicalJsonBox").textContent = JSON.stringify(profile.canonical_record, null, 2);
-    } else {
-      document.getElementById("canonicalJsonBox").textContent = "// No canonical record generated for this face.";
-    }
-  }
-
-  // View Mode Switcher (Gallery vs Table)
-  const viewModeGridBtn = document.getElementById("viewModeGridBtn");
-  const viewModeTableBtn = document.getElementById("viewModeTableBtn");
-  const galleryContainer = document.getElementById("galleryContainer");
-
-  viewModeGridBtn.addEventListener("click", () => {
-    viewModeGridBtn.classList.add("active");
-    viewModeTableBtn.classList.remove("active");
-    galleryContainer.classList.remove("table-view-active");
-  });
-
-  viewModeTableBtn.addEventListener("click", () => {
-    viewModeTableBtn.classList.add("active");
-    viewModeGridBtn.classList.remove("active");
-    galleryContainer.classList.add("table-view-active");
-  });
-
-  // Drawer Tabs
-  document.querySelectorAll(".drawer-tab").forEach(tab => {
-    tab.addEventListener("click", () => {
-      document.querySelectorAll(".drawer-tab").forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-
-      const tabId = tab.getAttribute("data-tab");
-      document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
-      document.getElementById(tabId).classList.add("active");
+    viewModeGridBtn.addEventListener("click", () => {
+      viewModeGridBtn.classList.add("active");
+      viewModeTableBtn.classList.remove("active");
+      galleryContainer.classList.remove("table-view-active");
     });
-  });
 
-  // Copy JSON Button
-  document.getElementById("copyRecordBtn").addEventListener("click", () => {
-    const text = document.getElementById("canonicalJsonBox").textContent;
-    navigator.clipboard.writeText(text).then(() => {
-      alert("Canonical RFC-8785 JSON copied to clipboard!");
+    viewModeTableBtn.addEventListener("click", () => {
+      viewModeTableBtn.classList.add("active");
+      viewModeGridBtn.classList.remove("active");
+      galleryContainer.classList.add("table-view-active");
     });
-  });
 
-  // Standalone Re-verification Button Handler
-  const reverifyBtn = document.getElementById("reverifyBtn");
-  const reverifyResultChip = document.getElementById("reverifyResultChip");
+    // Drawer Tabs
+    document.querySelectorAll(".drawer-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".drawer-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
 
-  reverifyBtn.addEventListener("click", async () => {
-    reverifyBtn.disabled = true;
-    reverifyBtn.innerHTML = `<span class="mono">VERIFYING WITH ON-CHAIN VAULT...</span>`;
-    reverifyResultChip.style.display = "none";
-    appendLog(new Date().toLocaleTimeString(), `--- Initiating Standalone Re-Verification against On-Chain Evidence Vault ---`);
-
-    try {
-      const res = await fetch("/api/reverify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ run_id: currentRunId }),
+        const tabId = tab.getAttribute("data-tab");
+        document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+        document.getElementById(tabId).classList.add("active");
       });
-      const report = await res.json();
-      displayReverifyResult(report);
-    } catch (err) {
-      appendLog(new Date().toLocaleTimeString(), `Re-verification request error: ${err.message}`);
-      reverifyResultChip.style.display = "inline-block";
-      reverifyResultChip.style.backgroundColor = "var(--status-danger-bg)";
-      reverifyResultChip.style.color = "var(--status-danger-text)";
-      reverifyResultChip.textContent = "VERIFICATION ERROR";
-    } finally {
-      reverifyBtn.disabled = false;
-      reverifyBtn.innerHTML = `
+    });
+
+    // Copy JSON Button
+    document.getElementById("copyRecordBtn").addEventListener("click", () => {
+      const text = document.getElementById("canonicalJsonBox").textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Canonical RFC-8785 JSON copied to clipboard!");
+      });
+    });
+
+    // Standalone Re-verification Button Handler
+    const reverifyBtn = document.getElementById("reverifyBtn");
+    const reverifyResultChip = document.getElementById("reverifyResultChip");
+
+    reverifyBtn.addEventListener("click", async () => {
+      reverifyBtn.disabled = true;
+      reverifyBtn.innerHTML = `<span class="mono">VERIFYING WITH ON-CHAIN VAULT...</span>`;
+      reverifyResultChip.style.display = "none";
+      appendLog(new Date().toLocaleTimeString(), `--- Initiating Standalone Re-Verification against On-Chain Evidence Vault ---`);
+
+      try {
+        const res = await fetch("/api/reverify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ run_id: currentRunId }),
+        });
+        const report = await res.json();
+        displayReverifyResult(report);
+      } catch (err) {
+        appendLog(new Date().toLocaleTimeString(), `Re-verification request error: ${err.message}`);
+        reverifyResultChip.style.display = "inline-block";
+        reverifyResultChip.style.backgroundColor = "var(--status-danger-bg)";
+        reverifyResultChip.style.color = "var(--status-danger-text)";
+        reverifyResultChip.textContent = "VERIFICATION ERROR";
+      } finally {
+        reverifyBtn.disabled = false;
+        reverifyBtn.innerHTML = `
         <svg class="nav-icon" style="width: 12px; height: 12px;" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
         <span>RE-VERIFY ON-CHAIN INTEGRITY</span>
       `;
-    }
-  });
-
-  function displayReverifyResult(report) {
-    reverifyResultChip.style.display = "inline-block";
-    if (report.verified) {
-      reverifyResultChip.style.backgroundColor = "var(--status-success-bg)";
-      reverifyResultChip.style.border = "1px solid var(--status-success-border)";
-      reverifyResultChip.style.color = "var(--status-success-text)";
-      reverifyResultChip.textContent = "✓ ON-CHAIN INTEGRITY VERIFIED (HASHES MATCH)";
-      appendLog(new Date().toLocaleTimeString(), `[AUDIT SUCCESS] Evidence bundle verified against ${report.network || "Ethereum Sepolia"}. Metadata SHA: MATCH. Image SHA: MATCH.`);
-    } else {
-      reverifyResultChip.style.backgroundColor = "var(--status-danger-bg)";
-      reverifyResultChip.style.border = "1px solid var(--status-danger-border)";
-      reverifyResultChip.style.color = "var(--status-danger-text)";
-      reverifyResultChip.textContent = "✗ TAMPER DETECTED — EXIT CODE 6 (HASH MISMATCH)";
-      appendLog(new Date().toLocaleTimeString(), `[AUDIT ALERT] CRYPTOGRAPHIC TAMPER DETECTED! Local evidence diverges from on-chain anchor.`);
-    }
-  }
-
-  // Stepper Reset
-  function resetStepper() {
-    for (let i = 1; i <= 8; i++) {
-      const bar = document.getElementById("bar" + i);
-      bar.className = "stepper-bar";
-    }
-    document.getElementById("stepperStatusText").textContent = "Initializing pipeline...";
-  }
-
-  function updateStep(stepNum, status, details) {
-    const bar = document.getElementById("bar" + stepNum);
-    if (!bar) return;
-    if (status === "running") {
-      bar.className = "stepper-bar running";
-      document.getElementById("stepperStatusText").textContent = `Step ${stepNum}/8: ${details}`;
-    } else if (status === "completed") {
-      bar.className = "stepper-bar done";
-    } else if (status === "failed") {
-      bar.className = "stepper-bar fail";
-      document.getElementById("stepperStatusText").textContent = `Step ${stepNum}/8 FAILED: ${details}`;
-    }
-    if (details) {
-      appendLog(new Date().toLocaleTimeString(), `[Step ${stepNum}/8] ${details}`);
-    }
-  }
-
-  function appendLog(timeStr, message) {
-    const line = `[${timeStr}] ${message}\n`;
-    terminalLogBox.textContent += line;
-    terminalLogBox.scrollTop = terminalLogBox.scrollHeight;
-  }
-
-  // WebSocket Connection
-  function connectWs() {
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
-
-    ws.onopen = () => {
-      if (!activeUploadId) {
-        requestPreview(selectedPreset);
       }
-    };
+    });
 
-    ws.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
+    function displayReverifyResult(report) {
+      reverifyResultChip.style.display = "inline-block";
+      if (report.verified) {
+        reverifyResultChip.style.backgroundColor = "var(--status-success-bg)";
+        reverifyResultChip.style.border = "1px solid var(--status-success-border)";
+        reverifyResultChip.style.color = "var(--status-success-text)";
+        reverifyResultChip.textContent = "✓ ON-CHAIN INTEGRITY VERIFIED (HASHES MATCH)";
+        appendLog(new Date().toLocaleTimeString(), `[AUDIT SUCCESS] Evidence bundle verified against ${report.network || "Ethereum Sepolia"}. Metadata SHA: MATCH. Image SHA: MATCH.`);
+      } else {
+        reverifyResultChip.style.backgroundColor = "var(--status-danger-bg)";
+        reverifyResultChip.style.border = "1px solid var(--status-danger-border)";
+        reverifyResultChip.style.color = "var(--status-danger-text)";
+        reverifyResultChip.textContent = "✗ TAMPER DETECTED — EXIT CODE 6 (HASH MISMATCH)";
+        appendLog(new Date().toLocaleTimeString(), `[AUDIT ALERT] CRYPTOGRAPHIC TAMPER DETECTED! Local evidence diverges from on-chain anchor.`);
+      }
+    }
 
-      if (msg.type === "preview_ready") {
+    // Stepper Reset
+    function resetStepper() {
+      for (let i = 1; i <= 8; i++) {
+        const bar = document.getElementById("bar" + i);
+        bar.className = "stepper-bar";
+      }
+      document.getElementById("stepperStatusText").textContent = "Initializing pipeline...";
+    }
+
+    function updateStep(stepNum, status, details) {
+      const bar = document.getElementById("bar" + stepNum);
+      if (!bar) return;
+      if (status === "running") {
+        bar.className = "stepper-bar running";
+        document.getElementById("stepperStatusText").textContent = `Step ${stepNum}/8: ${details}`;
+      } else if (status === "completed") {
+        bar.className = "stepper-bar done";
+      } else if (status === "failed") {
+        bar.className = "stepper-bar fail";
+        document.getElementById("stepperStatusText").textContent = `Step ${stepNum}/8 FAILED: ${details}`;
+      }
+      if (details) {
+        appendLog(new Date().toLocaleTimeString(), `[Step ${stepNum}/8] ${details}`);
+      }
+    }
+
+    function appendLog(timeStr, message) {
+      const line = `[${timeStr}] ${message}\n`;
+      terminalLogBox.textContent += line;
+      terminalLogBox.scrollTop = terminalLogBox.scrollHeight;
+    }
+
+    // WebSocket Connection
+    function connectWs() {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+
+      ws.onopen = () => {
         if (!activeUploadId) {
-          updateProbeProfile(msg.image_b64, msg.primary_face, msg.embedding_sample, msg.faces_count, "PRESET: " + msg.preset.split("_")[0], msg.all_faces);
+          requestPreview(selectedPreset);
         }
-      } else if (msg.type === "step_update") {
-        updateStep(msg.step, msg.status, msg.details);
-      } else if (msg.type === "run_complete") {
-        if (!currentDetectedFaces || currentDetectedFaces.length === 0 || msg.run_id === "rejected_no_face") {
-          runPipelineBtn.disabled = true;
-          runPipelineBtn.innerHTML = `
+      };
+
+      ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+
+        if (msg.type === "preview_ready") {
+          if (!activeUploadId) {
+            updateProbeProfile(msg.image_b64, msg.primary_face, msg.embedding_sample, msg.faces_count, "PRESET: " + msg.preset.split("_")[0], msg.all_faces);
+          }
+        } else if (msg.type === "step_update") {
+          updateStep(msg.step, msg.status, msg.details);
+        } else if (msg.type === "run_complete") {
+          if (!currentDetectedFaces || currentDetectedFaces.length === 0 || msg.run_id === "rejected_no_face") {
+            runPipelineBtn.disabled = true;
+            runPipelineBtn.innerHTML = `
             <svg class="nav-icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
             <span id="runBtnLabel">REJECTED: NO FACE DETECTED</span>
           `;
-        } else {
-          runPipelineBtn.disabled = false;
-          runPipelineBtn.innerHTML = `
+          } else {
+            runPipelineBtn.disabled = false;
+            runPipelineBtn.innerHTML = `
             <svg class="nav-icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
             <span id="runBtnLabel">EXECUTE IDENTIFICATION</span>
           `;
+          }
+          handleRunComplete(msg);
+        } else if (msg.type === "error") {
+          runPipelineBtn.disabled = false;
+          alert("Pipeline error: " + msg.message);
+          appendLog(new Date().toLocaleTimeString(), `ERROR: ${msg.message}`);
         }
-        handleRunComplete(msg);
-      } else if (msg.type === "error") {
-        runPipelineBtn.disabled = false;
-        alert("Pipeline error: " + msg.message);
-        appendLog(new Date().toLocaleTimeString(), `ERROR: ${msg.message}`);
-      }
-    };
-  }
-
-  function requestPreview(preset) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ action: "preview", preset }));
-    }
-  }
-
-  // Run Pipeline Execution
-  runPipelineBtn.addEventListener("click", () => {
-    if (!activeUploadId && !selectedPreset) {
-      alert("Please select a portrait preset or upload an image first.");
-      return;
-    }
-
-    if (!currentDetectedFaces || currentDetectedFaces.length === 0) {
-      alert("Pipeline execution rejected: No human face detected in probe image.");
-      return;
-    }
-
-    resetStepper();
-    runPipelineBtn.disabled = true;
-    runPipelineBtn.textContent = "EXECUTING PIPELINE...";
-
-    const similarityThreshold = parseFloat(thresholdSlider.value) || 0.80;
-    const tamper = tamperToggle.checked;
-    const engine = engineSelect.value;
-
-    const banner = document.getElementById("verdictCard");
-    banner.className = "verdict-card";
-    document.getElementById("verdictTitleText").textContent = "INVESTIGATION IN PROGRESS...";
-    document.getElementById("verdictSubtitle").textContent = "Executing face detection, ArcFace embedding, web discovery, and on-chain attestation...";
-    document.getElementById("verdictMetricBadge").textContent = "RUNNING";
-
-    const payload = {
-      action: "run",
-      upload_id: activeUploadId,
-      preset: activeUploadId ? null : selectedPreset,
-      similarity_threshold: similarityThreshold,
-      tamper: tamper,
-      dry_run: false,
-      engine: engine,
-      face_index: selectedFaceIdx,
-    };
-
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(payload));
-      appendLog(new Date().toLocaleTimeString(), `--- Initiating Run: Target=${activeUploadId || selectedPreset} (Threshold: ${similarityThreshold}, Tamper: ${tamper}) ---`);
-    }
-  });
-
-  // Handle Run Complete
-  function handleRunComplete(data) {
-    runResultsData = data;
-    currentRunId = data.run_id;
-
-    if (currentRunId && currentRunId !== "rejected_no_face") {
-      downloadLedgerTopBtn.style.display = "inline-flex";
-      downloadLedgerTopBtn.onclick = () => {
-        window.location.href = `/api/ledger/${currentRunId}`;
       };
     }
 
-    const banner = document.getElementById("verdictCard");
-    const vTitle = document.getElementById("verdictTitleText");
-    const vSub = document.getElementById("verdictSubtitle");
-    const vBadge = document.getElementById("verdictMetricBadge");
-
-    if (data.run_id === "rejected_no_face" || (data.success === false && data.status_message && data.status_message.includes("REJECTED"))) {
-      banner.className = "verdict-card tampered";
-      vTitle.textContent = "PIPELINE REJECTED: NO FACE DETECTED";
-      vSub.textContent = data.status_message || "Probe image contains zero detected human faces. Pipeline execution halted.";
-      vBadge.textContent = "REJECTED";
-      runPipelineBtn.disabled = true;
-      runPipelineBtn.innerHTML = `
-        <svg class="nav-icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-        <span id="runBtnLabel">REJECTED: NO FACE DETECTED</span>
-      `;
-      appendLog(new Date().toLocaleTimeString(), `REJECTED: ${data.status_message}`);
-      return;
+    function requestPreview(preset) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: "preview", preset }));
+      }
     }
 
-    const totalFaces = (data.faces_results || []).length;
-    const attestedCount = (data.faces_results || []).filter(p => p.attestation !== null).length;
-
-    if (data.tamper_mode_active) {
-      banner.className = "verdict-card tampered";
-      vTitle.textContent = "CRYPTOGRAPHIC TAMPER DETECTED";
-      vSub.textContent = "Mutated off-chain payload failed on-chain SHA-256 integrity validation.";
-      vBadge.textContent = "TAMPER DETECTED";
-    } else if (attestedCount === totalFaces && totalFaces > 0) {
-      banner.className = "verdict-card verified";
-      vTitle.textContent = totalFaces > 1 ? `VERIFIED — ${totalFaces} OF ${totalFaces} PERSONS IDENTIFIED & ATTESTED` : "VERIFIED — IMMUTABLE CRYPTOGRAPHIC MATCH";
-      vSub.textContent = `All detected persons verified on Ethereum Sepolia. Elapsed runtime: ${data.elapsed_seconds}s.`;
-      vBadge.textContent = "100% VERIFIED";
-    } else if (attestedCount > 0) {
-      banner.className = "verdict-card verified";
-      vTitle.textContent = `PARTIAL MATCH — ${attestedCount} OF ${totalFaces} ATTESTED`;
-      vSub.textContent = `${attestedCount} detected subject(s) cleared biometric threshold and attested.`;
-      vBadge.textContent = "PARTIAL VERIFIED";
-    } else {
-      banner.className = "verdict-card";
-      vTitle.textContent = "NO BIOMETRIC MATCH CLEARED THRESHOLD";
-      vSub.textContent = `Evaluated ${data.candidates_discovered || 0} discovered web candidates across search indexes.`;
-      vBadge.textContent = "NO MATCH";
-    }
-
-    if (data.faces_results && data.faces_results.length > 0) {
-      currentDetectedFaces = data.faces_results;
-      const targetFace = data.faces_results.find(p => p.face_index === selectedFaceIdx) || data.faces_results[0];
-      selectedFaceIdx = targetFace.face_index;
-      renderPeopleChips(data.faces_results, selectedFaceIdx);
-      selectPerson(selectedFaceIdx);
-    }
-  }
-
-  // Fetch Historical Runs for Audit Ledger Screen
-  async function fetchLedgerRuns() {
-    const tbody = document.getElementById("ledgerRunsBody");
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Fetching runs...</td></tr>`;
-
-    try {
-      const res = await fetch("/api/runs");
-      const data = await res.json();
-      const runs = data.runs || [];
-      tbody.innerHTML = "";
-
-      if (runs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">No runs recorded yet.</td></tr>`;
+    // Run Pipeline Execution
+    runPipelineBtn.addEventListener("click", () => {
+      if (!activeUploadId && !selectedPreset) {
+        alert("Please select a portrait preset or upload an image first.");
         return;
       }
 
-      runs.forEach(r => {
-        const tr = document.createElement("tr");
-        const statusText = r.re_verification_passed ? "VERIFIED" : (r.tamper_mode ? "TAMPERED" : "UNCONFIRMED");
-        const statusClass = r.re_verification_passed ? "match" : (r.tamper_mode ? "reject" : "runner");
+      if (!currentDetectedFaces || currentDetectedFaces.length === 0) {
+        alert("Pipeline execution rejected: No human face detected in probe image.");
+        return;
+      }
 
-        tr.innerHTML = `
+      resetStepper();
+      runPipelineBtn.disabled = true;
+      runPipelineBtn.textContent = "EXECUTING PIPELINE...";
+
+      const similarityThreshold = parseFloat(thresholdSlider.value) || 0.80;
+      const tamper = tamperToggle.checked;
+      const engine = engineSelect.value;
+
+      const banner = document.getElementById("verdictCard");
+      banner.className = "verdict-card";
+      document.getElementById("verdictTitleText").textContent = "INVESTIGATION IN PROGRESS...";
+      document.getElementById("verdictSubtitle").textContent = "Executing face detection, ArcFace embedding, web discovery, and on-chain attestation...";
+      document.getElementById("verdictMetricBadge").textContent = "RUNNING";
+
+      const payload = {
+        action: "run",
+        upload_id: activeUploadId,
+        preset: activeUploadId ? null : selectedPreset,
+        similarity_threshold: similarityThreshold,
+        tamper: tamper,
+        dry_run: false,
+        engine: engine,
+        face_index: selectedFaceIdx,
+      };
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(payload));
+        appendLog(new Date().toLocaleTimeString(), `--- Initiating Run: Target=${activeUploadId || selectedPreset} (Threshold: ${similarityThreshold}, Tamper: ${tamper}) ---`);
+      }
+    });
+
+    // Handle Run Complete
+    function handleRunComplete(data) {
+      runResultsData = data;
+      currentRunId = data.run_id;
+
+      if (currentRunId && currentRunId !== "rejected_no_face") {
+        downloadLedgerTopBtn.style.display = "inline-flex";
+        downloadLedgerTopBtn.onclick = () => {
+          window.location.href = `/api/ledger/${currentRunId}`;
+        };
+      }
+
+      const banner = document.getElementById("verdictCard");
+      const vTitle = document.getElementById("verdictTitleText");
+      const vSub = document.getElementById("verdictSubtitle");
+      const vBadge = document.getElementById("verdictMetricBadge");
+
+      if (data.run_id === "rejected_no_face" || (data.success === false && data.status_message && data.status_message.includes("REJECTED"))) {
+        banner.className = "verdict-card tampered";
+        vTitle.textContent = "PIPELINE REJECTED: NO FACE DETECTED";
+        vSub.textContent = data.status_message || "Probe image contains zero detected human faces. Pipeline execution halted.";
+        vBadge.textContent = "REJECTED";
+        runPipelineBtn.disabled = true;
+        runPipelineBtn.innerHTML = `
+        <svg class="nav-icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        <span id="runBtnLabel">REJECTED: NO FACE DETECTED</span>
+      `;
+        appendLog(new Date().toLocaleTimeString(), `REJECTED: ${data.status_message}`);
+        return;
+      }
+
+      const totalFaces = (data.faces_results || []).length;
+      const attestedCount = (data.faces_results || []).filter(p => p.attestation !== null).length;
+
+      if (data.tamper_mode_active) {
+        banner.className = "verdict-card tampered";
+        vTitle.textContent = "CRYPTOGRAPHIC TAMPER DETECTED";
+        vSub.textContent = "Mutated off-chain payload failed on-chain SHA-256 integrity validation.";
+        vBadge.textContent = "TAMPER DETECTED";
+      } else if (attestedCount === totalFaces && totalFaces > 0) {
+        banner.className = "verdict-card verified";
+        vTitle.textContent = totalFaces > 1 ? `VERIFIED — ${totalFaces} OF ${totalFaces} PERSONS IDENTIFIED & ATTESTED` : "VERIFIED — IMMUTABLE CRYPTOGRAPHIC MATCH";
+        vSub.textContent = `All detected persons verified on Ethereum Sepolia. Elapsed runtime: ${data.elapsed_seconds}s.`;
+        vBadge.textContent = "100% VERIFIED";
+      } else if (attestedCount > 0) {
+        banner.className = "verdict-card verified";
+        vTitle.textContent = `PARTIAL MATCH — ${attestedCount} OF ${totalFaces} ATTESTED`;
+        vSub.textContent = `${attestedCount} detected subject(s) cleared biometric threshold and attested.`;
+        vBadge.textContent = "PARTIAL VERIFIED";
+      } else {
+        banner.className = "verdict-card";
+        vTitle.textContent = "NO BIOMETRIC MATCH CLEARED THRESHOLD";
+        vSub.textContent = `Evaluated ${data.candidates_discovered || 0} discovered web candidates across search indexes.`;
+        vBadge.textContent = "NO MATCH";
+      }
+
+      if (data.faces_results && data.faces_results.length > 0) {
+        currentDetectedFaces = data.faces_results;
+        const targetFace = data.faces_results.find(p => p.face_index === selectedFaceIdx) || data.faces_results[0];
+        selectedFaceIdx = targetFace.face_index;
+        renderPeopleChips(data.faces_results, selectedFaceIdx);
+        selectPerson(selectedFaceIdx);
+      }
+    }
+
+    // Fetch Historical Runs for Audit Ledger Screen
+    async function fetchLedgerRuns() {
+      const tbody = document.getElementById("ledgerRunsBody");
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Fetching runs...</td></tr>`;
+
+      try {
+        const res = await fetch("/api/runs");
+        const data = await res.json();
+        const runs = data.runs || [];
+        tbody.innerHTML = "";
+
+        if (runs.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">No runs recorded yet.</td></tr>`;
+          return;
+        }
+
+        runs.forEach(r => {
+          const tr = document.createElement("tr");
+          const statusText = r.re_verification_passed ? "VERIFIED" : (r.tamper_mode ? "TAMPERED" : "UNCONFIRMED");
+          const statusClass = r.re_verification_passed ? "match" : (r.tamper_mode ? "reject" : "runner");
+
+          tr.innerHTML = `
           <td class="mono font-bold">${r.run_id}</td>
           <td class="mono" style="font-size: 11px;">${new Date(r.timestamp).toLocaleString()}</td>
           <td>${r.identified_name}</td>
@@ -2270,26 +2364,27 @@ contract FaceVerificationRegistry {
           <td><span class="candidate-status-tag ${statusClass}" style="position: static;">${statusText}</span></td>
           <td><a href="/api/ledger/${r.run_id}" class="btn-secondary mono" style="padding: 2px 8px; font-size: 10px;">JSON</a></td>
         `;
-        tbody.appendChild(tr);
-      });
-    } catch (e) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--status-danger-text);">Failed to load runs: ${e.message}</td></tr>`;
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--status-danger-text);">Failed to load runs: ${e.message}</td></tr>`;
+      }
     }
-  }
 
-  // Reset Button
-  resetAppBtn.addEventListener("click", () => {
-    clearUpload();
-    segPresetsBtn.click();
-    document.querySelector(".preset-card").click();
-    resetStepper();
-    document.getElementById("terminalLogBox").textContent = "[--:--:--] System initialized. Ready to execute pipeline.\n";
-  });
+    // Reset Button
+    resetAppBtn.addEventListener("click", () => {
+      clearUpload();
+      segPresetsBtn.click();
+      document.querySelector(".preset-card").click();
+      resetStepper();
+      document.getElementById("terminalLogBox").textContent = "[--:--:--] System initialized. Ready to execute pipeline.\n";
+    });
 
-  // Initialize
-  resetInvestigationWorkspace();
-  connectWs();
-</script>
+    // Initialize
+    resetInvestigationWorkspace();
+    connectWs();
+  </script>
 
 </body>
+
 </html>

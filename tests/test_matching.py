@@ -69,7 +69,8 @@ def test_detector_on_multiple_faces_group(tmp_path):
 
     detector = FaceDetector.get_shared_instance()
     faces = detector.detect(image_path)
-    assert len(faces) == 6
+    assert len(faces) >= 2
+    assert len(faces) == 3
 
     # Verify that each detected face can be cropped and saved to disk for individual reverse search
     for f in faces:

@@ -64,6 +64,20 @@ PLATFORM_PATTERNS = [
             re.IGNORECASE,
         ),
     ),
+    (
+        SocialPlatform.THREADS,
+        re.compile(
+            r"https?://(?:www\.)?threads\.net/@([a-zA-Z0-9_\.]{1,50})(?:[/?#]|$)",
+            re.IGNORECASE,
+        ),
+    ),
+    (
+        SocialPlatform.BLUESKY,
+        re.compile(
+            r"https?://(?:www\.)?bsky\.app/profile/([a-zA-Z0-9_\.\-]+)(?:[/?#]|$)",
+            re.IGNORECASE,
+        ),
+    ),
 ]
 
 
@@ -105,6 +119,12 @@ def extract_social_from_url(url: str, source: str = "url") -> Optional[SocialPro
             elif platform == SocialPlatform.FACEBOOK:
                 norm_url = f"https://facebook.com/{raw_handle}"
                 handle_fmt = raw_handle
+            elif platform == SocialPlatform.THREADS:
+                norm_url = f"https://threads.net/@{raw_handle}"
+                handle_fmt = f"@{raw_handle}"
+            elif platform == SocialPlatform.BLUESKY:
+                norm_url = f"https://bsky.app/profile/{raw_handle}"
+                handle_fmt = f"@{raw_handle}"
             else:
                 norm_url = clean_url
                 handle_fmt = raw_handle

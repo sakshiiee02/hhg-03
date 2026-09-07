@@ -4,7 +4,7 @@ Data models and contracts for social media profile resolution.
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 
 class SocialPlatform(str, Enum):
@@ -16,6 +16,8 @@ class SocialPlatform(str, Enum):
     WIKIPEDIA = "wikipedia"
     YOUTUBE = "youtube"
     FACEBOOK = "facebook"
+    THREADS = "threads"
+    BLUESKY = "bluesky"
     WEBSITE = "website"
 
 
@@ -27,6 +29,8 @@ PLATFORM_DISPLAY_NAMES = {
     SocialPlatform.WIKIPEDIA: "Wikipedia",
     SocialPlatform.YOUTUBE: "YouTube",
     SocialPlatform.FACEBOOK: "Facebook",
+    SocialPlatform.THREADS: "Threads",
+    SocialPlatform.BLUESKY: "Bluesky",
     SocialPlatform.WEBSITE: "Official Website",
 }
 
@@ -39,12 +43,14 @@ class SocialProfile:
     url: str
     source: str = "wikidata"  # "wikidata", "candidate_dom", "search"
     verified: bool = True
+    extracted_title: Optional[str] = None
+    verification_reason: Optional[str] = None
 
     @property
     def display_name(self) -> str:
         return PLATFORM_DISPLAY_NAMES.get(self.platform, self.platform.value.upper())
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> Dict[str, Any]:
         return {
             "platform": self.platform.value,
             "platform_label": self.display_name,
@@ -52,6 +58,8 @@ class SocialProfile:
             "url": self.url,
             "source": self.source,
             "verified": self.verified,
+            "extracted_title": self.extracted_title,
+            "verification_reason": self.verification_reason,
         }
 
 
