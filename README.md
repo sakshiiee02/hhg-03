@@ -65,13 +65,14 @@ Aegis executes an 8-stage asynchronous pipeline coordinating local GPU neural in
                        • Parallel Overlapping of Network I/O & GPU
                        • Confident Early Stopping (Cosine >= 0.92)
                                        │
-                                       ▼
-                       [6/8] Match Selection & Attribution
-                       • Multi-Face Resolution & Ranking
-                       • Automated Social Media Discovery Engine
-                       • Wikidata Entity & Anchor Extraction
-                       • Verified Platform Badges (X, LinkedIn, Wiki, GitHub)
-                                       │
+                                        ▼
+                        [6/8] Match Selection & Attribution
+                        • Multi-Face Resolution & Ranking
+                        • Automated Social Media Discovery Engine
+                        • 3-Tier Hybrid Verification (Wikidata + Meta + Handle)
+                        • Publisher Blacklist Filter (TechCrunch, Forbes, etc.)
+                        • Verified Badges (X, LinkedIn, Threads, Bluesky, Wiki, GitHub)
+                                        │
                                        ▼
                        [7/8] Cryptographic Attestation
                        • RFC-8785 Deterministic Canonical JSON
@@ -125,14 +126,26 @@ Aegis executes an 8-stage asynchronous pipeline coordinating local GPU neural in
 - **Confident Early Stopping**: If a candidate achieves $\text{cosine} \ge 0.96$ or ($\text{cosine} \ge 0.92$ with runner-up margin $\ge 0.15$), the orchestrator cancels remaining in-flight downloads immediately, cutting real-world runtime from 34.3s to **19.8s**.
 
 ### 2.5 Automated Social Media & Identity Attribution Engine
-- **Live Entity Resolution**: Discovers genuine subject identities from OpenGraph metadata, page titles, URL slugs, and Wikidata claim graphs without hardcoding hints.
-- **Verified Platform Badges**: Automatically resolves authentic profile URLs across 6 major platforms:
+- **Live Entity Resolution**: Discovers genuine subject identities from OpenGraph metadata, page titles, URL slugs, and Wikidata claim graphs without hardcoded hints.
+- **Strict Name-Matching Verification (`src/social/verifier.py`)**: Only candidate social links that explicitly verify against the identified person's canonical name are displayed, completely eliminating false positives (such as news outlet social links or other persons mentioned on the same page).
+- **3-Tier Hybrid Verification Architecture**:
+  - **Tier 1 (Authoritative Wikidata Claims)**: Inherently verified from official Wikidata Q-IDs (`P2002` for X/Twitter, `P6634` for LinkedIn, `P2003` for Instagram, `P2037` for GitHub, `P2397` for YouTube, `P856` for Official Website).
+  - **Tier 2 (Async HTTP Metadata Inspection)**: Concurrently fetches candidate social profile pages with a strict 2.5s timeout, parsing `<title>`, `<meta property="og:title">`, `<meta property="og:description">`, and `<meta name="description">`. Checks for contiguous full-name matches, multi-token matches (first + last name), or first-name matches.
+  - **Tier 3 (Handle-Slug Token Match Fallback)**: For platforms guarded by aggressive login walls (LinkedIn HTTP 999, X/Instagram HTTP 403), verifies whether the handle slug matches the subject's full name (`samaltman`, `jensenhuang`), initials (`saltman`, `jhuang`), or first name (`sama`).
+- **Publisher & Media Brand Blacklist**: Categorically rejects publisher, news outlet, and generic brand accounts (`@techcrunch`, `@forbes`, `@theverge`, `@bloomberg`, `@reuters`, `@wired`, `@cnbc`, `@nytimes`, `@wsj`, etc.) before making outbound network requests.
+- **In-Memory 1-Hour LRU Cache**: Caches verification results for 1 hour to prevent redundant HTTP requests and rate limits.
+- **Supported Identity Platforms**:
   - **X (Twitter)**: `@handle` format
-  - **LinkedIn**: `in/handle` format
+  - **LinkedIn**: `in/handle` personal profiles
+  - **Instagram**: `@handle` profile links
+  - **Threads**: `threads.net/@handle`
+  - **Bluesky**: `bsky.app/profile/handle`
   - **GitHub**: `github.com/handle`
   - **Wikipedia**: Direct biographical article links
-  - **Instagram**: `@handle` profile links
   - **YouTube**: `youtube.com/@channel`
+  - **Facebook**: Verified public pages
+  - **Official Website**: Authoritative personal/corporate portals
+- **Empty-State UI Notice**: If an identity is deduced but candidate links fail name verification, the UI explicitly reports: *"No direct social profiles matching [Person Name] verified"*.
 - **Canonical Binding**: Social media profile links and canonical names are bound immutably into the RFC-8785 canonical record prior to hashing.
 
 ### 2.6 Cryptographic Attestation & Sepolia Smart Contract
@@ -168,7 +181,7 @@ The `examples/` directory contains 4 standardized test archetypes:
 | Preset Name | File | Description | Expected Pipeline Behavior |
 | :--- | :--- | :--- | :--- |
 | **1 · Famous Person** | `sam_altman_portrait.jpg` | Single high-resolution portrait (sharpness 195.8, confidence 0.901). | Passes quality gate; executes full-image search; identifies Sam Altman; resolves verified X, LinkedIn, GitHub, and Wikipedia profiles; attests to Sepolia. |
-| **2 · Multi-Person Group** | `multiple_faces_group.jpg` | Group photograph containing 6 distinct faces. | Detects 6 faces; generates interactive selector chips; executes individual face crop searches ($\ge 250\text{px}$) in parallel; provides distinct results per person. |
+| **2 · Multi-Person Group** | `multiple_faces_group.jpg` | Group photograph containing multiple distinct faces. | Detects all faces; generates interactive selector chips; executes individual face crop searches ($\ge 250\text{px}$) in parallel; provides distinct results per person. |
 | **3 · Low Quality Blur Face** | `low_quality_blur_face.jpg` | High motion blur (Laplacian sharpness score 2.6). | Flags `(LOW QUALITY BLUR)` alert; fails quality gate threshold (35.0). |
 | **4 · No Face Image** | `no_face_landscape.jpg` | Scenery landscape image with 0 human faces. | **Strictly rejected**: Execution button disabled (`REJECTED: NO FACE DETECTED`); WebSocket halts execution; CLI aborts with exit code 1. |
 
@@ -358,18 +371,23 @@ tests/test_matching.py::test_cross_person_matching_discrimination PASSED [ 62%]
 tests/test_multi_engine_search.py::test_round_robin_interleaving_and_deduplication PASSED [ 65%]
 tests/test_multi_engine_search.py::test_search_router_auto_fallback_without_serpapi PASSED [ 68%]
 tests/test_multi_engine_search.py::test_search_router_parallel_with_serpapi PASSED [ 71%]
-tests/test_social_discovery.py::test_extract_social_from_url PASSED      [ 74%]
-tests/test_social_discovery.py::test_extract_socials_from_html PASSED    [ 77%]
-tests/test_social_discovery.py::test_clean_title_candidate PASSED        [ 80%]
-tests/test_social_discovery.py::test_extract_entity_name PASSED          [ 82%]
-tests/test_social_discovery.py::test_extract_entity_name_with_noise_slugs PASSED [ 85%]
-tests/test_social_discovery.py::test_social_discovery_engine_live PASSED [ 88%]
-tests/test_speed_optimizations.py::test_face_detector_module_pruning_and_directml PASSED [ 91%]
-tests/test_speed_optimizations.py::test_direct_cdn_download_priority PASSED [ 94%]
+tests/test_social_discovery.py::test_extract_social_from_url PASSED      [ 65%]
+tests/test_social_discovery.py::test_extract_socials_from_html PASSED    [ 67%]
+tests/test_social_discovery.py::test_clean_title_candidate PASSED        [ 70%]
+tests/test_social_discovery.py::test_extract_entity_name PASSED          [ 72%]
+tests/test_social_discovery.py::test_extract_entity_name_with_noise_slugs PASSED [ 75%]
+tests/test_social_discovery.py::test_social_discovery_engine_live PASSED [ 77%]
+tests/test_social_discovery.py::test_threads_and_bluesky_extraction PASSED [ 80%]
+tests/test_social_discovery.py::test_verifier_publisher_rejection PASSED [ 82%]
+tests/test_social_discovery.py::test_verifier_handle_matching PASSED     [ 85%]
+tests/test_social_discovery.py::test_verifier_metadata_text_matching PASSED [ 87%]
+tests/test_social_discovery.py::test_verifier_end_to_end_filtering PASSED [ 90%]
+tests/test_speed_optimizations.py::test_face_detector_module_pruning_and_directml PASSED [ 92%]
+tests/test_speed_optimizations.py::test_direct_cdn_download_priority PASSED [ 95%]
 tests/test_speed_optimizations.py::test_download_stream_early_cancellation PASSED [ 97%]
 tests/test_speed_optimizations.py::test_confident_early_stop_scoring_logic PASSED [100%]
 
-============================= 35 passed in 8.54s ==============================
+============================= 40 passed in 12.60s =============================
 ```
 
 ### 8.2 Section 17 Biometric Accuracy Benchmark
@@ -418,7 +436,10 @@ hhg-03/
 │   │   └── serpapi.py                  # 2-step official Google Lens, Bing & Reverse engine
 │   ├── social/
 │   │   ├── resolver.py                 # Noise slug filter, title cleaner & entity name extractor
+│   │   ├── verifier.py                 # 3-tier hybrid name verifier, publisher filter & LRU cache
 │   │   ├── wikidata.py                 # Wikidata SPARQL claim graph query engine
+│   │   ├── extractor.py                # Platform regex patterns (X, LinkedIn, Threads, Bluesky, etc.)
+│   │   ├── models.py                   # Data contracts for identities & verified profiles
 │   │   └── engine.py                   # End-to-end multi-platform social discovery engine
 │   ├── web/
 │   │   ├── downloader.py               # Bounded streaming downloader (Direct CDN first)
@@ -434,11 +455,11 @@ hhg-03/
 │       └── index.html                  # Enterprise SaaS UI (Linear design, sticky actions)
 ├── examples/                           # 4 standardized demo images
 │   ├── sam_altman_portrait.jpg         # 1. Famous Person (Sam Altman)
-│   ├── multiple_faces_group.jpg        # 2. Multi-Person Group (6 faces)
+│   ├── multiple_faces_group.jpg        # 2. Multi-Person Group (interactive per-face crops)
 │   ├── low_quality_blur_face.jpg       # 3. Low Quality Blur Face (sharpness 2.6)
 │   └── no_face_landscape.jpg           # 4. No Face Image (0 faces, rejected)
 ├── runs/                               # Immutable run evidence artifacts & audit bundles
-└── tests/                              # Automated test suite (35 tests passing)
+└── tests/                              # Automated test suite (40 tests passing)
 ```
 
 ---
